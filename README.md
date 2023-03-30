@@ -1,1 +1,1 @@
-# ocp4-ma-compute-powervs
+# ocp4-upi-day2-compute-powervs
