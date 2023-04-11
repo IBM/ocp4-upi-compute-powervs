@@ -16,10 +16,10 @@ ignition_file = "data/worker.ign"
 
 rhcos_image_name = "rhcos-4.13"
 
-ignition_hostname=demo.ocp-power.xyz
+ignition_hostname = demo.ocp-power.xyz
 
 # PowerVS configuration
-processor_type = "shared"
-system_type    = "s922"
-network_name   = "ocp-net"
-public_key_name="ex-key"
+processor_type  = "shared"
+system_type     = "s922"
+network_name    = "ocp-net"
+public_key_name = "ex-key"

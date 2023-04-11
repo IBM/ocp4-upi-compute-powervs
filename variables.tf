@@ -47,12 +47,12 @@ variable "worker" {
 }
 
 variable "public_key_name" {
-  type        = string
+  type    = string
   default = "<none>"
 }
 
 variable "ignition_hostname" {
-  type        = string
+  type    = string
   default = "<none>"
 }
 
