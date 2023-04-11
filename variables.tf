@@ -87,7 +87,7 @@ variable "network_name" {
 
 variable "dns_forwarders" {
   type    = string
-  default = "8.8.8.8; 8.8.4.4"
+  default = "8.8.8.8;8.8.4.4"
 }
 
 # The Ignition File 
