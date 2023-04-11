@@ -31,7 +31,7 @@ data "ibm_pi_network" "network" {
 
 data "ibm_pi_image" "worker" {
   count                = 1
-  pi_image_name        = var.rhel_image_name
+  pi_image_name        = var.rhcos_image_name
   pi_cloud_instance_id = var.service_instance_id
 }
 

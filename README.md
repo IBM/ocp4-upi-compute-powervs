@@ -24,11 +24,27 @@ or
 
 ### Init 
 
+```
+❯ terraform init -upgrade
+```
+
 ### Plan
+
+```
+❯ terraform plan -var-file=var.tfvars
+```
 
 ### Apply 
 
+```
+❯ terraform apply -var-file=var.tfvars
+```
+
 ### Destroy
+
+```
+❯ terraform destroy -var-file=var.tfvars
+```
 
 If you have any questions or issues you can create a new [issue here][issues].
 
