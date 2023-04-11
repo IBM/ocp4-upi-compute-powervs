@@ -26,3 +26,4 @@ The automation code uses the following providers:
 - [ ] 1. Add/Provision a DHCP Server for the Service similar to
 [link](https://github.com/openshift/installer/blob/46c35943df50a2bf83de8e0e22a8a9bae0a55bdf/data/data/powervs/cluster/master/vm/main.tf)
 - [ ] 2. Log into the Bastion node and accept the CSR
+- [ ] 3. user Data is limited to 65K (we may need to keep this light...)

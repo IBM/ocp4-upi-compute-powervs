@@ -36,9 +36,6 @@ data "ibm_pi_image" "worker" {
 }
 
 resource "ibm_pi_network" "public_network" {
-  depends_on = [
-    ibm_pi_network.network
-  ]
   pi_network_name      = "${local.name_prefix}-worker-pub-net"
   pi_cloud_instance_id = var.service_instance_id
   pi_network_type      = "pub-vlan"
@@ -46,16 +43,37 @@ resource "ibm_pi_network" "public_network" {
 }
 
 locals {
-  catalog_worker_image = [for x in data.ibm_pi_catalog_images.catalog_images.images : x if x.name == var.rhel_image_name]
+  catalog_worker_image = [for x in data.ibm_pi_catalog_images.catalog_images.images : x if x.name == var.rhcos_image_name]
   worker_image_id      = length(local.catalog_worker_image) == 0 ? data.ibm_pi_image.worker[0].id : local.catalog_worker_image[0].image_id
   worker_storage_pool  = length(local.catalog_worker_image) == 0 ? data.ibm_pi_image.worker[0].storage_pool : local.catalog_worker_image[0].storage_pool
+}
+
+# Build the ignition file so it points back to the control plane
+data "ignition_file" "w_hostname" {
+  count     = var.worker["count"]
+  overwrite = true
+  mode      = "420" // 0644
+  path      = "/etc/hostname"
+  content {
+    content = <<EOF
+worker-${count.index}.ocp-power.xyz
+EOF
+  }
+}
+
+data "ignition_config" "worker" {
+  count = var.worker["count"]
+  merge {
+    source = "http://${var.ignition_hostname}:22624/config/worker"
+  }
+  files = [data.ignition_file.w_hostname[count.index].rendered]
 }
 
 # Modeled off the OpenShift Installer work for IPI PowerVS
 # https://github.com/openshift/installer/blob/master/data/data/powervs/bootstrap/vm/main.tf#L41
 # https://github.com/openshift/installer/blob/master/data/data/powervs/cluster/master/vm/main.tf
 resource "ibm_pi_instance" "worker" {
-  count = var.worker
+  count = var.worker["count"]
 
   pi_memory        = var.worker["memory"]
   pi_processors    = var.worker["processors"]
@@ -66,7 +84,7 @@ resource "ibm_pi_instance" "worker" {
   pi_sys_type  = var.system_type
 
   pi_cloud_instance_id = var.service_instance_id
-  #  pi_storage_pool      = local.worker_storage_pool
+  pi_storage_pool      = local.worker_storage_pool
 
   pi_network {
     network_id = ibm_pi_network.public_network.network_id
@@ -75,10 +93,10 @@ resource "ibm_pi_instance" "worker" {
     network_id = data.ibm_pi_network.network.id
   }
 
-  pi_key_pair_name = var.ssh_key_id
+  pi_key_pair_name = var.public_key_name
   pi_health_status = "WARNING"
 
-  pi_user_data = base64encode(file(var.ignition_file))
+  pi_user_data = base64encode(data.ignition_config.worker[count.index].rendered)
 }
 
 # The PowerVS instance may take a few minutes to start (per the IPI work)

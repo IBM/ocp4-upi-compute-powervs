@@ -11,7 +11,7 @@ The `ocp4-upi-compute-powervs` [project](https://github.com/ibm/ocp4-upi-compute
 5. A downloaded ignition file stored (in data folder)
 
 ```
-❯ curl -k http://api.demo.ocp-power.xyz:22624/config/worker -o worker.ign
+❯ curl -k http://api.demo.ocp-power.xyz:22624/config/worker -o worker.ign -H "Accept: application/vnd.coreos.ignition+json;version=3.2.0"
 ```
 
 or
