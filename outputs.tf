@@ -4,7 +4,7 @@
 ################################################################
 
 output "worker_private_ip" {
-  value = join(", ", data.ibm_pi_instance_ip.worker_ip.*.ip)
+  value = join(", ", data.ibm_pi_instance_ip.worker.*.ip)
 }
 
 output "worker_public_ip" {

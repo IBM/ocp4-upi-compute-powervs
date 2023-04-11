@@ -11,7 +11,7 @@ The `ocp4-upi-compute-powervs` [project](https://github.com/ibm/ocp4-upi-compute
 5. A downloaded ignition file stored (in data folder)
 
 ```
-❯ curl -k http://api.demo.ocp-power.xyz:22624/config/worker -o worker.ign
+❯ curl -k http://api.demo.ocp-power.xyz:22624/config/worker -o worker.ign -H "Accept: application/vnd.coreos.ignition+json;version=3.2.0"
 ```
 
 or
@@ -24,11 +24,27 @@ or
 
 ### Init 
 
+```
+❯ terraform init -upgrade
+```
+
 ### Plan
+
+```
+❯ terraform plan -var-file=var.tfvars
+```
 
 ### Apply 
 
+```
+❯ terraform apply -var-file=var.tfvars
+```
+
 ### Destroy
+
+```
+❯ terraform destroy -var-file=var.tfvars
+```
 
 If you have any questions or issues you can create a new [issue here][issues].
 

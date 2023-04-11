@@ -46,6 +46,16 @@ variable "worker" {
   }
 }
 
+variable "public_key_name" {
+  type        = string
+  default = "<none>"
+}
+
+variable "ignition_hostname" {
+  type        = string
+  default = "<none>"
+}
+
 variable "rhcos_image_name" {
   type        = string
   description = "Name of the rhcos image that you want to use for the workers"
