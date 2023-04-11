@@ -1,3 +1,8 @@
+################################################################
+# Copyright 2023 - IBM Corporation. All rights reserved
+# SPDX-License-Identifier: Apache2.0
+################################################################
+
 ### IBM Cloud details
 ibmcloud_api_key    = "<key>"
 ibmcloud_region     = "<region>"
