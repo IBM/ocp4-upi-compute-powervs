@@ -35,6 +35,20 @@ data "ibm_pi_image" "worker" {
   pi_cloud_instance_id = var.service_instance_id
 }
 
+data "ibm_pi_dhcps" "dhcp_services" {
+  pi_cloud_instance_id = var.service_instance_id
+}
+
+resource "ibm_pi_dhcp" "new_dhcp_service" {
+  count                  = 1
+  pi_cloud_instance_id   = var.service_instance_id
+  pi_cidr                = ibm_pi_network.public_network.pi_cidr
+  pi_dns_server          = var.dns_forwarders
+  pi_dhcp_snat_enabled   = true
+  # the pi_dhcp_name param will be prefixed by the DHCP ID when created, so keep it short here:
+  pi_dhcp_name = local.name_prefix
+}
+
 resource "ibm_pi_network" "public_network" {
   pi_network_name      = "${local.name_prefix}-worker-pub-net"
   pi_cloud_instance_id = var.service_instance_id
@@ -61,18 +75,35 @@ EOF
   }
 }
 
+# Avoids a name resolution issue
+data "ignition_file" "w_dns" {
+  count     = var.worker["count"]
+  overwrite = true
+  mode      = "420" // 0644
+  path      = "/etc/resolv.conf"
+  content {
+    content = templatefile("${path.module}/templates/resolv.tftpl", { ip_addrs = var.dns_forwarders})
+  }
+}
+
 data "ignition_config" "worker" {
   count = var.worker["count"]
   merge {
     source = "http://${var.ignition_hostname}:22624/config/worker"
   }
-  files = [data.ignition_file.w_hostname[count.index].rendered]
+  files = [
+    data.ignition_file.w_hostname[count.index].rendered,
+    data.ignition_file.w_dns[count.index].rendered]
 }
 
 # Modeled off the OpenShift Installer work for IPI PowerVS
 # https://github.com/openshift/installer/blob/master/data/data/powervs/bootstrap/vm/main.tf#L41
 # https://github.com/openshift/installer/blob/master/data/data/powervs/cluster/master/vm/main.tf
 resource "ibm_pi_instance" "worker" {
+  depends_on = [
+    ibm_pi_dhcp.new_dhcp_service,
+    ibm_pi_network.public_network
+  ]
   count = var.worker["count"]
 
   pi_memory        = var.worker["memory"]
