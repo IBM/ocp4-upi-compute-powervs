@@ -660,7 +660,7 @@ resource "null_resource" "pre_install" {
   }
 }
 
-https://github.com/ocp-power-automation/ocp4-playbooks/tree/main/playbooks/roles/powervs-nodes-config
+# https://github.com/ocp-power-automation/ocp4-playbooks/tree/main/playbooks/roles/powervs-nodes-config
 
 
 

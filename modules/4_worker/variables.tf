@@ -37,4 +37,4 @@ variable "worker" {
   }
 }
 
-variable workers_version {}
+variable "workers_version" {}
