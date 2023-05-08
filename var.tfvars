@@ -10,9 +10,9 @@ ibmcloud_zone       = "<zone>"
 service_instance_id = "<cloud_instance_ID>"
 
 # Machine Details
-worker = { memory = "16", processors = "0.5", "count" = 1 }
-
-ignition_file = "data/worker.ign"
+worker            = { memory = "16", processors = "0.5", "count" = 1 }
+cluster_id_prefix = rdr-multi
+ignition_file     = "data/worker.ign"
 
 rhcos_image_name = "rhcos-4.13"
 

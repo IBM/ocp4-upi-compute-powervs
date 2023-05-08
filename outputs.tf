@@ -3,22 +3,26 @@
 # SPDX-License-Identifier: Apache2.0
 ################################################################
 
-output "worker_private_ip" {
-  value = join(", ", data.ibm_pi_instance_ip.worker.*.ip)
+output "cluster_id" {
+  value = local.cluster_id
 }
 
-output "worker_public_ip" {
-  value = join(", ", data.ibm_pi_instance_ip.worker_public_ip.*.external_ip)
+output "name_prefix" {
+  value = local.name_prefix
 }
 
-output "gateway_ip" {
-  value = data.ibm_pi_network.network.gateway
+output "bastion_private_vip" {
+  value = module.prepare.bastion_vip == "" ? null : module.prepare.bastion_vip
 }
 
-output "cidr" {
-  value = data.ibm_pi_network.network.cidr
+output "bastion_private_ip" {
+  value = join(", ", module.prepare.bastion_ip)
 }
 
-output "public_cidr" {
-  value = ibm_pi_network.public_network.pi_cidr
+output "bastion_public_ip" {
+  value = join(", ", module.prepare.bastion_public_ip)
+}
+
+output "bastion_ssh_command" {
+  value = "ssh -i ${var.private_key_file} ${var.rhel_username}@${module.prepare.bastion_public_ip[0]}"
 }

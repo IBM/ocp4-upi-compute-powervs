@@ -1,24 +1,19 @@
 # ocp4-upi-compute-powervs
 
-The `ocp4-upi-compute-powervs` [project](https://github.com/ibm/ocp4-upi-compute-powervs) provides Terraform based automation code to help with the deployment of OpenShift Container Platform (OCP) 4.x compute workers on [IBM® Power Systems™ Virtual Server on IBM Cloud](https://www.ibm.com/cloud/power-virtual-server).
+The [`ocp4-upi-compute-powervs` project](https://github.com/ibm/ocp4-upi-compute-powervs) provides Terraform based automation code to help with the deployment of OpenShift Container Platform (OCP) 4.x compute workers on [IBM® Power Systems™ Virtual Server on IBM Cloud](https://www.ibm.com/cloud/power-virtual-server).
 
 ## Prerequisites
 
 1. Requires Terraform v1.4.0 or Higher
-2. A PowerVS Service
-3. An RHCOS Image loaded to the PowerVS Service
-4. An Existing OpenShift Container Platform Cluster (on Power or Intel VPC)
-5. A downloaded ignition file stored (in data folder)
-
-```
-❯ curl -k http://api.demo.ocp-power.xyz:22624/config/worker -o worker.ign -H "Accept: application/vnd.coreos.ignition+json;version=3.2.0"
-```
-
-or
-
-```
-❯ oc extract -n openshift-machine-api secret/worker-user-data --keys=userData --to=-
-```
+2. A PowerVS Service 
+3. A PowerVS subnet (`ocp-net`) with L2 network communication open between hosts on the subnet.
+4. A PowerVS subnet (`ocp-net-cc`) where the Cloud Connection is going to be setup.
+5. An RHCOS Image loaded to the PowerVS Service
+6. An RHEL/Centos Image loaded to the PowerVS Service
+7. An Existing OpenShift Container Platform Cluster (on Power or Intel VPC)
+8. A downloaded ignition file stored (in data folder) using: 
+  - `curl -k http://api.demo.ocp-multiarch.xyz:22623/config/worker -o worker.ign -H "Accept: application/vnd.coreos.ignition+json;version=3.2.0"`
+  - `oc extract -n openshift-machine-api secret/worker-user-data --keys=userData --to=-`
 
 ## Commands
 
@@ -45,6 +40,8 @@ or
 ```
 ❯ terraform destroy -var-file=var.tfvars
 ```
+
+## Contributing
 
 If you have any questions or issues you can create a new [issue here][issues].
 
@@ -75,6 +72,6 @@ If you would like to see the detailed LICENSE click [here](LICENSE).
 # Support
 Is this a Red Hat or IBM supported solution?
 
-No. This is only an early alpha version of a mixed architecture compute.
+No. This is only an early alpha version of multi-architecture compute.
 
 This notice will be removed when the feature is generally available or in Tech Preview. 

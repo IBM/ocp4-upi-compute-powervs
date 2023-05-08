@@ -1,0 +1,19 @@
+---
+ssh_gen_key: true
+ipi: false
+baremetal: true
+staticips: false
+force_ocp_download: false
+cleanup_existing: false
+ocp_bios: "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.9/4.9.0/rhcos-4.9.0-x86_64-live-rootfs.x86_64.img"
+ocp_initramfs: "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.9/4.9.0/rhcos-4.9.0-x86_64-live-initramfs.x86_64.img"
+ocp_install_kernel: "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.9/4.9.0/rhcos-4.9.0-x86_64-live-kernel-x86_64"
+ocp_client: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.9.18/openshift-client-linux-4.9.18.tar.gz"
+ocp_installer: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.9.18/openshift-install-linux-4.9.18.tar.gz"
+download_imgs: true
+chars: (\\_|\\$|\\\|\\/|\\=|\\)|\\(|\\&|\\^|\\%|\\$|\\#|\\@|\\!|\\*)
+ppc64le: false
+uefi: false
+chronyconfig:
+  enabled: false
+machineconfig_path: ../machineconfig
