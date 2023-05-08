@@ -53,43 +53,43 @@ module "prepare" {
 }
 
 module "support" {
-  depends_on = [ module.prepare]
-  source = "./modules/2_support"
+  depends_on = [module.prepare]
+  source     = "./modules/2_support"
 
-  bastion_ip                     = module.prepare.bastion_ip
-  bastion_public_ip              = module.prepare.bastion_public_ip
-  gateway_ip                     = module.prepare.gateway_ip
-  cidr                           = module.prepare.cidr
-  cluster_domain                  = var.cluster_domain
-  cluster_id                      = local.cluster_id
-  name_prefix                     = local.name_prefix
-  node_prefix                     = local.node_prefix
+  bastion_ip        = module.prepare.bastion_ip
+  bastion_public_ip = module.prepare.bastion_public_ip
+  gateway_ip        = module.prepare.gateway_ip
+  cidr              = module.prepare.cidr
+  cluster_domain    = var.cluster_domain
+  cluster_id        = local.cluster_id
+  name_prefix       = local.name_prefix
+  node_prefix       = local.node_prefix
 
-  rhel_username                   = var.rhel_username
-  private_key                     = local.private_key
-  ssh_agent                       = var.ssh_agent
+  rhel_username = var.rhel_username
+  private_key   = local.private_key
+  ssh_agent     = var.ssh_agent
 
-  openshift_install_tarball       = var.openshift_install_tarball
-  openshift_client_tarball        = var.openshift_client_tarball
-  pull_secret                    = file(coalesce(var.pull_secret_file, "/dev/null"))
-  ansible_support_version         = var.ansible_support_version
+  openshift_install_tarball = var.openshift_install_tarball
+  openshift_client_tarball  = var.openshift_client_tarball
+  pull_secret               = file(coalesce(var.pull_secret_file, "/dev/null"))
+  ansible_support_version   = var.ansible_support_version
 
   connection_timeout = var.connection_timeout
 }
 
 module "worker" {
-  depends_on = [ module.prepare]
-  source = "./modules/4_worker"
+  depends_on = [module.prepare]
+  source     = "./modules/4_worker"
 
-  bastion_ip                     = module.prepare.bastion_ip
-  worker = var.worker
-  rhcos_image_name = var.rhcos_image_name
+  bastion_ip          = module.prepare.bastion_ip
+  worker              = var.worker
+  rhcos_image_name    = var.rhcos_image_name
   service_instance_id = var.service_instance_id
-  network_name = var.network_name
-  system_type = var.system_type
-  public_key_name = var.public_key_name
-  processor_type = var.processor_type
-  name_prefix = local.name_prefix
+  network_name        = var.network_name
+  system_type         = var.system_type
+  public_key_name     = var.public_key_name
+  processor_type      = var.processor_type
+  name_prefix         = local.name_prefix
 
   workers_version = var.workers_version
 }

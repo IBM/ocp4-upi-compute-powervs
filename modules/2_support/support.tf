@@ -5,22 +5,22 @@
 
 locals {
   helpernode_vars = {
-    cluster_domain        = var.cluster_domain
-    name_prefix           = var.name_prefix
-    cluster_id            = var.cluster_id
-    name_prefix           = var.name_prefix
-    bastion_ip            = var.bastion_ip[0]
-    bastion_name          = "${var.name_prefix}-bastion-0"
-    isHA                  = false
-    bastion_master_ip     = var.bastion_ip[0]
-    bastion_backup_ip     = []
-    forwarders            = var.dns_forwarders
+    cluster_domain    = var.cluster_domain
+    name_prefix       = var.name_prefix
+    cluster_id        = var.cluster_id
+    name_prefix       = var.name_prefix
+    bastion_ip        = var.bastion_ip[0]
+    bastion_name      = "${var.name_prefix}-bastion-0"
+    isHA              = false
+    bastion_master_ip = var.bastion_ip[0]
+    bastion_backup_ip = []
+    forwarders        = var.dns_forwarders
     # Might have to force this to SNAT which uses var.bastion_ip[0]
-    gateway_ip            = var.gateway_ip
-    netmask               = cidrnetmask(var.cidr)
-    broadcast             = cidrhost(var.cidr, -1)
-    ipid                  = cidrhost(var.cidr, 0)
-    pool                  = { "start" : cidrhost(var.cidr, 2), "end" : cidrhost(var.cidr, -2) }
+    gateway_ip      = var.gateway_ip
+    netmask         = cidrnetmask(var.cidr)
+    broadcast       = cidrhost(var.cidr, -1)
+    ipid            = cidrhost(var.cidr, 0)
+    pool            = { "start" : cidrhost(var.cidr, 2), "end" : cidrhost(var.cidr, -2) }
     client_tarball  = var.openshift_client_tarball
     install_tarball = var.openshift_install_tarball
   }
