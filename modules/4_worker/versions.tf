@@ -5,22 +5,19 @@
 
 terraform {
   required_providers {
-    ibm = {
-      source  = "ibm-cloud/ibm"
-      version = "1.53.0"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.4"
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.2"
     }
     ignition = {
       source  = "community-terraform-providers/ignition"
       version = "~> 2.1.3"
     }
-    null = {
-      source  = "hashicorp/null"
-      version = "~> 3.2.1"
+    ibm = {
+      source  = "IBM-Cloud/ibm"
+      version = "~> 1.53.0"
     }
+
   }
   required_version = ">= 1.4.0"
 }

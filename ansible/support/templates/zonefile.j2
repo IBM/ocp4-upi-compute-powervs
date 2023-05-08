@@ -1,0 +1,24 @@
+$TTL 1W
+@	IN	SOA	ns1.{{ dns.clusterid }}.{{ dns.domain | lower }}.	root (
+			{{ serialnumber }}	; serial
+			3H		; refresh (3 hours)
+			30M		; retry (30 minutes)
+			2W		; expiry (2 weeks)
+			1W )		; minimum (1 week)
+	IN	NS	ns1.{{ dns.clusterid }}.{{ dns.domain | lower }}.
+	IN	MX 10	smtp.{{ dns.clusterid }}.{{ dns.domain | lower }}.
+;
+; 
+ns1	IN	A	{{ helper.ipaddr }}
+smtp	IN	A	{{ helper.ipaddr }}
+;
+{{ helper.name | lower }}	IN	A	{{ helper.ipaddr }}
+;
+; Create entries for the worker hosts
+{% if workers is defined %}
+{% for w in workers %}
+{{ w.name | lower }}		IN	A	{{ w.ipaddr }}
+{% endfor %}
+{% endif %}
+;
+;EOF

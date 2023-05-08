@@ -1,0 +1,20 @@
+---
+- name: restart bind
+  service:
+    name: named
+    state: restarted
+
+- name: restart httpd
+  service:
+    name: httpd
+    state: restarted
+
+- name: restart dhcpd
+  service:
+    name: dhcpd
+    state: restarted
+
+- name: restart tftp
+  service:
+    name: tftp
+    state: restarted
