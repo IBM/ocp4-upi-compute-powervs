@@ -78,7 +78,7 @@ module "support" {
 }
 
 module "worker" {
-  depends_on = [module.prepare]
+  depends_on = [module.support]
   source     = "./modules/4_worker"
 
   bastion_ip          = module.prepare.bastion_ip
@@ -92,4 +92,14 @@ module "worker" {
   name_prefix         = local.name_prefix
 
   workers_version = var.workers_version
+}
+
+module "post" {
+  depends_on = [module.worker]
+  source     = "./modules/5_post"
+
+  ssh_agent         = var.ssh_agent
+  bastion_public_ip = module.prepare.bastion_public_ip
+  private_key_file  = var.private_key_file
+  kubeconfig_file   = var.kubeconfig_file
 }

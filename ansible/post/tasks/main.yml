@@ -1,0 +1,39 @@
+---
+- name: Installation of RSCT Daemonset
+  hosts: all
+  vars_files:
+    - ../vars/main.yml
+
+  tasks:
+  - name: Ensure able to fetch project list
+    shell: "oc get projects"
+    register: projects_list
+    until: projects_list.stdout.find("default") != -1
+    retries: 20
+    delay: 30
+
+  - name: Create openshift-powervm-rmc project
+    when: projects_list.stdout.find("openshift-powervm-rmc") == -1
+    k8s:
+      name: openshift-powervm-rmc
+      api_version: project.openshift.io/v1
+      kind: Project
+      state: present
+
+  - name: Create openshift-powervm-rmc serviceaccount
+    k8s:
+      state: present
+      definition:
+        api_version: v1
+        kind: ServiceAccount
+        metadata:
+          name: openshift-powervm-rmc
+          namespace: openshift-powervm-rmc
+
+  - name: Add privileged scc to openshift-powervm-rmc serviceaccount
+    shell: "oc adm policy add-scc-to-user -z openshift-powervm-rmc privileged -n openshift-powervm-rmc"
+
+  - name: Deploy openshift-powervm-rmc DaemonSet
+    k8s:
+      state: present
+      definition: "{{ lookup('template', '../templates/rsct-deamonset.yml.j2') }}"
