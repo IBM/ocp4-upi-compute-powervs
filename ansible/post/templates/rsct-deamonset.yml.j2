@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: "{{ rmc_name }}"
+  namespace: "{{ rmc_name }}"
+spec:
+  selector:
+    matchLabels:
+      app: "{{ rmc_name }}"
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: "{{ rmc_name }}"
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: ppc64le
+        node.openshift.io/os_id: rhcos
+      restartPolicy: Always
+      serviceAccountName: "{{ rmc_name }}"
+      hostNetwork: true
+      containers:
+        - name: "{{ rmc_name }}"
+          image: "{{ rsct_image }}"
+          ports:
+            - name: rmc-tcp
+              hostPort: 657
+              containerPort: 657
+              protocol: TCP
+            - name: rmc-udp
+              hostPort: 657
+              containerPort: 657
+              protocol: UDP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 500Mi
+            limits:
+              memory: 4Gi
+          volumeMounts:
+            - name: lib-modules
+              mountPath: /lib/modules
+              readOnly: true
+          securityContext:
+            privileged: true
+            runAsUser: 0
+      serviceAccount: "{{ rmc_name }}"
+      volumes:
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+

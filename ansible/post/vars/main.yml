@@ -1,0 +1,3 @@
+---
+rsct_image: "quay.io/powercloud/rsct-ppc64le:latest"
+rmc_name: "openshift-powervm-rmc"
