@@ -478,3 +478,11 @@ variable "workers_version" {
   description = "Trigger for workers to be rebuilt via version change"
   default     = "1"
 }
+
+# Kubeconfig file
+
+variable "kubeconfig_file" {
+  type        = string
+  description = "Path to kubeconfig file"
+  default     = "../../data/kubeconfig"
+}
