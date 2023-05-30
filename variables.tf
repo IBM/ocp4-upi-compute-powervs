@@ -484,5 +484,5 @@ variable "workers_version" {
 variable "kubeconfig_file" {
   type        = string
   description = "Path to kubeconfig file"
-  default     = "../../data/kubeconfig"
+  default     = "data/kubeconfig"
 }
