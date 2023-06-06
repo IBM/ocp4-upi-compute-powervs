@@ -25,6 +25,12 @@ resource "null_resource" "post_kubeconfig" {
     source      = var.kubeconfig_file
     destination = "/root/.kube/config"
   }
+
+  #copies the ansible/post to specific folder
+  provisioner "file" {
+    source      = "ansible/post"
+    destination = "/root/ocp4-upi-compute-powervs/post/"
+  }
 }
 
 #command to run ansible playbook on Bastion
@@ -41,8 +47,8 @@ resource "null_resource" "post_ansible" {
   #command to run ansible playbook on Bastion
   provisioner "remote-exec" {
     inline = [
-      "cd /root/ocp4-upi-compute-powervs/ansible/post",
-      "echo running ansible-playbook for Post Activities",
+      "echo Running ansible-playbook for Post Activities",
+      "cd /root/ocp4-upi-compute-powervs/post",
       "ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-post.log ansible-playbook tasks/main.yml"
     ]
   }
