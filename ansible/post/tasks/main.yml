@@ -15,7 +15,7 @@
   - name: Create openshift-powervm-rmc project
     when: projects_list.stdout.find("openshift-powervm-rmc") == -1
     k8s:
-      name: openshift-powervm-rmc
+      name: "{{ project_name }}"
       api_version: project.openshift.io/v1
       kind: Project
       state: present
@@ -27,8 +27,8 @@
         api_version: v1
         kind: ServiceAccount
         metadata:
-          name: openshift-powervm-rmc
-          namespace: openshift-powervm-rmc
+          name: "{{ rmc_name }}"
+          namespace: "{{ project_name }}"
 
   - name: Add privileged scc to openshift-powervm-rmc serviceaccount
     shell: "oc adm policy add-scc-to-user -z openshift-powervm-rmc privileged -n openshift-powervm-rmc"
