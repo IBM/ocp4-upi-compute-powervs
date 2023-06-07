@@ -8,7 +8,7 @@ resource "null_resource" "post_kubeconfig" {
     type        = "ssh"
     user        = "root"
     private_key = file(var.private_key_file)
-    host        = var.bastion_public_ip
+    host        = var.bastion_public_ip[0]
     agent       = var.ssh_agent
   }
 
@@ -40,7 +40,7 @@ resource "null_resource" "post_ansible" {
     type        = "ssh"
     user        = "root"
     private_key = file(var.private_key_file)
-    host        = var.bastion_public_ip
+    host        = var.bastion_public_ip[0]
     agent       = var.ssh_agent
   }
 
