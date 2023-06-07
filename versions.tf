@@ -7,11 +7,11 @@ terraform {
   required_providers {
     ibm = {
       source  = "ibm-cloud/ibm"
-      version = "1.54444.0"
+      version = "1.54.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = "~> 3.4"
+      version = "~> 3.5.1"
     }
     ignition = {
       source  = "community-terraform-providers/ignition"
