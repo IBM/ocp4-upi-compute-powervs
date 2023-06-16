@@ -6,6 +6,7 @@
 ################################################################
 # Configure the IBM Cloud provider
 ################################################################
+
 variable "ibmcloud_api_key" {
   type        = string
   description = "IBM Cloud API key associated with user's identity"
@@ -27,6 +28,22 @@ variable "ibmcloud_region" {
 variable "ibmcloud_zone" {
   type        = string
   description = "The zone of an IBM Cloud region where you want to create Power System resources"
+  default     = ""
+}
+
+################################################################
+# Configure the IBM VPC provider
+################################################################
+
+variable "vpc_ibmcloud_name" {
+  type        = string
+  description = "The name of an IBM Cloud VPC where OCP cluster is running"
+  default     = ""
+}
+
+variable "vpc_ibmcloud_region" {
+  type        = string
+  description = "The region of an IBM Cloud VPC where OCP cluster is running"
   default     = ""
 }
 

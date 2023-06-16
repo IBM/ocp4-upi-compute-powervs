@@ -50,6 +50,10 @@ module "prepare" {
   rhel_subscription_activationkey = var.rhel_subscription_activationkey
   ansible_repo_name               = var.ansible_repo_name
   rhel_smt                        = var.rhel_smt
+  vpc_ibmcloud_name               = var.vpc_ibmcloud_name
+  vpc_ibmcloud_region             = var.vpc_ibmcloud_region
+  ibmcloud_region                 = var.ibmcloud_region
+  ibmcloud_api_key                = var.ibmcloud_api_key
 }
 
 module "support" {
@@ -103,3 +107,4 @@ module "post" {
   private_key_file  = var.private_key_file
   kubeconfig_file   = var.kubeconfig_file
 }
+

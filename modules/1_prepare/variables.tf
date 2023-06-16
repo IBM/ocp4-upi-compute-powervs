@@ -32,6 +32,11 @@ variable "node_prefix" {
   }
 }
 
+variable "vpc_ibmcloud_region" {}
+variable "vpc_ibmcloud_name" {}
+variable "ibmcloud_region" {}
+variable "ibmcloud_api_key" {}
+
 variable "service_instance_id" {}
 variable "rhel_image_name" {}
 
