@@ -1,5 +1,5 @@
 ---
-- name: Installation of RSCT Daemonset
+- name: Post Installation Tasks (Setting up Node Labels, Installation of RSCT Daemonset)
   hosts: all
   vars_files:
     - ../vars/main.yml
@@ -37,3 +37,21 @@
     k8s:
       state: present
       definition: "{{ lookup('template', '../templates/rsct-deamonset.yml.j2') }}"
+
+  - name: Get Nodes with ppc64le architecture
+    shell: "oc get nodes -l kubernetes.io/arch=ppc64le | awk '(NR>1) { print $1 }'"
+    register: node_names
+
+  - name: Print Node names with ppc64le architecture
+    debug:
+      msg: "Nodes with ppc64le : {{ node_names.stdout_lines }}"
+
+  - name: Add labels defined in node_labels to ppc64le Nodes
+    k8s:
+      state: present
+      kind: Node
+      name: "{{ item }}"
+      definition:
+        metadata:
+          labels: "{{ node_labels }}"
+    with_items: "{{ node_names.stdout_lines }}"

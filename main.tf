@@ -106,5 +106,8 @@ module "post" {
   bastion_public_ip = module.prepare.bastion_public_ip
   private_key_file  = var.private_key_file
   kubeconfig_file   = var.kubeconfig_file
+  ibmcloud_region   = var.ibmcloud_region
+  ibmcloud_zone     = var.ibmcloud_zone
+  system_type       = var.system_type
 }
 
