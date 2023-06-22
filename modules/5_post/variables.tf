@@ -11,3 +11,6 @@ variable "bastion_public_ip" {
 variable "ssh_agent" {}
 variable "private_key_file" {}
 variable "kubeconfig_file" {}
+variable "ibmcloud_region" {}
+variable "ibmcloud_zone" {}
+variable "system_type" {}
