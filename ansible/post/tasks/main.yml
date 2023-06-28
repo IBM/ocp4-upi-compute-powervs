@@ -1,10 +1,30 @@
 ---
-- name: Post Installation Tasks (Setting up Node Labels, Installation of RSCT Daemonset)
+- name: Post Installation Tasks (Approving CSRs, Setting up Node Labels, Installation of RSCT Daemonset)
   hosts: all
   vars_files:
     - ../vars/main.yml
 
   tasks:
+  - name: Get CSRs
+    shell: "oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name'"
+    register: csr_list
+
+  - name: Get Worker Nodes count (with ppc64le architecture)
+    shell: "oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | wc -l"
+    register: ppc_nodes_count
+
+  - name: Print PPC Node count and CSRs
+    debug:
+      msg: "PPC Worker Node count is : {{ ppc_nodes_count.stdout }}, Pending CSR List is : {{ csr_list.stdout }}"
+
+  # Run approve command till we have all ppc workers ready. 'xargs -r ' is used to ignore empty stdin.
+  - name: Approve Worker CSRs
+    shell: "oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name' | xargs -r oc adm certificate approve"
+    until: lookup('pipe','oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | grep -w Ready | wc -l') == ppc_nodes_count.stdout
+    retries: 10
+    delay: 30
+    when: csr_list.stdout != ""
+
   - name: Ensure able to fetch project list
     shell: "oc get projects"
     register: projects_list
