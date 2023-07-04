@@ -22,6 +22,18 @@ locals {
   node_prefix = var.use_zone_info_for_names ? "${var.ibmcloud_zone}-" : ""
 }
 
+### Prepares the VPC Support Machine
+module "vpc_support" {
+  providers = {
+    ibm = ibm.vpc
+  }
+
+  source = "./modules/0_vpc_support"
+  vpc_name = var.vpc_name
+  public_key = var.public_key
+  public_key_file = var.public_key_file
+}
+
 ### Prepares the Bastion Support machine
 module "prepare" {
   source = "./modules/1_prepare"
