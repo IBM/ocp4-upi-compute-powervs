@@ -5,7 +5,7 @@
 
 # Based on reference https://github.com/openshift/installer/blob/master/data/data/powervs/cluster/dns/dns.tf
 
-locals { 
+locals {
   public_key_file = var.public_key_file == "" ? "${path.cwd}/data/id_rsa.pub" : "${path.cwd}/${var.public_key_file}"
   public_key      = var.public_key == "" ? file(coalesce(local.public_key_file, "/dev/null")) : var.public_key
 }
@@ -83,9 +83,9 @@ data "ibm_is_image" "dns_vm_image" {
 }
 
 resource "ibm_is_instance" "dns_vm_vsi" {
-  count   = 1
+  count = 1
 
-  depends_on = [ ibm_is_ssh_key.dns_ssh_key ]
+  depends_on = [ibm_is_ssh_key.dns_ssh_key]
 
   name    = "${var.vpc_name}-dns-vsi"
   vpc     = data.ibm_is_vpc.ex_vpc.id
@@ -103,5 +103,5 @@ resource "ibm_is_instance" "dns_vm_vsi" {
     security_groups = [ibm_is_security_group.dns_vm_sg[0].id]
   }
 
-  user_data = templatefile("${path.cwd}/modules/0_dns/templates/cloud-init.yaml.tpl", { })
+  user_data = templatefile("${path.cwd}/modules/0_dns/templates/cloud-init.yaml.tpl", {})
 }

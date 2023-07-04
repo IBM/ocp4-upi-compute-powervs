@@ -28,9 +28,9 @@ module "vpc_support" {
     ibm = ibm.vpc
   }
 
-  source = "./modules/0_vpc_support"
-  vpc_name = var.vpc_name
-  public_key = var.public_key
+  source          = "./modules/0_vpc_support"
+  vpc_name        = var.vpc_name
+  public_key      = var.public_key
   public_key_file = var.public_key_file
 }
 
