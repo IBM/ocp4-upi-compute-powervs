@@ -9,6 +9,8 @@ locals {
     region      = var.ibmcloud_region
     zone        = var.ibmcloud_zone
     system_type = var.system_type
+    nfs_server  = var.nfs_server
+    nfs_path    = var.nfs_path
   }
 }
 
@@ -53,7 +55,7 @@ resource "null_resource" "post_ansible" {
     agent       = var.ssh_agent
   }
 
-  #create ansible_post_vars.json file on bation with desired node_labels in it
+  #create ansible_post_vars.json file on bastion (with desired variables to be passed to Ansible from Terraform)
   provisioner "file" {
     content     = templatefile("${path.module}/templates/ansible_post_vars.json.tpl", local.ansible_vars)
     destination = "${local.ansible_post_path}/ansible_post_vars.json"

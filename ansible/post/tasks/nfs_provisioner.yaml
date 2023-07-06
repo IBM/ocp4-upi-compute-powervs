@@ -1,0 +1,29 @@
+- name: Create nfs-provisioner Project
+  k8s:
+    state: present
+    definition: "{{ lookup('template', '../templates/nfs-ns.yml') }}"
+  
+- name: Create RBAC for nfs-provisioner
+  k8s:
+    state: present
+    definition: "{{ lookup('template', '../templates/nfs-rbac.yml') }}"
+
+- name: Setup Authorization
+  shell: "oc adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:nfs-provisioner:nfs-client-provisioner"
+
+- name: Create Deployment for nfs-provisioner
+  k8s:
+    state: present
+    definition: "{{ lookup('template', '../templates/nfs-deployment.yml.j2') }}"
+
+- name: Create Storage Class for nfs
+  k8s:
+    state: present
+    definition: "{{ lookup('template', '../templates/nfs-sc.yml') }}"
+
+- name: Ensure nfs-provisioner Pod is up and running fine
+  shell: "oc get pods -n nfs-provisioner"
+  register: pod_output
+  until: pod_output.stdout.find("Running") != -1
+  retries: 10
+  delay: 30

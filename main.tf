@@ -121,5 +121,7 @@ module "post" {
   ibmcloud_region   = var.ibmcloud_region
   ibmcloud_zone     = var.ibmcloud_zone
   system_type       = var.system_type
+  nfs_server        = var.nfs_server
+  nfs_path          = var.nfs_path
 }
 
