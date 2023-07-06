@@ -47,6 +47,12 @@ variable "vpc_ibmcloud_region" {
   default     = ""
 }
 
+variable "vpc_name" {
+  type        = string
+  description = "The VPC Name"
+  default     = ""
+}
+
 ################################################################
 # The PowerVS configuration settings
 ################################################################

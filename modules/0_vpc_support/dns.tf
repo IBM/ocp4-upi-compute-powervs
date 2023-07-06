@@ -103,5 +103,5 @@ resource "ibm_is_instance" "dns_vm_vsi" {
     security_groups = [ibm_is_security_group.dns_vm_sg[0].id]
   }
 
-  user_data = templatefile("${path.cwd}/modules/0_dns/templates/cloud-init.yaml.tpl", {})
+  user_data = templatefile("${path.cwd}/modules/0_vpc_support/templates/cloud-init.yaml.tpl", {})
 }

@@ -362,9 +362,10 @@ resource "null_resource" "exclude_vpc_csi" {
   }
 
   provisioner "remote-exec" {
-    inline = <<EOF
+    inline = [<<EOF
 oc --kubeconfig=~/.kube/kubeconfig annotate ns openshift-cluster-csi-drivers \
     scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
 EOF
+    ]
   }
 }

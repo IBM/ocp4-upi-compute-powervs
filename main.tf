@@ -24,9 +24,9 @@ locals {
 
 ### Prepares the VPC Support Machine
 module "vpc_support" {
-  providers = {
-    ibm = ibm.vpc
-  }
+  #providers = {
+  #  ibm = ibm.vpc
+  #}
 
   source          = "./modules/0_vpc_support"
   vpc_name        = var.vpc_name
