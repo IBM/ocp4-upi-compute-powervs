@@ -5,3 +5,7 @@ node_labels: {
   "node.kubernetes.io/instance-type": "${system_type}"
 }
 
+# NFS Storage variables
+nfs_server: "${nfs_server}"
+nfs_path: "${nfs_path}"
+

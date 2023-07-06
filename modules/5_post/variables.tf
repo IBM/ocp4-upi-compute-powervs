@@ -14,3 +14,5 @@ variable "kubeconfig_file" {}
 variable "ibmcloud_region" {}
 variable "ibmcloud_zone" {}
 variable "system_type" {}
+variable "nfs_server" {}
+variable "nfs_path" {}

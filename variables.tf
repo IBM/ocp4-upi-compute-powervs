@@ -391,8 +391,6 @@ variable "dns_forwarders" {
   default = "8.8.8.8;8.8.4.4"
 }
 
-
-
 variable "node_labels" {
   type        = map(string)
   description = "Map of node labels for the cluster nodes"
@@ -424,6 +422,18 @@ variable "setup_snat" {
   type        = bool
   description = "IMPORTANT: This is an experimental feature. Flag to configure bastion as SNAT and use the router on all cluster nodes"
   default     = true
+}
+
+variable "nfs_server" {
+  type        = string
+  description = "IP address of existing NFS Server"
+  default     = "none"
+}
+
+variable "nfs_path" {
+  type        = string
+  description = "Path on NFS Server where storage is mounted"
+  default     = "/export"
 }
 
 ##########################################
