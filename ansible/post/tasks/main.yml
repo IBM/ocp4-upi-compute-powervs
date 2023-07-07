@@ -56,7 +56,7 @@
   - name: Deploy openshift-powervm-rmc DaemonSet
     k8s:
       state: present
-      definition: "{{ lookup('template', '../templates/rsct-deamonset.yml.j2') }}"
+      definition: "{{ lookup('template', '../templates/rsct-daemonset.yml.j2') }}"
 
   - name: Get Nodes with ppc64le architecture
     shell: "oc get nodes -l kubernetes.io/arch=ppc64le | awk '(NR>1) { print $1 }'"

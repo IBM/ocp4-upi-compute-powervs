@@ -74,6 +74,7 @@ variable "processor_type" {
   default     = "shared"
 }
 
+# Reference https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-about-virtual-server
 variable "system_type" {
   type        = string
   description = "The type of system (s922/e980)"
