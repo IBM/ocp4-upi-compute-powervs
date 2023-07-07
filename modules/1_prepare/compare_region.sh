@@ -1,5 +1,10 @@
 #!/bin/bash
 
+################################################################
+# Copyright 2023 - IBM Corporation. All rights reserved
+# SPDX-License-Identifier: Apache-2.0
+################################################################
+
 # Parse Input values
 eval "$(jq -r '@sh "export vpc_region=\(.vpc_region) pvs_region=\(.pvs_region)"')"
 

@@ -1,25 +1,34 @@
 ################################################################
 # Copyright 2023 - IBM Corporation. All rights reserved
-# SPDX-License-Identifier: Apache2.0
+# SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-### IBM Cloud details
-ibmcloud_api_key    = "<key>"
-ibmcloud_region     = "<region>"
-ibmcloud_zone       = "<zone>"
-service_instance_id = "<cloud_instance_ID>"
+### IBM Cloud
+ibmcloud_api_key = "<key>"
+
+# VPC
+vpc_name   = "<zone>"
+vpc_region = "<region>"
+vpc_zone   = "<zone>"
+
+# PowerVS
+powervs_service_instance_id = "<cloud_instance_ID>"
+powervs_region              = "<region>"
+powervs_zone                = "<zone>"
+
+# Power Instance Configuration
+processor_type = "shared"
+system_type    = "e980"
 
 # Machine Details
-worker            = { memory = "16", processors = "0.5", "count" = 1 }
-cluster_id_prefix = rdr-multi
-ignition_file     = "data/worker.ign"
+bastion_health_status = "WARNING"
+bastion               = { memory = "16", processors = "1", "count" = 1 }
+worker                = { memory = "16", processors = "1", "count" = 1 }
 
-rhcos_image_name = "rhcos-4.13"
+# Images for Power Systems
+rhel_image_name  = "centos-03112022"
+rhcos_image_name = "rhcos-414-92-202306140644-t1"
 
-ignition_hostname = demo.ocp-power.xyz
-
-# PowerVS configuration
-processor_type  = "shared"
-system_type     = "s922"
-network_name    = "ocp-net"
-public_key_name = "ex-key"
+# Public and Private Key for Bastion Nodes
+public_key_file  = "data/compute_id_rsa.pub"
+private_key_file = "data/compute_id_rsa"
