@@ -3,6 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
+# *Design Note*
+# Global variables are prefixed with ibmcloud_
+# PowerVS variables are prefixed with powervs_
+# VPC variables are prefixed with vpc_
+
 variable "ibmcloud_api_key" {
   type        = string
   description = "IBM Cloud API key associated with user's identity"
