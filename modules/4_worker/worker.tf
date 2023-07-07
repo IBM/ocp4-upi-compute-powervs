@@ -8,7 +8,7 @@ data "ibm_pi_catalog_images" "catalog_images" {
 }
 
 data "ibm_pi_network" "network" {
-  pi_network_name      = var.network_name
+  pi_network_name      = var.powervs_network_name
   pi_cloud_instance_id = var.service_instance_id
 }
 

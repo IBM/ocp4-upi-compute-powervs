@@ -53,11 +53,6 @@ resource "null_resource" "config" {
     ]
   }
 
-  provisioner "file" {
-    content     = var.pull_secret
-    destination = ".openshift/pull-secret"
-  }
-
   # Copies the ansible/support to specific folder
   provisioner "file" {
     source      = "ansible/support"

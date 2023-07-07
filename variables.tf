@@ -3,31 +3,31 @@
 # SPDX-License-Identifier: Apache2.0
 ################################################################
 
-################################################################
-# Configure the IBM Cloud provider
-################################################################
-
 variable "ibmcloud_api_key" {
   type        = string
   description = "IBM Cloud API key associated with user's identity"
   default     = "<key>"
 }
 
-variable "service_instance_id" {
+################################################################
+# Configure the IBM PowerVS provider
+################################################################
+
+variable "powervs_service_instance_id" {
   type        = string
-  description = "The cloud instance ID of your account"
+  description = "The PowerVS service instance ID of your account"
   default     = ""
 }
 
-variable "ibmcloud_region" {
+variable "powervs_region" {
   type        = string
-  description = "The IBM Cloud region where you want to create the resources"
+  description = "The IBM Cloud region where you want to create the workers"
   default     = ""
 }
 
-variable "ibmcloud_zone" {
+variable "powervs_zone" {
   type        = string
-  description = "The zone of an IBM Cloud region where you want to create Power System resources"
+  description = "The zone of an IBM Cloud region where you want to create Power System workers"
   default     = ""
 }
 
@@ -35,38 +35,27 @@ variable "ibmcloud_zone" {
 # Configure the IBM VPC provider
 ################################################################
 
-variable "vpc_ibmcloud_name" {
+variable "vpc_name" {
   type        = string
   description = "The name of an IBM Cloud VPC where OCP cluster is running"
   default     = ""
 }
 
-variable "vpc_ibmcloud_region" {
+variable "vpc_region" {
   type        = string
   description = "The region of an IBM Cloud VPC where OCP cluster is running"
   default     = ""
 }
 
-variable "vpc_name" {
+variable "vpc_zone" {
   type        = string
-  description = "The VPC Name"
+  description = "The zone of an IBM Cloud VPC where OCP cluster is running"
   default     = ""
 }
 
 ################################################################
-# The PowerVS configuration settings
+# The PowerVS Instance configuration settings
 ################################################################
-
-variable "network_name" {
-  type        = string
-  description = "The name of the network to be used for deploy operations"
-  default     = "ocp-net"
-
-  validation {
-    condition     = var.network_name != ""
-    error_message = "The network_name is required and cannot be empty."
-  }
-}
 
 variable "processor_type" {
   type        = string
@@ -75,14 +64,15 @@ variable "processor_type" {
 }
 
 # Reference https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-about-virtual-server
+# The default is e980.
 variable "system_type" {
   type        = string
   description = "The type of system (s922/e980)"
-  default     = "s922"
+  default     = "e980"
 }
 
 ################################################################
-# Configure the bastion details
+# Configure the PowerVS instance bastion details
 ################################################################
 
 variable "bastion" {
@@ -101,7 +91,7 @@ variable "bastion" {
 variable "bastion_health_status" {
   type        = string
   description = "Specify if bastion should poll for the Health Status to be OK or WARNING. Default is OK."
-  default     = "OK"
+  default     = "WARNING"
   validation {
     condition     = contains(["OK", "WARNING"], var.bastion_health_status)
     error_message = "The bastion_health_status value must be either OK or WARNING."
@@ -139,14 +129,15 @@ variable "rhel_subscription_activationkey" {
   default = ""
 }
 
+# SMT level is 8 which is the maximum.
 variable "rhel_smt" {
   type        = number
   description = "SMT value to set on the bastion node. Eg: on,off,2,4,8"
-  default     = 4
+  default     = 8
 }
 
 ################################################################
-# Configure the workers to be added to the compute plane
+# Configure the PowerVS workers to be added to the compute plane
 ################################################################
 
 variable "worker" {
@@ -184,6 +175,7 @@ variable "rhcos_kernel_options" {
 # Image upload variables (used only for uploading RHCOS image
 # from cloud object storage to PowerVS catalog)
 ################################################################
+
 variable "rhcos_import_image" {
   type        = bool
   description = "Set to true to upload RHCOS image to PowerVS from Cloud Object Storage."
@@ -205,6 +197,7 @@ variable "rhcos_import_image_storage_type" {
 ################################################################
 # IBM Cloud DirectLink configuration variables
 ################################################################
+
 variable "ibm_cloud_dl_endpoint_net_cidr" {
   type        = string
   description = "IBM Cloud DirectLink endpoint network cidr eg. 10.0.0.0/8"
@@ -214,6 +207,7 @@ variable "ibm_cloud_dl_endpoint_net_cidr" {
 ################################################################
 ### OpenShift variables
 ################################################################
+
 variable "openshift_install_tarball" {
   type    = string
   default = "https://mirror.openshift.com/pub/openshift-v4/multi/clients/ocp/stable/ppc64le/openshift-install-linux.tar.gz"
@@ -222,26 +216,6 @@ variable "openshift_install_tarball" {
 variable "openshift_client_tarball" {
   type    = string
   default = "https://mirror.openshift.com/pub/openshift-v4/multi/clients/ocp/stable/ppc64le/openshift-client-linux.tar.gz"
-}
-
-variable "pull_secret_file" {
-  type    = string
-  default = "data/pull-secret.txt"
-
-  validation {
-    condition     = var.pull_secret_file != ""
-    error_message = "The pull_secret_file is required and cannot be empty."
-  }
-
-  validation {
-    condition     = fileexists(var.pull_secret_file)
-    error_message = "The pull secret file doesn't exist."
-  }
-
-  validation {
-    condition     = file(var.pull_secret_file) != ""
-    error_message = "The pull secret file shouldn't be empty."
-  }
 }
 
 variable "release_image_override" {
@@ -350,26 +324,6 @@ variable "ansible_extra_options" {
 variable "ansible_repo_name" {
   default = "ansible-2.9-for-rhel-8-ppc64le-rpms"
 }
-
-# variable "pull_secret_file" {
-#   type    = string
-#   default = "data/pull-secret.txt"
-
-#   validation {
-#     condition     = var.pull_secret_file != ""
-#     error_message = "The pull_secret_file is required and cannot be empty."
-#   }
-
-#   validation {
-#     condition     = fileexists(var.pull_secret_file)
-#     error_message = "The pull secret file doesn't exist."
-#   }
-
-#   validation {
-#     condition     = file(var.pull_secret_file) != ""
-#     error_message = "The pull secret file shouldn't be empty."
-#   }
-# }
 
 variable "private_network_mtu" {
   type        = number
@@ -500,7 +454,7 @@ locals {
   public_key       = var.public_key == "" ? file(coalesce(local.public_key_file, "/dev/null")) : var.public_key
 }
 
-
+### Development Specific Triggers
 variable "ansible_support_version" {
   type        = string
   description = "Trigger for ansible code refresh"
@@ -513,8 +467,7 @@ variable "workers_version" {
   default     = "1"
 }
 
-# Kubeconfig file
-
+### OpenShift Configuration
 variable "kubeconfig_file" {
   type        = string
   description = "Path to kubeconfig file"

@@ -32,9 +32,9 @@ variable "node_prefix" {
   }
 }
 
-variable "vpc_ibmcloud_region" {}
-variable "vpc_ibmcloud_name" {}
-variable "ibmcloud_region" {}
+variable "vpc_region" {}
+variable "vpc_name" {}
+variable "powervs_region" {}
 variable "ibmcloud_api_key" {}
 
 variable "service_instance_id" {}
@@ -45,7 +45,7 @@ variable "public_key" {}
 
 variable "processor_type" {}
 variable "system_type" {}
-variable "network_name" {}
+variable "powervs_network_name" {}
 variable "network_dns" {}
 
 variable "bastion_health_status" {}

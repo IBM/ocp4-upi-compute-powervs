@@ -96,7 +96,6 @@ locals {
     bastion_vip              = var.bastion_vip
     cluster_id               = var.cluster_id
     cluster_domain           = var.cluster_domain
-    pull_secret              = var.pull_secret
     public_ssh_key           = var.public_key
     storage_type             = var.storage_type
     log_level                = var.log_level
@@ -195,10 +194,7 @@ resource "null_resource" "config" {
     content     = templatefile("${path.module}/templates/helpernode_inventory", local.helpernode_inventory)
     destination = "ocp4-helpernode/inventory"
   }
-  provisioner "file" {
-    content     = var.pull_secret
-    destination = ".openshift/pull-secret"
-  }
+
   provisioner "file" {
     content     = templatefile("${path.module}/templates/helpernode_vars.yaml", local.helpernode_vars)
     destination = "ocp4-helpernode/helpernode_vars.yaml"

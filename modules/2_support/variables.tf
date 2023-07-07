@@ -29,7 +29,6 @@ variable "connection_timeout" {}
 
 variable "openshift_client_tarball" {}
 variable "openshift_install_tarball" {}
-variable "pull_secret" {}
 
 variable "helpernode_repo" { default = "https://github.com/redhat-cop/ocp4-helpernode" }
 variable "helpernode_tag" { default = "main" }

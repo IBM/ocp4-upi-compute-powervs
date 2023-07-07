@@ -9,7 +9,9 @@ variable "rhcos_image_name" {
   default     = "rhcos-4.13"
 }
 
-variable "network_name" {}
+variable "powervs_network_name" {
+  type = string
+}
 variable "name_prefix" {}
 
 variable "system_type" {}

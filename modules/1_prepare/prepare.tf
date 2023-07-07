@@ -6,7 +6,7 @@
 provider "ibm" {
   alias            = "vpc"
   ibmcloud_api_key = var.ibmcloud_api_key
-  region           = var.vpc_ibmcloud_region
+  region           = var.vpc_region
 }
 
 locals {
@@ -25,14 +25,14 @@ locals {
 
 data "ibm_is_vpc" "vpc" {
   provider = ibm.vpc
-  name     = var.vpc_ibmcloud_name
+  name     = var.vpc_name
 }
 
 data "external" "region_validate" {
   program = ["bash", "${path.root}/modules/1_prepare/compare_region.sh"]
   query = {
-    vpc_region = var.vpc_ibmcloud_region
-    pvs_region = var.ibmcloud_region
+    vpc_region = var.vpc_region
+    pvs_region = var.powervs_region
   }
 }
 
@@ -40,7 +40,7 @@ resource "null_resource" "region_checker" {
   # This resource gets executed and error is shown only when status is not "valid"
   count = data.external.region_validate.result.status == "valid" ? 0 : 1
   provisioner "local-exec" {
-    command     = "echo ERROR: Kindly confirm VPC region - ${var.vpc_ibmcloud_region} and PowerVS region - ${var.ibmcloud_region} are compatible; false"
+    command     = "echo ERROR: Kindly confirm VPC region - ${var.vpc_region} and PowerVS region - ${var.powervs_region} are compatible; false"
     interpreter = ["bash", "-c"]
   }
 }
@@ -52,7 +52,7 @@ data "ibm_pi_image" "bastion" {
 }
 
 data "ibm_pi_network" "network" {
-  pi_network_name      = var.network_name
+  pi_network_name      = var.powervs_network_name
   pi_cloud_instance_id = var.service_instance_id
 }
 

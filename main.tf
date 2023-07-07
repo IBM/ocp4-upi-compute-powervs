@@ -5,8 +5,8 @@
 
 provider "ibm" {
   ibmcloud_api_key = var.ibmcloud_api_key
-  region           = var.ibmcloud_region
-  zone             = var.ibmcloud_zone
+  region           = var.vpc_region
+  zone             = var.vpc_zone
 }
 
 # Create a random_id label
@@ -19,7 +19,7 @@ locals {
   cluster_id = var.cluster_id == "" ? random_id.label[0].hex : (var.cluster_id_prefix == "" ? var.cluster_id : "${var.cluster_id_prefix}-${var.cluster_id}")
   # Generates vm_id as combination of vm_id_prefix + (random_id or user-defined vm_id)
   name_prefix = var.name_prefix == "" ? random_id.label[0].hex : "${var.name_prefix}"
-  node_prefix = var.use_zone_info_for_names ? "${var.ibmcloud_zone}-" : ""
+  node_prefix = var.use_zone_info_for_names ? "${var.powervs_zone}-" : ""
 }
 
 ### Prepares the VPC Support Machine
@@ -39,7 +39,7 @@ module "prepare" {
   source = "./modules/1_prepare"
 
   bastion                         = var.bastion
-  service_instance_id             = var.service_instance_id
+  service_instance_id             = var.powervs_service_instance_id
   cluster_id                      = local.cluster_id
   name_prefix                     = local.name_prefix
   node_prefix                     = local.node_prefix
@@ -47,7 +47,6 @@ module "prepare" {
   rhel_image_name                 = var.rhel_image_name
   processor_type                  = var.processor_type
   system_type                     = var.system_type
-  network_name                    = var.network_name
   network_dns                     = var.dns_forwarders == "" ? [] : [for dns in split(";", var.dns_forwarders) : trimspace(dns)]
   bastion_health_status           = var.bastion_health_status
   private_network_mtu             = var.private_network_mtu
@@ -62,9 +61,10 @@ module "prepare" {
   rhel_subscription_activationkey = var.rhel_subscription_activationkey
   ansible_repo_name               = var.ansible_repo_name
   rhel_smt                        = var.rhel_smt
-  vpc_ibmcloud_name               = var.vpc_ibmcloud_name
-  vpc_ibmcloud_region             = var.vpc_ibmcloud_region
-  ibmcloud_region                 = var.ibmcloud_region
+  vpc_name                        = var.vpc_name
+  vpc_region                      = var.vpc_region
+  powervs_network_name            = ""
+  powervs_region                  = var.powervs_region
   ibmcloud_api_key                = var.ibmcloud_api_key
 }
 
@@ -87,7 +87,6 @@ module "support" {
 
   openshift_install_tarball = var.openshift_install_tarball
   openshift_client_tarball  = var.openshift_client_tarball
-  pull_secret               = file(coalesce(var.pull_secret_file, "/dev/null"))
   ansible_support_version   = var.ansible_support_version
 
   connection_timeout = var.connection_timeout
@@ -100,14 +99,14 @@ module "worker" {
   bastion_ip          = module.prepare.bastion_ip
   worker              = var.worker
   rhcos_image_name    = var.rhcos_image_name
-  service_instance_id = var.service_instance_id
-  network_name        = var.network_name
+  service_instance_id = var.powervs_service_instance_id
   system_type         = var.system_type
   public_key_name     = var.public_key_name
   processor_type      = var.processor_type
   name_prefix         = local.name_prefix
-
-  workers_version = var.workers_version
+  # TODO link to the Provisioning of the network
+  powervs_network_name = ""
+  workers_version      = var.workers_version
 }
 
 module "post" {
@@ -118,8 +117,8 @@ module "post" {
   bastion_public_ip = module.prepare.bastion_public_ip
   private_key_file  = var.private_key_file
   kubeconfig_file   = var.kubeconfig_file
-  ibmcloud_region   = var.ibmcloud_region
-  ibmcloud_zone     = var.ibmcloud_zone
+  ibmcloud_region   = var.vpc_region
+  ibmcloud_zone     = var.vpc_zone
   system_type       = var.system_type
   nfs_server        = var.nfs_server
   nfs_path          = var.nfs_path
