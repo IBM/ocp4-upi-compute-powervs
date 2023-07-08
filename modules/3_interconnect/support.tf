@@ -17,6 +17,9 @@ locals {
     "topology.kubernetes.io/region"    = var.region
     "topology.kubernetes.io/zone"      = var.zone
     "node.kubernetes.io/instance-type" = var.system_type
+    "failure-domain.beta.kubernetes.io/region" = var.region
+    "failure-domain.beta.kubernetes.io/zone" = var.zone
+    "vpc-block-csi-driver-labels" = "false"
   }
 
   local_registry = {
