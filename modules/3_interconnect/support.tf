@@ -134,7 +134,7 @@ locals {
   powervs_config_vars = {
     ibmcloud_dl_endpoint_net_cidr = var.ibmcloud_dl_endpoint_net_cidr
     ibmcloud_http_proxy           = var.ibmcloud_http_proxy
-    ocp_node_net_gw                = var.gateway_ip
+    ocp_node_net_gw               = var.gateway_ip
   }
 
   csi_driver_install_vars = {
