@@ -75,10 +75,10 @@ resource "ibm_pi_instance" "worker" {
 
   pi_user_data = base64encode(
     templatefile(
-      "${path.cwd}/modules/5_worker/templates/worker.ign", 
+      "${path.cwd}/modules/5_worker/templates/worker.ign",
       { ignition_url : var.ignition_url,
-        name: base64encode("${var.name_prefix}-worker-${count.index}"),
-       }))
+        name : base64encode("${var.name_prefix}-worker-${count.index}"),
+  }))
 }
 
 # The PowerVS instance may take a few minutes to start (per the IPI work)
