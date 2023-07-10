@@ -341,7 +341,7 @@ resource "ibm_pi_network_port_attach" "bastion_external_vip" {
   pi_network_port_description = "External VIP"
 }
 
-# Depends on the kubeconfig to annotate the csi namespace
+# Depends on the url/user/pass to annotate the csi namespace
 # causing the scheduler to place the workload only on amd64 nodes
 resource "null_resource" "exclude_vpc_csi" {
   count      = local.bastion_count
@@ -356,15 +356,12 @@ resource "null_resource" "exclude_vpc_csi" {
     timeout     = "${var.connection_timeout}m"
   }
 
-  provisioner "file" {
-    content     = "${path.root}/data/kubeconfig"
-    destination = ".kube/kubeconfig"
-  }
-
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://10.248.0.6:3128"
-oc --kubeconfig=~/.kube/kubeconfig annotate ns openshift-cluster-csi-drivers \
+oc login \
+  "${var.openshift_api_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
+oc annotate ns openshift-cluster-csi-drivers \
     scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
 EOF
     ]
