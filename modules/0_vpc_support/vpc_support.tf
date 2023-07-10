@@ -51,6 +51,71 @@ resource "ibm_is_security_group_rule" "dns_vm_sg_ssh_all" {
   }
 }
 
+# allow all incoming network traffic on port 3128
+resource "ibm_is_security_group_rule" "squid_vm_sg_ssh_all" {
+  count     = 1
+  group     = ibm_is_security_group.dns_vm_sg[0].id
+  direction = "inbound"
+  remote    = "0.0.0.0/0"
+
+  tcp {
+    port_min = 3128
+    port_max = 3128
+  }
+}
+
+# allow all incoming network traffic on port 2049
+resource "ibm_is_security_group_rule" "nfs_1_vm_sg_ssh_all" {
+  count     = 1
+  group     = ibm_is_security_group.dns_vm_sg[0].id
+  direction = "inbound"
+  remote    = "0.0.0.0/0"
+
+  tcp {
+    port_min = 2049
+    port_max = 2049
+  }
+}
+
+# allow all incoming network traffic on port 111
+resource "ibm_is_security_group_rule" "nfs_2_vm_sg_ssh_all" {
+  count     = 1
+  group     = ibm_is_security_group.dns_vm_sg[0].id
+  direction = "inbound"
+  remote    = "0.0.0.0/0"
+
+  tcp {
+    port_min = 111
+    port_max = 111
+  }
+}
+
+# allow all incoming network traffic on port 2049
+resource "ibm_is_security_group_rule" "nfs_3_vm_sg_ssh_all" {
+  count     = 1
+  group     = ibm_is_security_group.dns_vm_sg[0].id
+  direction = "inbound"
+  remote    = "0.0.0.0/0"
+
+  udp {
+    port_min = 2049
+    port_max = 2049
+  }
+}
+
+# allow all incoming network traffic on port 111
+resource "ibm_is_security_group_rule" "nfs_4_vm_sg_ssh_all" {
+  count     = 1
+  group     = ibm_is_security_group.dns_vm_sg[0].id
+  direction = "inbound"
+  remote    = "0.0.0.0/0"
+
+  udp {
+    port_min = 111
+    port_max = 111
+  }
+}
+
 # allow all incoming network traffic on port 53
 resource "ibm_is_security_group_rule" "dns_vm_sg_dns_all" {
   count     = 1
@@ -103,5 +168,7 @@ resource "ibm_is_instance" "dns_vm_vsi" {
     security_groups = [ibm_is_security_group.dns_vm_sg[0].id]
   }
 
-  user_data = templatefile("${path.cwd}/modules/0_vpc_support/templates/cloud-init.yaml.tpl", {})
+  user_data = templatefile("${path.cwd}/modules/0_vpc_support/templates/cloud-init.yaml.tpl", {
+    domain : split(separator, string),
+  })
 }

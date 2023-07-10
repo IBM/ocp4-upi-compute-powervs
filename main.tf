@@ -28,10 +28,11 @@ module "vpc_support" {
   #  ibm = ibm.vpc
   #}
 
-  source          = "./modules/0_vpc_support"
-  vpc_name        = var.vpc_name
-  public_key      = var.public_key
-  public_key_file = var.public_key_file
+  source            = "./modules/0_vpc_support"
+  vpc_name          = var.vpc_name
+  public_key        = var.public_key
+  public_key_file   = var.public_key_file
+  openshift_api_url = var.openshift_api_url
 }
 
 ### Prepares the Bastion Support machine
@@ -66,6 +67,10 @@ module "prepare" {
   powervs_network_name            = ""
   powervs_region                  = var.powervs_region
   ibmcloud_api_key                = var.ibmcloud_api_key
+
+  openshift_api_url = var.openshift_api_url
+  openshift_user    = var.openshift_user
+  openshift_pass    = var.openshift_pass
 }
 
 module "support" {

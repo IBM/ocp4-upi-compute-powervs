@@ -28,3 +28,9 @@ variable "public_key" {
   default     = ""
   # if empty, will read contents of file at var.public_key_file
 }
+
+variable "openshift_api_url" {
+  type        = string
+  description = "The API URL of the OpenShift Cluster"
+  default     = "https://api.example.ocp-multiarch.xyz:6443"
+}

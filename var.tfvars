@@ -11,6 +11,11 @@ vpc_name   = "<zone>"
 vpc_region = "<region>"
 vpc_zone   = "<zone>"
 
+# OpenShift Cluster
+openshift_api_url = "<openshift_cluster_API_URL>"
+openshift_user    = "<openshift_cluster_user>"
+openshift_pass    = "<openshift_cluster_pass>"
+
 # PowerVS
 powervs_service_instance_id = "<cloud_instance_ID>"
 powervs_region              = "<region>"

@@ -5,6 +5,7 @@ packages:
   - bind-utils
   - httpd
   - nfs-utils
+  - squid
 write_files:
 - path: /tmp/named-conf-edit.sed
   permissions: '0640'
@@ -19,10 +20,18 @@ write_files:
   permissions: '0640'
   content: |
     /export *(rw)
+- path: /etc/squid/squid.conf
+  permissions: '0640'
+  content: |
+    acl ibm_endpoints dstdomain .${domain}
+    http_access deny !ibm_endpoints
+    http_port 3128
+    coredump_dir /var/spool/squid
 runcmd:
   - export MYIP=`hostname -I`; sed -i.bak "s/MYIP/$MYIP/" /tmp/named-conf-edit.sed
   - sed -i.orig -f /tmp/named-conf-edit.sed /etc/named.conf
   - systemctl enable named.service nfs-server
   - systemctl start named.service nfs-server
   - mkdir -p /export && chmod -R 777 /export
-
+  - systemctl enable squid
+  - systemctl start squid

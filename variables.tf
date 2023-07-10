@@ -59,6 +59,28 @@ variable "vpc_zone" {
 }
 
 ################################################################
+# The OpenShift Cluster details
+################################################################
+
+variable "openshift_api_url" {
+  type        = string
+  description = "The API URL of the OpenShift Cluster"
+  default     = "https://api.example.ocp-multiarch.xyz:6443"
+}
+
+variable "openshift_user" {
+  type        = string
+  description = "The user of the OpenShift Cluster"
+  default     = ""
+}
+
+variable "openshift_pass" {
+  type        = string
+  description = "The pass of the OpenShift Cluster"
+  default     = ""
+}
+
+################################################################
 # The PowerVS Instance configuration settings
 ################################################################
 

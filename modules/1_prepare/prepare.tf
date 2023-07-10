@@ -363,6 +363,7 @@ resource "null_resource" "exclude_vpc_csi" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
+export HTTPS_PROXY="http://10.248.0.6:3128"
 oc --kubeconfig=~/.kube/kubeconfig annotate ns openshift-cluster-csi-drivers \
     scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
 EOF
