@@ -22,22 +22,22 @@ data "ibm_pi_dhcps" "dhcp_services" {
   pi_cloud_instance_id = var.service_instance_id
 }
 
-# resource "ibm_pi_dhcp" "new_dhcp_service" {
-#   count                = 1
-#   pi_cloud_instance_id = var.service_instance_id
-#   pi_cidr              = data.ibm_pi_network.network.cidr
-#   pi_dns_server        = "8.8.8.8"
-#   pi_dhcp_snat_enabled = true
-#   # the pi_dhcp_name param will be prefixed by the DHCP ID when created, so keep it short here:
-#   pi_dhcp_name = local.name_prefix
-# }
+resource "ibm_pi_dhcp" "new_dhcp_service" {
+  count                = 1
+  pi_cloud_instance_id = var.service_instance_id
+  pi_cidr              = data.ibm_pi_network.network.cidr
+  pi_dns_server        = "8.8.8.8" # TODO needs to come from VPC_Support
+  pi_dhcp_snat_enabled = true
+  # the pi_dhcp_name param will be prefixed by the DHCP ID when created, so keep it short here:
+  pi_dhcp_name = local.name_prefix
+}
 
-# resource "ibm_pi_network" "public_network" {
-#   pi_network_name      = "${local.name_prefix}-worker-pub-net"
-#   pi_cloud_instance_id = var.service_instance_id
-#   pi_network_type      = "pub-vlan"
-#   pi_dns               = [for dns in split(";", var.dns_forwarders) : trimspace(dns)]
-# }
+resource "ibm_pi_network" "public_network" {
+  pi_network_name      = "${local.name_prefix}-worker-pub-net"
+  pi_cloud_instance_id = var.service_instance_id
+  pi_network_type      = "pub-vlan"
+  pi_dns               = [for dns in split(";", var.dns_forwarders) : trimspace(dns)]
+}
 
 locals {
   catalog_worker_image = [for x in data.ibm_pi_catalog_images.catalog_images.images : x if x.name == var.rhcos_image_name]
@@ -45,22 +45,13 @@ locals {
   worker_storage_pool  = length(local.catalog_worker_image) == 0 ? data.ibm_pi_image.worker[0].storage_pool : local.catalog_worker_image[0].storage_pool
 }
 
-data "ignition_config" "worker" {
-  count = var.worker["count"]
-  merge {
-    source = "http://${var.bastion_ip[0]}:8080/ignition/worker.ign"
-    #"https://api-int.${var.cluster_domain}:22623/config/worker"
-  }
-  files = []
-}
-
 # Modeled off the OpenShift Installer work for IPI PowerVS
 # https://github.com/openshift/installer/blob/master/data/data/powervs/bootstrap/vm/main.tf#L41
 # https://github.com/openshift/installer/blob/master/data/data/powervs/cluster/master/vm/main.tf
 resource "ibm_pi_instance" "worker" {
   depends_on = [
-    #ibm_pi_dhcp.new_dhcp_service,
-    #ibm_pi_network.public_network
+    ibm_pi_dhcp.new_dhcp_service,
+    ibm_pi_network.public_network
   ]
   count = var.worker["count"]
 
@@ -82,7 +73,12 @@ resource "ibm_pi_instance" "worker" {
   pi_key_pair_name = var.public_key_name
   pi_health_status = "WARNING"
 
-  pi_user_data = base64encode(data.ignition_config.worker[count.index].rendered)
+  pi_user_data = base64encode(
+    templatefile(
+      "${path.cwd}/modules/5_worker/templates/worker.ign", 
+      { ignition_url : var.ignition_url,
+        name: base64encode("${var.name_prefix}-worker-${count.index}"),
+       }))
 }
 
 # The PowerVS instance may take a few minutes to start (per the IPI work)
