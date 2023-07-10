@@ -132,8 +132,8 @@ locals {
   }
 
   powervs_config_vars = {
-    ibm_cloud_dl_endpoint_net_cidr = var.ibm_cloud_dl_endpoint_net_cidr
-    ibm_cloud_http_proxy           = var.ibm_cloud_http_proxy
+    ibmcloud_dl_endpoint_net_cidr = var.ibmcloud_dl_endpoint_net_cidr
+    ibmcloud_http_proxy           = var.ibmcloud_http_proxy
     ocp_node_net_gw                = var.gateway_ip
   }
 
@@ -272,7 +272,7 @@ EOF
 }
 
 resource "null_resource" "external_services" {
-  count      = var.use_ibm_cloud_services ? var.bastion_count : 0
+  count      = var.use_ibmcloud_services ? var.bastion_count : 0
   depends_on = [null_resource.config, null_resource.setup_snat]
 
   triggers = {
@@ -409,7 +409,7 @@ resource "null_resource" "bootstrap_config" {
 
 resource "null_resource" "powervs_config" {
   depends_on = [null_resource.install]
-  count      = var.ibm_cloud_dl_endpoint_net_cidr != "" && var.ibm_cloud_http_proxy != "" ? 1 : 0
+  count      = var.ibmcloud_dl_endpoint_net_cidr != "" && var.ibmcloud_http_proxy != "" ? 1 : 0
 
   connection {
     type        = "ssh"
@@ -607,7 +607,7 @@ data "ibm_pi_instance_ip" "worker_public_ip" {
 
 resource "null_resource" "powervs_config" {
   depends_on = [null_resource.install]
-  count      = var.ibm_cloud_dl_endpoint_net_cidr != "" && var.ibm_cloud_http_proxy != "" ? 1 : 0
+  count      = var.ibmcloud_dl_endpoint_net_cidr != "" && var.ibmcloud_http_proxy != "" ? 1 : 0
 
   connection {
     type        = "ssh"
@@ -690,7 +690,7 @@ EOF
 
 
 resource "null_resource" "external_services" {
-  count      = var.use_ibm_cloud_services ? var.bastion_count : 0
+  count      = var.use_ibmcloud_services ? var.bastion_count : 0
   depends_on = [null_resource.config]
 
   triggers = {

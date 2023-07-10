@@ -203,7 +203,7 @@ variable "rhcos_import_image_storage_type" {
 # IBM Cloud DirectLink configuration variables
 ################################################################
 
-variable "ibm_cloud_dl_endpoint_net_cidr" {
+variable "ibmcloud_dl_endpoint_net_cidr" {
   type        = string
   description = "IBM Cloud DirectLink endpoint network cidr eg. 10.0.0.0/8"
   default     = ""
@@ -232,7 +232,7 @@ variable "release_image_override" {
 variable "cluster_domain" {
   type        = string
   default     = "ibm.com"
-  description = "Domain name to use to setup the cluster. A DNS Forward Zone should be a registered in IBM Cloud if use_ibm_cloud_services = true"
+  description = "Domain name to use to setup the cluster. A DNS Forward Zone should be a registered in IBM Cloud if use_ibmcloud_services = true"
 
   validation {
     condition     = can(regex("^[a-z0-9]+[a-zA-Z0-9_\\-.]*[a-z0-9]+$", var.cluster_domain))
