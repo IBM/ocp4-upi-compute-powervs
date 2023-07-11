@@ -29,6 +29,8 @@ The [`ocp4-upi-compute-powervs` project](https://github.com/ibm/ocp4-upi-compute
 ❯ terraform plan -var-file=var.tfvars
 ```
 
+Note: The PowerVS and IBMCloud VPC regions must be compatible.
+
 ### Apply 
 
 ```
