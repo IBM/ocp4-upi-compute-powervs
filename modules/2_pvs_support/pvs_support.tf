@@ -14,7 +14,7 @@ locals {
     isHA              = false
     bastion_master_ip = var.bastion_ip[0]
     bastion_backup_ip = []
-    forwarders        = var.dns_forwarders
+    forwarders        = var.vpc_dns_forwarders
     # Might have to force this to SNAT which uses var.bastion_ip[0]
     gateway_ip      = var.gateway_ip
     netmask         = cidrnetmask(var.cidr)

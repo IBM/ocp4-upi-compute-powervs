@@ -10,8 +10,8 @@ variable "cluster_id" {
   default = "test-ocp"
 }
 
-variable "dns_forwarders" {
-  default = "8.8.8.8; 9.9.9.9"
+variable "vpc_dns_forwarders" {
+  default = "161.26.0.7; 161.26.0.8"
 }
 
 variable "name_prefix" {}

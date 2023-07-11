@@ -530,7 +530,7 @@ data "ignition_file" "w_dns" {
   mode      = "420" // 0644
   path      = "/etc/resolv.conf"
   content {
-    content = templatefile("${path.module}/templates/resolv.tftpl", { ip_addrs = var.dns_forwarders })
+    content = templatefile("${path.module}/templates/resolv.tftpl", { ip_addrs = var.powervs_dns_forwarders })
   }
 }
 

@@ -370,7 +370,7 @@ variable "public_key_name" {
   default = "<none>"
 }
 
-variable "dns_forwarders" {
+variable "powervs_dns_forwarders" {
   type    = string
   default = "8.8.8.8;8.8.4.4"
 }

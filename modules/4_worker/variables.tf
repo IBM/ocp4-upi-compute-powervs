@@ -40,5 +40,5 @@ variable "worker" {
 }
 
 variable "workers_version" {}
-variable "dns_forwarders" {}
+variable "powervs_dns_forwarders" {}
 variable "ignition_url" {}

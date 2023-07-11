@@ -43,10 +43,6 @@ module "checks" {
 
 ### Prepares the VPC Support Machine
 module "vpc_support" {
-  #providers = {
-  #  ibm = ibm.vpc
-  #}
-
   depends_on = [module.checks]
 
   source            = "./modules/0_vpc_support"
@@ -54,12 +50,11 @@ module "vpc_support" {
   public_key        = var.public_key
   public_key_file   = var.public_key_file
   openshift_api_url = var.openshift_api_url
-  dns_forwarders    = var.dns_forwarders
 }
 
 ### Prepares the Bastion Support machine
 module "prepare" {
-  source = "./modules/1_prepare"
+  source = "./modules/1_pvs_prepare"
 
   bastion                         = var.bastion
   service_instance_id             = var.powervs_service_instance_id
@@ -70,7 +65,7 @@ module "prepare" {
   rhel_image_name                 = var.rhel_image_name
   processor_type                  = var.processor_type
   system_type                     = var.system_type
-  network_dns                     = var.dns_forwarders == "" ? [] : [for dns in split(";", var.dns_forwarders) : trimspace(dns)]
+  network_dns                     = var.powervs_dns_forwarders == "" ? [] : [for dns in split(";", var.powervs_dns_forwarders) : trimspace(dns)]
   bastion_health_status           = var.bastion_health_status
   private_network_mtu             = var.private_network_mtu
   rhel_username                   = var.rhel_username
@@ -137,8 +132,8 @@ module "worker" {
   processor_type      = var.processor_type
   name_prefix         = local.name_prefix
   # TODO link to the Provisioning of the network
-  powervs_network_name = ""
-  dns_forwarders       = var.dns_forwarders
+  powervs_network_name   = ""
+  powervs_dns_forwarders = var.powervs_dns_forwarders
 
   # Eventually, this should be a bit more dynamic - include the MachineConfigPool
   ignition_url = "http://${module.prepare.bastion_ip}:8080/worker.ign"
