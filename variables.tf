@@ -223,29 +223,6 @@ variable "rhcos_kernel_options" {
 }
 
 ################################################################
-# Image upload variables (used only for uploading RHCOS image
-# from cloud object storage to PowerVS catalog)
-################################################################
-
-variable "rhcos_import_image" {
-  type        = bool
-  description = "Set to true to upload RHCOS image to PowerVS from Cloud Object Storage."
-  default     = false
-}
-
-variable "rhcos_import_image_filename" {
-  type        = string
-  description = "Name of the RHCOS image object file. This file is expected to be in .owa.gz format"
-  default     = "rhcos-411-85-202203181612-0-ppc64le-powervs.ova.gz"
-}
-
-variable "rhcos_import_image_storage_type" {
-  type        = string
-  description = "Storage type in PowerVS where the RHCOS image needs to be uploaded"
-  default     = "tier1"
-}
-
-################################################################
 # IBM Cloud DirectLink configuration variables
 ################################################################
 

@@ -29,11 +29,11 @@ resource "ibm_pi_dhcp" "new_dhcp_service" {
   pi_dns_server        = "8.8.8.8" # TODO needs to come from VPC_Support
   pi_dhcp_snat_enabled = true
   # the pi_dhcp_name param will be prefixed by the DHCP ID when created, so keep it short here:
-  pi_dhcp_name = local.name_prefix
+  pi_dhcp_name = var.name_prefix
 }
 
 resource "ibm_pi_network" "public_network" {
-  pi_network_name      = "${local.name_prefix}-worker-pub-net"
+  pi_network_name      = "${var.name_prefix}-worker-pub-net"
   pi_cloud_instance_id = var.service_instance_id
   pi_network_type      = "pub-vlan"
   pi_dns               = [for dns in split(";", var.dns_forwarders) : trimspace(dns)]
@@ -75,8 +75,8 @@ resource "ibm_pi_instance" "worker" {
 
   pi_user_data = base64encode(
     templatefile(
-      "${path.cwd}/modules/5_worker/templates/worker.ign",
-      { ignition_url : var.ignition_url,
+      "${path.cwd}/modules/4_worker/templates/worker.ign", {
+        ignition_url : var.ignition_url,
         name : base64encode("${var.name_prefix}-worker-${count.index}"),
   }))
 }

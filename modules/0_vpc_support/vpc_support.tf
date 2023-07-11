@@ -169,6 +169,6 @@ resource "ibm_is_instance" "dns_vm_vsi" {
   }
 
   user_data = templatefile("${path.cwd}/modules/0_vpc_support/templates/cloud-init.yaml.tpl", {
-    domain : split(separator, string),
+    domain : split("//", split(":", var.openshift_api_url)[0])[0],
   })
 }

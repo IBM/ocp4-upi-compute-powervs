@@ -83,7 +83,7 @@ variable "openshift_pass" {
 }
 
 ### RHCOS
+variable "rhcos_image_name" {}
 variable "rhcos_import_image" {}
-variable "rhcos_import_bucket_region" {}
 variable "rhcos_import_image_filename" {}
 variable "rhcos_import_image_storage_type" {}

@@ -33,6 +33,7 @@ module "vpc_support" {
   public_key        = var.public_key
   public_key_file   = var.public_key_file
   openshift_api_url = var.openshift_api_url
+  dns_forwarders    = var.dns_forwarders
 }
 
 ### Prepares the Bastion Support machine
@@ -71,11 +72,16 @@ module "prepare" {
   openshift_api_url = var.openshift_api_url
   openshift_user    = var.openshift_user
   openshift_pass    = var.openshift_pass
+
+  rhcos_image_name                = var.rhcos_image_name
+  rhcos_import_image              = var.rhcos_import_image
+  rhcos_import_image_filename     = var.rhcos_import_image_filename
+  rhcos_import_image_storage_type = var.rhcos_import_image_storage_type
 }
 
 module "support" {
   depends_on = [module.prepare]
-  source     = "./modules/2_support"
+  source     = "./modules/2_pvs_support"
 
   bastion_ip        = module.prepare.bastion_ip
   bastion_public_ip = module.prepare.bastion_public_ip
@@ -111,7 +117,12 @@ module "worker" {
   name_prefix         = local.name_prefix
   # TODO link to the Provisioning of the network
   powervs_network_name = ""
-  workers_version      = var.workers_version
+  dns_forwarders       = var.dns_forwarders
+
+  # Eventually, this should be a bit more dynamic - include the MachineConfigPool
+  ignition_url = "http://${module.prepare.bastion_ip}:8080/worker.ign"
+
+  workers_version = var.workers_version
 }
 
 module "post" {

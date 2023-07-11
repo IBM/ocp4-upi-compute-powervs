@@ -16,7 +16,7 @@ locals {
     sao     = "br-sao",
     us-east = "us-east"
   }
-  rhcos_import_bucket_region = lookup(local.powervs_vpc_region_map, var.ibmcloud_region, "au-syd")
+  rhcos_import_bucket_region = lookup(local.powervs_vpc_region_map, var.vpc_region, "au-syd")
 }
 
 # RHCOS Image Import
@@ -25,7 +25,7 @@ resource "ibm_pi_image" "rhcos_image_import" {
 
   pi_image_name             = "${var.name_prefix}rhcos-${var.rhcos_import_image_storage_type}-image"
   pi_cloud_instance_id      = var.service_instance_id
-  pi_image_bucket_name      = "rhcos-powervs-images-${var.rhcos_import_bucket_region}"
+  pi_image_bucket_name      = "rhcos-powervs-images-${local.rhcos_import_bucket_region}"
   pi_image_bucket_region    = local.rhcos_import_bucket_region
   pi_image_bucket_file_name = var.rhcos_import_image_filename
   pi_image_storage_type     = var.rhcos_import_image_storage_type
