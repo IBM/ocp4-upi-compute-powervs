@@ -81,3 +81,9 @@ variable "openshift_pass" {
   description = "The pass of the OpenShift Cluster"
   default     = ""
 }
+
+### RHCOS
+variable "rhcos_import_image" {}
+variable "rhcos_import_bucket_region" {}
+variable "rhcos_import_image_filename" {}
+variable "rhcos_import_image_storage_type" {}

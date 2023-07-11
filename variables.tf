@@ -180,11 +180,35 @@ variable "worker" {
   }
 }
 
+################################################################
+# RHCOS PowerVS Details
+################################################################
+
 variable "rhcos_image_name" {
   type        = string
   description = "Name of the rhcos image that you want to use for the workers"
-  default     = "rhcos-4.13"
+  default     = "rhcos-4.14"
 }
+
+variable "rhcos_import_image" {
+  type        = bool
+  description = "Set to true to upload RHCOS image to PowerVS from Cloud Object Storage."
+  default     = false
+}
+
+variable "rhcos_import_image_filename" {
+  type        = string
+  description = "Name of the RHCOS image object file. This file is expected to be in .ova.gz format"
+  default     = "rhcos-414-92-202307181612-0-ppc64le-powervs.ova.gz"
+}
+
+variable "rhcos_import_image_storage_type" {
+  type        = string
+  description = "Storage type in PowerVS where the RHCOS image needs to be uploaded"
+  default     = "tier1"
+}
+
+### RHCOS Instance Details
 
 variable "rhcos_pre_kernel_options" {
   type        = list(string)
