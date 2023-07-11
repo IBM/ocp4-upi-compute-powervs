@@ -5,10 +5,6 @@
 
 # Based on https://github.com/ocp-power-automation/ocp4-upi-powervs/blob/main/ocp.tf 
 locals {
-  # Generates cluster_id as combination of cluster_id_prefix + (random_id or user-defined cluster_id)
-  cluster_id   = var.cluster_id == "" ? random_id.label[0].hex : (var.cluster_id_prefix == "" ? var.cluster_id : "${var.cluster_id_prefix}-${var.cluster_id}")
-  node_prefix  = var.use_zone_info_for_names ? "${var.ibmcloud_zone}-" : ""
-  storage_type = lookup(var.bastion, "count", 1) > 1 ? "none" : var.storage_type
   powervs_vpc_region_map = {
     syd     = "au-syd",
     osa     = "jp-osa",
@@ -20,6 +16,7 @@ locals {
     sao     = "br-sao",
     us-east = "us-east"
   }
+  rhcos_import_bucket_region = lookup(local.powervs_vpc_region_map, var.ibmcloud_region, "au-syd")
 }
 
 # RHCOS Image Import
@@ -29,7 +26,7 @@ resource "ibm_pi_image" "rhcos_image_import" {
   pi_image_name             = "${var.name_prefix}rhcos-${var.rhcos_import_image_storage_type}-image"
   pi_cloud_instance_id      = var.service_instance_id
   pi_image_bucket_name      = "rhcos-powervs-images-${var.rhcos_import_bucket_region}"
-  pi_image_bucket_region    = var.rhcos_import_bucket_region
+  pi_image_bucket_region    = local.rhcos_import_bucket_region
   pi_image_bucket_file_name = var.rhcos_import_image_filename
   pi_image_storage_type     = var.rhcos_import_image_storage_type
 }
