@@ -370,11 +370,6 @@ variable "public_key_name" {
   default = "<none>"
 }
 
-variable "ignition_hostname" {
-  type    = string
-  default = "<none>"
-}
-
 variable "dns_forwarders" {
   type    = string
   default = "8.8.8.8;8.8.4.4"
@@ -384,27 +379,6 @@ variable "node_labels" {
   type        = map(string)
   description = "Map of node labels for the cluster nodes"
   default     = {}
-}
-
-# The Ignition File 
-variable "ignition_file" {
-  type    = string
-  default = "data/worker.ign"
-
-  validation {
-    condition     = var.ignition_file != ""
-    error_message = "The ignition_file is required and cannot be empty."
-  }
-
-  validation {
-    condition     = fileexists(var.ignition_file)
-    error_message = "The ignition file doesn't exist."
-  }
-
-  validation {
-    condition     = file(var.ignition_file) != ""
-    error_message = "The ignition secret file shouldn't be empty."
-  }
 }
 
 variable "setup_snat" {
@@ -457,8 +431,8 @@ variable "public_key" {
 
 ###
 variable "name_prefix" {
-  type = string
-
+  type    = string
+  default = ""
   validation {
     condition     = length(var.name_prefix) <= 32
     error_message = "Length cannot exceed 32 characters for name_prefix."
@@ -466,8 +440,8 @@ variable "name_prefix" {
 }
 
 variable "node_prefix" {
-  type = string
-
+  type    = string
+  default = ""
   validation {
     condition     = length(var.node_prefix) <= 32
     error_message = "Length cannot exceed 32 characters for node_prefix."

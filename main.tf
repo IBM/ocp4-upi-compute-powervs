@@ -7,6 +7,14 @@ provider "ibm" {
   ibmcloud_api_key = var.ibmcloud_api_key
   region           = var.vpc_region
   zone             = var.vpc_zone
+  alias            = "ibmcloud"
+}
+
+provider "ibm" {
+  ibmcloud_api_key = var.ibmcloud_api_key
+  region           = var.vpc_region
+  zone             = var.vpc_zone
+  alias            = "powervs"
 }
 
 # Create a random_id label
@@ -23,10 +31,23 @@ locals {
 }
 
 ### Prepares the VPC Support Machine
+module "checks" {
+  source = "./modules/0_checks"
+
+  ibmcloud_api_key = var.ibmcloud_api_key
+  vpc_name       = var.vpc_name
+  vpc_region     = var.vpc_region
+  vpc_zone = var.vpc_zone
+  powervs_region = var.powervs_region
+}
+
+### Prepares the VPC Support Machine
 module "vpc_support" {
   #providers = {
   #  ibm = ibm.vpc
   #}
+
+  depends_on = [module.checks]
 
   source            = "./modules/0_vpc_support"
   vpc_name          = var.vpc_name

@@ -12,14 +12,6 @@ provider "ibm" {
 data "ibm_is_vpc" "ibm_is_vpc" {
   provider = ibm.vpc
   name     = var.vpc_name
-
-  lifecycle {
-    # Confirms the PVS/VPC regions are locally compatible.
-    postcondition {
-      condition     = length(regexall("${var.pvs_region}", "${var.vpc_region}")) > 0
-      error_message = "ERROR: Kindly confirm VPC region - ${var.vpc_region} and PowerVS region - ${var.powervs_region} are compatible; false"
-    }
-  }
 }
 
 locals {
