@@ -9,6 +9,19 @@ provider "ibm" {
   region           = var.vpc_region
 }
 
+data "ibm_is_vpc" "ibm_is_vpc" {
+  provider = ibm.vpc
+  name     = var.vpc_name
+
+  lifecycle {
+    # Confirms the PVS/VPC regions are locally compatible.
+    postcondition {
+      condition     = length(regexall("${var.pvs_region}", "${var.vpc_region}")) > 0
+      error_message = "ERROR: Kindly confirm VPC region - ${var.vpc_region} and PowerVS region - ${var.powervs_region} are compatible; false"
+    }
+  }
+}
+
 locals {
   bastion_count = lookup(var.bastion, "count", 1)
 }
@@ -21,28 +34,6 @@ locals {
   catalog_bastion_image = [for x in data.ibm_pi_catalog_images.catalog_images.images : x if x.name == var.rhel_image_name]
   bastion_image_id      = length(local.catalog_bastion_image) == 0 ? data.ibm_pi_image.bastion[0].id : local.catalog_bastion_image[0].image_id
   bastion_storage_pool  = length(local.catalog_bastion_image) == 0 ? data.ibm_pi_image.bastion[0].storage_pool : local.catalog_bastion_image[0].storage_pool
-}
-
-data "ibm_is_vpc" "vpc" {
-  provider = ibm.vpc
-  name     = var.vpc_name
-}
-
-data "external" "region_validate" {
-  program = ["bash", "${path.root}/modules/1_prepare/compare_region.sh"]
-  query = {
-    vpc_region = var.vpc_region
-    pvs_region = var.powervs_region
-  }
-}
-
-resource "null_resource" "region_checker" {
-  # This resource gets executed and error is shown only when status is not "valid"
-  count = data.external.region_validate.result.status == "valid" ? 0 : 1
-  provisioner "local-exec" {
-    command     = "echo ERROR: Kindly confirm VPC region - ${var.vpc_region} and PowerVS region - ${var.powervs_region} are compatible; false"
-    interpreter = ["bash", "-c"]
-  }
 }
 
 data "ibm_pi_image" "bastion" {
