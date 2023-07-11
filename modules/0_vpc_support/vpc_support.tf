@@ -32,6 +32,7 @@ resource "ibm_is_security_group" "dns_vm_sg" {
 
 # allow all outgoing network traffic
 resource "ibm_is_security_group_rule" "dns_vm_sg_outgoing_all" {
+
   count     = 1
   group     = ibm_is_security_group.dns_vm_sg[0].id
   direction = "outbound"
@@ -40,6 +41,7 @@ resource "ibm_is_security_group_rule" "dns_vm_sg_outgoing_all" {
 
 # allow all incoming network traffic on port 22
 resource "ibm_is_security_group_rule" "dns_vm_sg_ssh_all" {
+
   count     = 1
   group     = ibm_is_security_group.dns_vm_sg[0].id
   direction = "inbound"
@@ -53,6 +55,7 @@ resource "ibm_is_security_group_rule" "dns_vm_sg_ssh_all" {
 
 # allow all incoming network traffic on port 3128
 resource "ibm_is_security_group_rule" "squid_vm_sg_ssh_all" {
+
   count     = 1
   group     = ibm_is_security_group.dns_vm_sg[0].id
   direction = "inbound"
@@ -66,6 +69,7 @@ resource "ibm_is_security_group_rule" "squid_vm_sg_ssh_all" {
 
 # allow all incoming network traffic on port 2049
 resource "ibm_is_security_group_rule" "nfs_1_vm_sg_ssh_all" {
+
   count     = 1
   group     = ibm_is_security_group.dns_vm_sg[0].id
   direction = "inbound"
@@ -79,6 +83,7 @@ resource "ibm_is_security_group_rule" "nfs_1_vm_sg_ssh_all" {
 
 # allow all incoming network traffic on port 111
 resource "ibm_is_security_group_rule" "nfs_2_vm_sg_ssh_all" {
+
   count     = 1
   group     = ibm_is_security_group.dns_vm_sg[0].id
   direction = "inbound"
@@ -92,6 +97,7 @@ resource "ibm_is_security_group_rule" "nfs_2_vm_sg_ssh_all" {
 
 # allow all incoming network traffic on port 2049
 resource "ibm_is_security_group_rule" "nfs_3_vm_sg_ssh_all" {
+
   count     = 1
   group     = ibm_is_security_group.dns_vm_sg[0].id
   direction = "inbound"
@@ -105,6 +111,7 @@ resource "ibm_is_security_group_rule" "nfs_3_vm_sg_ssh_all" {
 
 # allow all incoming network traffic on port 111
 resource "ibm_is_security_group_rule" "nfs_4_vm_sg_ssh_all" {
+
   count     = 1
   group     = ibm_is_security_group.dns_vm_sg[0].id
   direction = "inbound"
@@ -118,6 +125,7 @@ resource "ibm_is_security_group_rule" "nfs_4_vm_sg_ssh_all" {
 
 # allow all incoming network traffic on port 53
 resource "ibm_is_security_group_rule" "dns_vm_sg_dns_all" {
+
   count     = 1
   group     = ibm_is_security_group.dns_vm_sg[0].id
   direction = "inbound"
@@ -131,6 +139,7 @@ resource "ibm_is_security_group_rule" "dns_vm_sg_dns_all" {
 
 # allow all incoming network traffic for ping
 resource "ibm_is_security_group_rule" "dns_vm_sg_ping_all" {
+
   count     = 1
   group     = ibm_is_security_group.dns_vm_sg[0].id
   direction = "inbound"
@@ -143,11 +152,13 @@ resource "ibm_is_security_group_rule" "dns_vm_sg_ping_all" {
 }
 
 data "ibm_is_image" "dns_vm_image" {
+
   count = 1
   name  = var.dns_vm_image_name
 }
 
 resource "ibm_is_instance" "dns_vm_vsi" {
+
   count = 1
 
   depends_on = [ibm_is_ssh_key.dns_ssh_key]

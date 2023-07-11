@@ -3,16 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-provider "ibm" {
-  ibmcloud_api_key = var.ibmcloud_api_key
-  region           = var.vpc_region
-  zone             = var.vpc_zone
-  alias            = "ibmcloud"
-}
-
 data "ibm_is_vpc" "ibm_is_vpc" {
-  provider = ibm.ibmcloud
-  name     = var.vpc_name
+  name = var.vpc_name
 
   lifecycle {
     # Confirms the PVS/VPC regions are compatible.

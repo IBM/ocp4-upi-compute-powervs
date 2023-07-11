@@ -32,6 +32,9 @@ locals {
 
 ### Prepares the VPC Support Machine
 module "checks" {
+  providers = {
+    ibm = ibm.ibmcloud
+  }
   source = "./modules/0_checks"
 
   ibmcloud_api_key = var.ibmcloud_api_key
@@ -43,10 +46,15 @@ module "checks" {
 
 ### Prepares the VPC Support Machine
 module "vpc_support" {
+  providers = {
+    ibm = ibm.ibmcloud
+  }
   depends_on = [module.checks]
 
   source            = "./modules/0_vpc_support"
   vpc_name          = var.vpc_name
+  vpc_region        = var.vpc_region
+  vpc_zone          = var.vpc_zone
   public_key        = var.public_key
   public_key_file   = var.public_key_file
   openshift_api_url = var.openshift_api_url
