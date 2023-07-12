@@ -5,7 +5,7 @@
 
 output "bastion_image_id" {
   description = "The PowerVS Centos/RHEL Image Id"
-  value       = data.ibm_pi_image.bastion.id
+  value       = data.ibm_pi_image.bastion[0].id
 }
 
 output "rhcos_image_id" {

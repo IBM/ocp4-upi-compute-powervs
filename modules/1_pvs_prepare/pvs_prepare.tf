@@ -5,11 +5,11 @@
 
 module "images" {
   providers = {
-    ibm = ibm.ibmcloud
+    ibm = ibm
   }
   source = "./images"
 
-  powervs_service_instance_id                = var.powervs_service_instance_id
+  powervs_service_instance_id        = var.powervs_service_instance_id
   powervs_region                     = var.powervs_region
   rhel_image_name                    = var.rhel_image_name
   rhcos_image_name                   = var.rhcos_image_name
@@ -21,41 +21,41 @@ module "images" {
 
 module "keys" {
   providers = {
-    ibm = ibm.ibmcloud
+    ibm = ibm
   }
   source = "./keys"
 
   powervs_service_instance_id = var.powervs_service_instance_id
-  name_prefix         = var.name_prefix
-  public_key          = var.public_key
+  name_prefix                 = var.name_prefix
+  public_key                  = var.public_key
 }
 
 module "network" {
   providers = {
-    ibm = ibm.ibmcloud
+    ibm = ibm
   }
   source = "./network"
 
   powervs_service_instance_id = var.powervs_service_instance_id
-  name_prefix         = var.name_prefix
-  pub_network_dns     = var.pub_network_dns
-  pvs_network_name    = var.pvs_network_name
-  machine_cidr        = var.machine_cidr
-  vpc_dns_server      = var.vpc_dns_server
-  enable_snat         = var.enable_snat
-  cluster_id          = var.cluster_id
-  cloud_conn_name     = var.cloud_conn_name
-  vpc_crn             = var.vpc_crn
+  name_prefix                 = var.name_prefix
+  powervs_dns_forwarders      = var.powervs_dns_forwarders
+  powervs_network_name        = var.powervs_network_name
+  powervs_machine_cidr        = var.powervs_machine_cidr
+  vpc_support_server_ip       = var.vpc_support_server_ip
+  enable_snat                 = var.enable_snat
+  cluster_id                  = var.cluster_id
+  cloud_conn_name             = var.cloud_conn_name
+  vpc_crn                     = var.vpc_crn
 }
 
 module "bastion" {
   providers = {
-    ibm = ibm.ibmcloud
+    ibm = ibm
   }
   depends_on = [module.images, module.keys, module.network]
   source     = "./bastion"
 
-  powervs_service_instance_id         = var.powervs_service_instance_id
+  powervs_service_instance_id = var.powervs_service_instance_id
   name_prefix                 = var.name_prefix
   bastion                     = var.bastion
   system_type                 = var.system_type

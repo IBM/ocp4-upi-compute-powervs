@@ -6,7 +6,7 @@
 # *Bastion*
 # Checks the image catalog to see if the image name exists and extracts the id
 data "ibm_pi_catalog_images" "catalog_images" {
-  pi_cloud_instance_id = var.service_instance_id
+  pi_cloud_instance_id = var.powervs_service_instance_id
 }
 
 locals {
@@ -17,7 +17,7 @@ locals {
 
 data "ibm_pi_image" "bastion" {
   count                = length(local.catalog_bastion_image) == 0 ? 1 : 0
-  pi_cloud_instance_id = var.service_instance_id
+  pi_cloud_instance_id = var.powervs_service_instance_id
   pi_image_name        = var.rhel_image_name
 }
 
@@ -43,7 +43,7 @@ locals {
 resource "ibm_pi_image" "rhcos_image_import" {
   count = var.rhcos_import_image ? 1 : 0
 
-  pi_cloud_instance_id      = var.service_instance_id
+  pi_cloud_instance_id      = var.powervs_service_instance_id
   pi_image_name             = "rhcos-${var.rhcos_import_image_storage_type}-image"
   pi_image_bucket_name      = "rhcos-powervs-images-${local.rhcos_import_bucket_region}"
   pi_image_bucket_region    = local.rhcos_import_bucket_region
@@ -55,5 +55,5 @@ data "ibm_pi_image" "rhcos" {
   depends_on = [ibm_pi_image.rhcos_image_import]
 
   pi_image_name        = var.rhcos_import_image ? ibm_pi_image.rhcos_image_import[0].pi_image_name : var.rhcos_image_name
-  pi_cloud_instance_id = var.service_instance_id
+  pi_cloud_instance_id = var.powervs_service_instance_id
 }

@@ -12,17 +12,9 @@ output "name_prefix" {
 }
 
 output "bastion_private_vip" {
-  value = module.prepare.bastion_vip == "" ? null : module.prepare.bastion_vip
-}
-
-output "bastion_private_ip" {
-  value = join(", ", module.prepare.bastion_ip)
+  value = module.pvs_prepare.bastion_ip
 }
 
 output "bastion_public_ip" {
-  value = join(", ", module.prepare.bastion_public_ip)
-}
-
-output "bastion_ssh_command" {
-  value = "ssh -i ${var.private_key_file} ${var.rhel_username}@${module.prepare.bastion_public_ip[0]}"
+  value = join(", ", module.pvs_prepare.bastion_public_ip)
 }

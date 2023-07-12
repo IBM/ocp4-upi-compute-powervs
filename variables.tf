@@ -209,6 +209,12 @@ variable "rhcos_import_image_storage_type" {
   default     = "tier1"
 }
 
+variable "rhcos_import_image_region_override" {
+  type        = string
+  description = "Overrides the region used to import"
+  default     = ""
+}
+
 ### RHCOS Instance Details
 
 variable "rhcos_pre_kernel_options" {
@@ -224,12 +230,18 @@ variable "rhcos_kernel_options" {
 }
 
 ################################################################
-# IBM Cloud DirectLink configuration variables
+# PowerVS Network - Networking
 ################################################################
 
-variable "ibmcloud_dl_endpoint_net_cidr" {
+variable "powervs_machine_cidr" {
   type        = string
-  description = "IBM Cloud DirectLink endpoint network cidr eg. 10.0.0.0/8"
+  description = "PowerVS DHCP Network cidr eg. 192.168.200.0/24"
+  default     = "192.168.200.0/24"
+}
+
+variable "powervs_network_name" {
+  type        = string
+  description = "PowerVS DHCP Network name"
   default     = ""
 }
 
@@ -376,15 +388,21 @@ variable "powervs_dns_forwarders" {
   default = "8.8.8.8;8.8.4.4"
 }
 
+variable "cloud_conn_name" {
+  type        = string
+  description = "The Cloud Connection Name that already exists"
+  default     = ""
+}
+
 variable "node_labels" {
   type        = map(string)
   description = "Map of node labels for the cluster nodes"
   default     = {}
 }
 
-variable "setup_snat" {
+variable "enable_snat" {
   type        = bool
-  description = "IMPORTANT: This is an experimental feature. Flag to configure bastion as SNAT and use the router on all cluster nodes"
+  description = "Enables SNAT on the DHCP service"
   default     = true
 }
 
