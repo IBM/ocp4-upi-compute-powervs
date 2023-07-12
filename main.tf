@@ -37,11 +37,12 @@ module "checks" {
   }
   source = "./modules/0_checks"
 
-  ibmcloud_api_key = var.ibmcloud_api_key
-  vpc_name         = var.vpc_name
-  vpc_region       = var.vpc_region
-  vpc_zone         = var.vpc_zone
-  powervs_region   = var.powervs_region
+  ibmcloud_api_key      = var.ibmcloud_api_key
+  vpc_name              = var.vpc_name
+  vpc_region            = var.vpc_region
+  vpc_zone              = var.vpc_zone
+  powervs_region        = var.powervs_region
+  override_region_check = var.override_region_check
 }
 
 ### Prepares the VPC Support Machine

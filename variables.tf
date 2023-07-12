@@ -475,3 +475,13 @@ variable "kubeconfig_file" {
   description = "Path to kubeconfig file"
   default     = "data/kubeconfig"
 }
+
+################################################################
+# Overrides the Region Check
+################################################################
+
+variable "override_region_check" {
+  type         = boolean
+  desceription = "Set to true if you want to skip region checks."
+  default      = false
+}

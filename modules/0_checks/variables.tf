@@ -32,3 +32,9 @@ variable "powervs_region" {
   description = "The IBM Cloud region where you want to create the workers"
   default     = ""
 }
+
+variable "override_region_check" {
+  type         = boolean
+  desceription = "Set to true if you want to skip region checks."
+  default      = false
+}
