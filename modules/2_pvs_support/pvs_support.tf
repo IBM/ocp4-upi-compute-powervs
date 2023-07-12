@@ -9,10 +9,10 @@ locals {
     name_prefix       = var.name_prefix
     cluster_id        = var.cluster_id
     name_prefix       = var.name_prefix
-    bastion_ip        = var.bastion_ip[0]
+    bastion_ip        = var.bastion_ip
     bastion_name      = "${var.name_prefix}-bastion-0"
     isHA              = false
-    bastion_master_ip = var.bastion_ip[0]
+    bastion_master_ip = var.bastion_ip
     bastion_backup_ip = []
     forwarders        = var.vpc_dns_forwarders
     # Might have to force this to SNAT which uses var.bastion_ip[0]

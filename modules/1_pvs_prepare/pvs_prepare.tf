@@ -3,6 +3,24 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
+# The code block that follows loads the image catalog
+# Checks the image catalog to see if the catalog exists.
+data "ibm_pi_catalog_images" "catalog_images" {
+  pi_cloud_instance_id = var.service_instance_id
+}
+
+locals {
+  catalog_bastion_image = [for x in data.ibm_pi_catalog_images.catalog_images.images : x if x.name == var.rhel_image_name]
+  bastion_image_id      = length(local.catalog_bastion_image) == 0 ? data.ibm_pi_image.bastion[0].id : local.catalog_bastion_image[0].image_id
+  bastion_storage_pool  = length(local.catalog_bastion_image) == 0 ? data.ibm_pi_image.bastion[0].storage_pool : local.catalog_bastion_image[0].storage_pool
+}
+
+data "ibm_pi_image" "bastion" {
+  count                = length(local.catalog_bastion_image) == 0 ? 1 : 0
+  pi_image_name        = var.rhel_image_name
+  pi_cloud_instance_id = var.service_instance_id
+}
+
 # Based on https://github.com/ocp-power-automation/ocp4-upi-powervs/blob/main/ocp.tf 
 locals {
   powervs_vpc_region_map = {
@@ -40,22 +58,6 @@ data "ibm_pi_image" "rhcos" {
 
 locals {
   bastion_count = lookup(var.bastion, "count", 1)
-}
-
-data "ibm_pi_catalog_images" "catalog_images" {
-  pi_cloud_instance_id = var.service_instance_id
-}
-
-locals {
-  catalog_bastion_image = [for x in data.ibm_pi_catalog_images.catalog_images.images : x if x.name == var.rhel_image_name]
-  bastion_image_id      = length(local.catalog_bastion_image) == 0 ? data.ibm_pi_image.bastion[0].id : local.catalog_bastion_image[0].image_id
-  bastion_storage_pool  = length(local.catalog_bastion_image) == 0 ? data.ibm_pi_image.bastion[0].storage_pool : local.catalog_bastion_image[0].storage_pool
-}
-
-data "ibm_pi_image" "bastion" {
-  count                = length(local.catalog_bastion_image) == 0 ? 1 : 0
-  pi_image_name        = var.rhel_image_name
-  pi_cloud_instance_id = var.service_instance_id
 }
 
 data "ibm_pi_network" "network" {
@@ -346,31 +348,4 @@ resource "ibm_pi_network_port_attach" "bastion_external_vip" {
   pi_instance_id              = ibm_pi_instance.bastion[count.index].instance_id
   pi_network_name             = ibm_pi_network.public_network.pi_network_name
   pi_network_port_description = "External VIP"
-}
-
-# Depends on the url/user/pass to annotate the csi namespace
-# causing the scheduler to place the workload only on amd64 nodes
-resource "null_resource" "exclude_vpc_csi" {
-  count      = local.bastion_count
-  depends_on = [null_resource.cloud_init_remove]
-
-  connection {
-    type        = "ssh"
-    user        = var.rhel_username
-    host        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
-    private_key = var.private_key
-    agent       = var.ssh_agent
-    timeout     = "${var.connection_timeout}m"
-  }
-
-  provisioner "remote-exec" {
-    inline = [<<EOF
-export HTTPS_PROXY="http://10.248.0.6:3128"
-oc login \
-  "${var.openshift_api_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
-oc annotate ns openshift-cluster-csi-drivers \
-    scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
-EOF
-    ]
-  }
 }

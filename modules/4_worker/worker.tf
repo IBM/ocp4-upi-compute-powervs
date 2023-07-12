@@ -3,6 +3,33 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
+# Depends on the url/user/pass to annotate the csi namespace
+# causing the scheduler to place the workload only on amd64 nodes
+# resource "null_resource" "exclude_vpc_csi" {
+#   count      = local.bastion_count
+#   #depends_on = [null_resource.cloud_init_remove]
+
+#   connection {
+#     type        = "ssh"
+#     user        = var.rhel_username
+#     host        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
+#     private_key = var.private_key
+#     agent       = var.ssh_agent
+#     timeout     = "${var.connection_timeout}m"
+#   }
+
+#   provisioner "remote-exec" {
+#     inline = [<<EOF
+# export HTTPS_PROXY="http://10.248.0.6:3128"
+# oc login \
+#   "${var.openshift_api_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
+# oc annotate ns openshift-cluster-csi-drivers \
+#     scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
+# EOF
+#     ]
+#   }
+# }
+
 data "ibm_pi_catalog_images" "catalog_images" {
   pi_cloud_instance_id = var.service_instance_id
 }

@@ -125,6 +125,7 @@ variable "bastion_health_status" {
   }
 }
 
+# Centos default is CentOS-Stream-8
 variable "rhel_image_name" {
   type        = string
   description = "Name of the RHEL image that you want to use for the bastion node"
@@ -481,7 +482,7 @@ variable "kubeconfig_file" {
 ################################################################
 
 variable "override_region_check" {
-  type         = boolean
-  desceription = "Set to true if you want to skip region checks."
-  default      = false
+  type        = bool
+  description = "Set to true if you want to skip region checks."
+  default     = false
 }

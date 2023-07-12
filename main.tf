@@ -93,7 +93,7 @@ module "prepare" {
   rhel_smt                        = var.rhel_smt
   vpc_name                        = var.vpc_name
   vpc_region                      = var.vpc_region
-  powervs_network_name            = ""
+  powervs_network_name            = "DHCPSERVERcc-vpc-dhcp_Private"
   powervs_region                  = var.powervs_region
   ibmcloud_api_key                = var.ibmcloud_api_key
 
@@ -111,7 +111,7 @@ module "support" {
   depends_on = [module.prepare]
   source     = "./modules/2_pvs_support"
 
-  bastion_ip        = module.prepare.bastion_ip
+  bastion_ip        = module.prepare.bastion_ip[0]
   bastion_public_ip = module.prepare.bastion_public_ip
   gateway_ip        = module.prepare.gateway_ip
   cidr              = module.prepare.cidr
@@ -135,7 +135,7 @@ module "worker" {
   depends_on = [module.support]
   source     = "./modules/4_worker"
 
-  bastion_ip          = module.prepare.bastion_ip
+  bastion_ip          = module.prepare.bastion_ip[0]
   worker              = var.worker
   rhcos_image_name    = var.rhcos_image_name
   service_instance_id = var.powervs_service_instance_id
@@ -144,11 +144,11 @@ module "worker" {
   processor_type      = var.processor_type
   name_prefix         = local.name_prefix
   # TODO link to the Provisioning of the network
-  powervs_network_name   = ""
+  powervs_network_name   = "DHCPSERVERcc-vpc-dhcp_Private"
   powervs_dns_forwarders = var.powervs_dns_forwarders
 
   # Eventually, this should be a bit more dynamic - include the MachineConfigPool
-  ignition_url = "http://${module.prepare.bastion_ip}:8080/worker.ign"
+  ignition_url = "http://${module.prepare.bastion_ip[0]}:8080/worker.ign"
 
   workers_version = var.workers_version
 }
