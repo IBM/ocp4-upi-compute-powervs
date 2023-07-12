@@ -20,9 +20,5 @@ output "powervs_dhcp_network_id" {
 }
 
 output "powervs_dhcp_network_name" {
-  value = data.ibm_pi_dhcp.dhcp_service.pi_network_name
-}
-
-output "powervs_dhcp_cidr" {
-  value = data.ibm_pi_dhcp.dhcp_service.cidr
+  value = data.ibm_pi_dhcp.dhcp_service.network_name
 }

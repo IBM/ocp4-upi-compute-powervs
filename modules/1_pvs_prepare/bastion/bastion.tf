@@ -6,7 +6,7 @@
 resource "ibm_pi_instance" "bastion" {
   count = 1
 
-  pi_cloud_instance_id = var.service_instance_id
+  pi_cloud_instance_id = var.powervs_service_instance_id
   pi_memory            = var.bastion["memory"]
   pi_processors        = var.bastion["processors"]
   pi_instance_name     = "${var.name_prefix}-bastion-${count.index}"
@@ -15,7 +15,7 @@ resource "ibm_pi_instance" "bastion" {
   pi_key_pair_name     = var.key_name
   pi_sys_type          = var.system_type
   pi_health_status     = var.bastion_health_status
-  pi_storage_pool      = local.bastion_storage_pool
+  pi_storage_pool      = var.bastion_storage_pool
 
   pi_network {
     network_id = var.bastion_public_network_id
@@ -33,7 +33,7 @@ data "ibm_pi_instance_ip" "bastion_ip" {
 
   pi_instance_name     = ibm_pi_instance.bastion[count.index].pi_instance_name
   pi_network_name      = var.powervs_dhcp_network_name
-  pi_cloud_instance_id = var.service_instance_id
+  pi_cloud_instance_id = var.powervs_service_instance_id
 }
 
 data "ibm_pi_instance_ip" "bastion_public_ip" {
@@ -42,7 +42,7 @@ data "ibm_pi_instance_ip" "bastion_public_ip" {
 
   pi_instance_name     = ibm_pi_instance.bastion[count.index].pi_instance_name
   pi_network_name      = var.bastion_public_network_name
-  pi_cloud_instance_id = var.service_instance_id
+  pi_cloud_instance_id = var.powervs_service_instance_id
 }
 
 #### Configure the Bastion

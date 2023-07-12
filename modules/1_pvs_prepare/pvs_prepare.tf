@@ -69,7 +69,7 @@ module "bastion" {
   bastion_dhcp_network        = module.network.bastion_public_network_cidr
   powervs_dhcp_network_id     = module.network.powervs_dhcp_network_id
   powervs_dhcp_network_name   = module.network.powervs_dhcp_network_name
-  powervs_dhcp_network        = module.network.powervs_dhcp_cidr
+  powervs_dhcp_network        = var.powervs_machine_cidr
   private_key                 = var.private_key
   ssh_agent                   = var.ssh_agent
   connection_timeout          = var.connection_timeout
