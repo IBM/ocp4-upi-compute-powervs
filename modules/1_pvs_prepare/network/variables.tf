@@ -3,15 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-variable "cluster_id" {
-  type = string
-
-  validation {
-    condition     = length(var.cluster_id) <= 32
-    error_message = "Length cannot exceed 32 characters when combined with cluster_id_prefix."
-  }
-}
-variable "bastion" {}
+variable "powervs_service_instance_id" {}
 
 variable "name_prefix" {
   type = string
@@ -21,6 +13,26 @@ variable "name_prefix" {
     error_message = "Length cannot exceed 32 characters for name_prefix."
   }
 }
+
+variable "cluster_id" {
+  type = string
+
+  validation {
+    condition     = length(var.cluster_id) <= 32
+    error_message = "Length cannot exceed 32 characters when combined with cluster_id_prefix."
+  }
+}
+
+variable "pub_network_dns" {}
+variable "pvs_network_name" {}
+variable "machine_cidr" {}
+variable "vpc_dns_server" {}
+variable "enable_snat" {}
+variable "cluster_id" {}
+variable "cloud_conn_name" {}
+variable "vpc_crn" {}
+
+
 
 variable "node_prefix" {
   type = string

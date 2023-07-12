@@ -3,12 +3,13 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-output "bastion_ip" {
-  depends_on = [module.bastion]
-  value      = module.bastion.bastion_ip
-}
-
-output "bastion_public_ip" {
-  depends_on = [module.bastion]
-  value      = module.bastion.bastion_public_ip
+terraform {
+  required_providers {
+    ibm = {
+      source                = "IBM-Cloud/ibm"
+      version               = "~> 1.55.0"
+      configuration_aliases = [ibm]
+    }
+  }
+  required_version = ">= 1.5.0"
 }

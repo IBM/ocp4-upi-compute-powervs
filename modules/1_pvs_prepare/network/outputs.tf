@@ -1,0 +1,20 @@
+################################################################
+# Copyright 2023 - IBM Corporation. All rights reserved
+# SPDX-License-Identifier: Apache-2.0
+################################################################
+
+output "bastion_public_network_id" {
+  value = ibm_pi_network.public_network.network_id
+}
+
+output "bastion_public_network_name" {
+  value = ibm_pi_network.public_network.network_name
+}
+
+output "powervs_dhcp_network_id" {
+  value = data.ibm_pi_dhcp.dhcp_service.network_id
+}
+
+output "powervs_dhcp_network_name" {
+  value = data.ibm_pi_dhcp.dhcp_service.network_name
+}

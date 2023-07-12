@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
+variable "cluster_domain" {}
 variable "cluster_id" {
   type = string
 
@@ -45,7 +46,7 @@ variable "public_key" {}
 variable "processor_type" {}
 variable "system_type" {}
 variable "powervs_network_name" {}
-
+variable "network_dns" {}
 
 variable "bastion_health_status" {}
 variable "private_network_mtu" {}

@@ -200,7 +200,7 @@ variable "rhcos_import_image" {
 variable "rhcos_import_image_filename" {
   type        = string
   description = "Name of the RHCOS image object file. This file is expected to be in .ova.gz format"
-  default     = "rhcos-414-92-202307181612-0-ppc64le-powervs.ova.gz"
+  default     = "rhcos-414-92-202307050443-0-ppc64le-powervs.ova.gz"
 }
 
 variable "rhcos_import_image_storage_type" {

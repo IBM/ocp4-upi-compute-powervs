@@ -3,12 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-output "bastion_ip" {
-  depends_on = [module.bastion]
-  value      = module.bastion.bastion_ip
-}
-
-output "bastion_public_ip" {
-  depends_on = [module.bastion]
-  value      = module.bastion.bastion_public_ip
+# Acts as an update to the keypair
+resource "ibm_pi_key" "key" {
+  pi_cloud_instance_id = var.service_instance_id
+  pi_key_name          = "${var.name_prefix}-keypair"
+  pi_ssh_key           = var.public_key
 }

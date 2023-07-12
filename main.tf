@@ -68,43 +68,42 @@ module "prepare" {
   }
   source = "./modules/1_pvs_prepare"
 
-  bastion                         = var.bastion
-  service_instance_id             = var.powervs_service_instance_id
-  cluster_id                      = local.cluster_id
-  name_prefix                     = local.name_prefix
-  node_prefix                     = local.node_prefix
-  cluster_domain                  = var.cluster_domain
-  rhel_image_name                 = var.rhel_image_name
-  processor_type                  = var.processor_type
-  system_type                     = var.system_type
-  network_dns                     = var.powervs_dns_forwarders == "" ? [] : [for dns in split(";", var.powervs_dns_forwarders) : trimspace(dns)]
-  bastion_health_status           = var.bastion_health_status
-  private_network_mtu             = var.private_network_mtu
-  rhel_username                   = var.rhel_username
-  private_key                     = local.private_key
-  public_key                      = local.public_key
-  ssh_agent                       = var.ssh_agent
-  connection_timeout              = var.connection_timeout
-  rhel_subscription_username      = var.rhel_subscription_username
-  rhel_subscription_password      = var.rhel_subscription_password
-  rhel_subscription_org           = var.rhel_subscription_org
-  rhel_subscription_activationkey = var.rhel_subscription_activationkey
-  ansible_repo_name               = var.ansible_repo_name
-  rhel_smt                        = var.rhel_smt
-  vpc_name                        = var.vpc_name
-  vpc_region                      = var.vpc_region
-  powervs_network_name            = "DHCPSERVERcc-vpc-dhcp_Private"
-  powervs_region                  = var.powervs_region
-  ibmcloud_api_key                = var.ibmcloud_api_key
-
-  openshift_api_url = var.openshift_api_url
-  openshift_user    = var.openshift_user
-  openshift_pass    = var.openshift_pass
-
-  rhcos_image_name                = var.rhcos_image_name
-  rhcos_import_image              = var.rhcos_import_image
-  rhcos_import_image_filename     = var.rhcos_import_image_filename
-  rhcos_import_image_storage_type = var.rhcos_import_image_storage_type
+  bastion                            = var.bastion
+  service_instance_id                = var.powervs_service_instance_id
+  cluster_id                         = local.cluster_id
+  name_prefix                        = local.name_prefix
+  node_prefix                        = local.node_prefix
+  cluster_domain                     = var.cluster_domain
+  rhel_image_name                    = var.rhel_image_name
+  processor_type                     = var.processor_type
+  system_type                        = var.system_type
+  network_dns                        = var.powervs_dns_forwarders == "" ? [] : [for dns in split(";", var.powervs_dns_forwarders) : trimspace(dns)]
+  bastion_health_status              = var.bastion_health_status
+  private_network_mtu                = var.private_network_mtu
+  rhel_username                      = var.rhel_username
+  private_key                        = local.private_key
+  public_key                         = local.public_key
+  ssh_agent                          = var.ssh_agent
+  connection_timeout                 = var.connection_timeout
+  rhel_subscription_username         = var.rhel_subscription_username
+  rhel_subscription_password         = var.rhel_subscription_password
+  rhel_subscription_org              = var.rhel_subscription_org
+  rhel_subscription_activationkey    = var.rhel_subscription_activationkey
+  ansible_repo_name                  = var.ansible_repo_name
+  rhel_smt                           = var.rhel_smt
+  vpc_name                           = var.vpc_name
+  vpc_region                         = var.vpc_region
+  powervs_network_name               = "DHCPSERVERcc-vpc-dhcp_Private"
+  powervs_region                     = var.powervs_region
+  ibmcloud_api_key                   = var.ibmcloud_api_key
+  openshift_api_url                  = var.openshift_api_url
+  openshift_user                     = var.openshift_user
+  openshift_pass                     = var.openshift_pass
+  rhcos_image_name                   = var.rhcos_image_name
+  rhcos_import_image                 = var.rhcos_import_image
+  rhcos_import_image_filename        = var.rhcos_import_image_filename
+  rhcos_import_image_storage_type    = var.rhcos_import_image_storage_type
+  rhcos_import_image_region_override = var.rhcos_import_image_region_override
 }
 
 module "support" {
