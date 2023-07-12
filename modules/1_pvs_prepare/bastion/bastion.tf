@@ -84,7 +84,7 @@ echo 'vm.max_map_count = 262144' | sudo tee --append /etc/sysctl.conf > /dev/nul
 sudo ppc64_cpu --smt=${var.rhel_smt} | true
 
 # turn off rx and set mtu to var.private_network_mtu for all interfaces to improve network performance
-cidrs=("${ibm_pi_network.public_network.pi_cidr}" "${data.ibm_pi_network.network.cidr}")
+cidrs=("${var.bastion_public_cidr}" "${var.powervs_dhcp_cidr}")
 for cidr in "$${cidrs[@]}"; do
   envs=($(ip r | grep "$cidr dev" | awk '{print $3}'))
   for env in "$${envs[@]}"; do

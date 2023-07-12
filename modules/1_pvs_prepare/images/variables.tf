@@ -5,7 +5,7 @@
 
 # PVS
 variable "powervs_region" {}
-variable "service_instance_id" {}
+variable "powervs_service_instance_id" {}
 
 # Bastion
 variable "rhel_image_name" {}
