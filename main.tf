@@ -12,8 +12,8 @@ provider "ibm" {
 
 provider "ibm" {
   ibmcloud_api_key = var.ibmcloud_api_key
-  region           = var.vpc_region
-  zone             = var.vpc_zone
+  region           = var.powervs_region
+  zone             = var.powervs_zone
   alias            = "powervs"
 }
 
@@ -62,6 +62,9 @@ module "vpc_support" {
 
 ### Prepares the Bastion Support machine
 module "prepare" {
+  providers = {
+    ibm = ibm.powervs
+  }
   source = "./modules/1_pvs_prepare"
 
   bastion                         = var.bastion
