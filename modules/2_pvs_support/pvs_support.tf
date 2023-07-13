@@ -15,14 +15,8 @@ locals {
     bastion_master_ip = var.bastion_ip
     bastion_backup_ip = []
     forwarders        = var.vpc_dns_forwarders
-    # Might have to force this to SNAT which uses var.bastion_ip[0]
-    gateway_ip      = var.gateway_ip
-    netmask         = cidrnetmask(var.cidr)
-    broadcast       = cidrhost(var.cidr, -1)
-    ipid            = cidrhost(var.cidr, 0)
-    pool            = { "start" : cidrhost(var.cidr, 2), "end" : cidrhost(var.cidr, -2) }
-    client_tarball  = var.openshift_client_tarball
-    install_tarball = var.openshift_install_tarball
+    client_tarball    = var.openshift_client_tarball
+    install_tarball   = var.openshift_install_tarball
   }
 
   helpernode_inventory = {

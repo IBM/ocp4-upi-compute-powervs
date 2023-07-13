@@ -11,7 +11,7 @@ output "bastion_public_network_name" {
   value = ibm_pi_network.bastion_public_network.pi_network_name
 }
 
-output "bastion_public_cidr" {
+output "bastion_public_network_cidr" {
   value = ibm_pi_network.bastion_public_network.pi_cidr
 }
 

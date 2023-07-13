@@ -488,13 +488,6 @@ variable "workers_version" {
   default     = "1"
 }
 
-### OpenShift Configuration
-variable "kubeconfig_file" {
-  type        = string
-  description = "Path to kubeconfig file"
-  default     = "data/kubeconfig"
-}
-
 ################################################################
 # Overrides the Region Check
 ################################################################

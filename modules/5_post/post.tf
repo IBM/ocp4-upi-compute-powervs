@@ -14,7 +14,7 @@ locals {
   }
 }
 
-resource "null_resource" "post_kubeconfig" {
+resource "null_resource" "post_kube" {
   connection {
     type        = "ssh"
     user        = "root"
@@ -31,12 +31,6 @@ resource "null_resource" "post_kubeconfig" {
     ]
   }
 
-  #copy kubeconfig to Bastion
-  provisioner "file" {
-    source      = var.kubeconfig_file
-    destination = "/root/.kube/config"
-  }
-
   #copies the ansible/post to specific folder
   provisioner "file" {
     source      = "ansible/post"
@@ -46,7 +40,7 @@ resource "null_resource" "post_kubeconfig" {
 
 #command to run ansible playbook on Bastion
 resource "null_resource" "post_ansible" {
-  depends_on = [null_resource.post_kubeconfig]
+  depends_on = [null_resource.post_kube]
   connection {
     type        = "ssh"
     user        = "root"

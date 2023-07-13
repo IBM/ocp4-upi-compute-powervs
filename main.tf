@@ -96,6 +96,8 @@ module "pvs_prepare" {
   rhel_subscription_password         = var.rhel_subscription_password
   rhel_subscription_username         = var.rhel_subscription_username
   rhel_username                      = var.rhel_username
+  rhel_subscription_activationkey    = var.rhel_subscription_activationkey
+  rhel_smt                           = var.rhel_smt
   ssh_agent                          = var.ssh_agent
   system_type                        = var.system_type
   vpc_crn                            = module.vpc_support.vpc_crn
@@ -106,10 +108,8 @@ module "support" {
   depends_on = [module.pvs_prepare]
   source     = "./modules/2_pvs_support"
 
-  bastion_ip        = module.prepare.bastion_ip[0]
-  bastion_public_ip = module.prepare.bastion_public_ip
-  gateway_ip        = module.prepare.gateway_ip
-  cidr              = module.prepare.cidr
+  bastion_ip        = module.pvs_prepare.bastion_ip[0]
+  bastion_public_ip = module.pvs_prepare.bastion_public_ip
   cluster_domain    = var.cluster_domain
   cluster_id        = local.cluster_id
   name_prefix       = local.name_prefix
@@ -130,7 +130,7 @@ module "worker" {
   depends_on = [module.support]
   source     = "./modules/4_worker"
 
-  bastion_ip          = module.prepare.bastion_ip[0]
+  bastion_ip          = module.pvs_prepare.bastion_ip[0]
   worker              = var.worker
   rhcos_image_name    = var.rhcos_image_name
   service_instance_id = var.powervs_service_instance_id
@@ -143,7 +143,7 @@ module "worker" {
   powervs_dns_forwarders = var.powervs_dns_forwarders
 
   # Eventually, this should be a bit more dynamic - include the MachineConfigPool
-  ignition_url = "http://${module.prepare.bastion_ip[0]}:8080/worker.ign"
+  ignition_url = "http://${module.pvs_prepare.bastion_ip[0]}:8080/worker.ign"
 
   workers_version = var.workers_version
 }
@@ -153,13 +153,11 @@ module "post" {
   source     = "./modules/5_post"
 
   ssh_agent         = var.ssh_agent
-  bastion_public_ip = module.prepare.bastion_public_ip
+  bastion_public_ip = module.pvs_prepare.bastion_public_ip
   private_key_file  = var.private_key_file
-  kubeconfig_file   = var.kubeconfig_file
   ibmcloud_region   = var.vpc_region
   ibmcloud_zone     = var.vpc_zone
   system_type       = var.system_type
   nfs_server        = var.nfs_server
   nfs_path          = var.nfs_path
 }
-

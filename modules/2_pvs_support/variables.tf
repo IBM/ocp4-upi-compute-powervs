@@ -11,7 +11,7 @@ variable "cluster_id" {
 }
 
 variable "vpc_dns_forwarders" {
-  default = "161.26.0.7; 161.26.0.8"
+  default = "161.26.0.7;161.26.0.8"
 }
 
 variable "name_prefix" {}
@@ -19,9 +19,7 @@ variable "node_prefix" {}
 
 variable "bastion_ip" {}
 variable "bastion_public_ip" {}
-variable "gateway_ip" {}
 
-variable "cidr" {}
 variable "rhel_username" {}
 variable "private_key" {}
 variable "ssh_agent" {}

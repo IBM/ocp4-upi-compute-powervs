@@ -31,6 +31,8 @@ variable "rhel_subscription_org" {}
 variable "rhel_subscription_password" {}
 variable "rhel_subscription_username" {}
 variable "rhel_username" {}
+variable "rhel_smt" {}
+variable "rhel_subscription_activationkey" {}
 variable "ssh_agent" {}
 variable "system_type" {}
 variable "vpc_crn" {}
