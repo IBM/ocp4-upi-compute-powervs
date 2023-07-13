@@ -83,7 +83,7 @@ module "pvs_prepare" {
   private_key                        = var.private_key
   private_network_mtu                = var.private_network_mtu
   processor_type                     = var.processor_type
-  powervs_dns_forwarders             = var.powervs_dns_forwarders
+  powervs_dns_forwarders             = var.powervs_dns_forwarders == "" ? [] : [for dns in split(";", var.powervs_dns_forwarders) : trimspace(dns)]
   public_key                         = var.public_key
   powervs_network_name               = var.powervs_network_name
   rhcos_image_name                   = var.rhcos_image_name
@@ -130,17 +130,16 @@ module "worker" {
   depends_on = [module.support]
   source     = "./modules/4_worker"
 
-  bastion_ip          = module.pvs_prepare.bastion_ip[0]
-  worker              = var.worker
-  rhcos_image_name    = var.rhcos_image_name
-  service_instance_id = var.powervs_service_instance_id
-  system_type         = var.system_type
-  public_key_name     = var.public_key_name
-  processor_type      = var.processor_type
-  name_prefix         = local.name_prefix
-  # TODO link to the Provisioning of the network
-  powervs_network_name   = "DHCPSERVERcc-vpc-dhcp_Private"
-  powervs_dns_forwarders = var.powervs_dns_forwarders
+  bastion_ip             = module.pvs_prepare.bastion_ip[0]
+  worker                 = var.worker
+  rhcos_image_name       = var.rhcos_image_name
+  service_instance_id    = var.powervs_service_instance_id
+  system_type            = var.system_type
+  public_key_name        = var.public_key_name
+  processor_type         = var.processor_type
+  name_prefix            = local.name_prefix
+  powervs_network_name   = var.powervs_network_name
+  powervs_dns_forwarders = var.powervs_dns_forwarders == "" ? [] : [for dns in split(";", var.powervs_dns_forwarders) : trimspace(dns)]
 
   # Eventually, this should be a bit more dynamic - include the MachineConfigPool
   ignition_url = "http://${module.pvs_prepare.bastion_ip[0]}:8080/worker.ign"

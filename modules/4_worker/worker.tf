@@ -63,7 +63,7 @@ resource "ibm_pi_network" "public_network" {
   pi_network_name      = "${var.name_prefix}-worker-pub-net"
   pi_cloud_instance_id = var.service_instance_id
   pi_network_type      = "pub-vlan"
-  pi_dns               = [for dns in split(";", var.powervs_dns_forwarders) : trimspace(dns)]
+  pi_dns               = var.powervs_dns_forwarders
 }
 
 locals {
