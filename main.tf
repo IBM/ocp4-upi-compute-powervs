@@ -7,7 +7,7 @@ provider "ibm" {
   ibmcloud_api_key = var.ibmcloud_api_key
   region           = var.vpc_region
   zone             = var.vpc_zone
-  alias            = "ibmcloud"
+  alias            = "vpc"
 }
 
 provider "ibm" {
@@ -33,7 +33,7 @@ locals {
 ### Prepares the VPC Support Machine
 module "checks" {
   providers = {
-    ibm = ibm.ibmcloud
+    ibm = ibm.vpc
   }
   source = "./modules/0_checks"
 
@@ -48,7 +48,7 @@ module "checks" {
 ### Prepares the VPC Support Machine
 module "vpc_support" {
   providers = {
-    ibm = ibm.ibmcloud
+    ibm = ibm.vpc
   }
   depends_on = [module.checks]
 
