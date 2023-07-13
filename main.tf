@@ -135,8 +135,9 @@ module "worker" {
   name_prefix                 = local.name_prefix
   powervs_service_instance_id = var.powervs_service_instance_id
   powervs_dhcp_network_id     = module.pvs_prepare.powervs_dhcp_network_id
+  powervs_dhcp_network_name   = module.pvs_prepare.powervs_dhcp_network_name
   processor_type              = var.processor_type
-  rhcos_image_name            = module.pvs_prepare.rhcos_image_id
+  rhcos_image_id              = module.pvs_prepare.rhcos_image_id
   system_type                 = var.system_type
   worker                      = var.worker
   ignition_url                = "http://${module.pvs_prepare.bastion_ip[0]}:8080/worker.ign"
@@ -150,8 +151,8 @@ module "post" {
   ssh_agent         = var.ssh_agent
   bastion_public_ip = module.pvs_prepare.bastion_public_ip
   private_key_file  = var.private_key_file
-  ibmcloud_region   = var.vpc_region
-  ibmcloud_zone     = var.vpc_zone
+  vpc_region        = var.vpc_region
+  vpc_zone          = var.vpc_zone
   system_type       = var.system_type
   nfs_server        = module.vpc_support.vpc_support_server_ip
   nfs_path          = var.nfs_path

@@ -32,7 +32,6 @@ resource "ibm_is_security_group" "supp_vm_sg" {
 
 # allow all outgoing network traffic
 resource "ibm_is_security_group_rule" "supp_vm_sg_outgoing_all" {
-
   count     = 1
   group     = ibm_is_security_group.supp_vm_sg[0].id
   direction = "outbound"
@@ -41,7 +40,6 @@ resource "ibm_is_security_group_rule" "supp_vm_sg_outgoing_all" {
 
 # allow all incoming network traffic on port 22
 resource "ibm_is_security_group_rule" "supp_vm_sg_ssh_all" {
-
   count     = 1
   group     = ibm_is_security_group.supp_vm_sg[0].id
   direction = "inbound"
@@ -55,7 +53,6 @@ resource "ibm_is_security_group_rule" "supp_vm_sg_ssh_all" {
 
 # allow all incoming network traffic on port 3128
 resource "ibm_is_security_group_rule" "squid_vm_sg_ssh_all" {
-
   count     = 1
   group     = ibm_is_security_group.supp_vm_sg[0].id
   direction = "inbound"
@@ -69,7 +66,6 @@ resource "ibm_is_security_group_rule" "squid_vm_sg_ssh_all" {
 
 # allow all incoming network traffic on port 2049
 resource "ibm_is_security_group_rule" "nfs_1_vm_sg_ssh_all" {
-
   count     = 1
   group     = ibm_is_security_group.supp_vm_sg[0].id
   direction = "inbound"
@@ -83,7 +79,6 @@ resource "ibm_is_security_group_rule" "nfs_1_vm_sg_ssh_all" {
 
 # allow all incoming network traffic on port 111
 resource "ibm_is_security_group_rule" "nfs_2_vm_sg_ssh_all" {
-
   count     = 1
   group     = ibm_is_security_group.supp_vm_sg[0].id
   direction = "inbound"
@@ -97,7 +92,6 @@ resource "ibm_is_security_group_rule" "nfs_2_vm_sg_ssh_all" {
 
 # allow all incoming network traffic on port 2049
 resource "ibm_is_security_group_rule" "nfs_3_vm_sg_ssh_all" {
-
   count     = 1
   group     = ibm_is_security_group.supp_vm_sg[0].id
   direction = "inbound"
@@ -125,7 +119,6 @@ resource "ibm_is_security_group_rule" "nfs_4_vm_sg_ssh_all" {
 
 # allow all incoming network traffic on port 53
 resource "ibm_is_security_group_rule" "supp_vm_sg_supp_all" {
-
   count     = 1
   group     = ibm_is_security_group.supp_vm_sg[0].id
   direction = "inbound"
@@ -152,21 +145,18 @@ resource "ibm_is_security_group_rule" "supp_vm_sg_ping_all" {
 }
 
 data "ibm_is_image" "supp_vm_image" {
-
   count = 1
   name  = var.supp_vm_image_name
 }
 
 resource "ibm_is_instance" "supp_vm_vsi" {
-
   count = 1
-
-  depends_on = [ibm_is_ssh_key.supp_ssh_key]
+  depends_on = [ibm_is_ssh_key.vpc_support_ssh_key]
 
   name    = "${var.vpc_name}-dns-vsi"
   vpc     = data.ibm_is_vpc.ex_vpc.id
   zone    = data.ibm_is_vpc.ex_vpc.subnets[0].zone
-  keys    = [ibm_is_ssh_key.supp_ssh_key[0].id]
+  keys    = [ibm_is_ssh_key.vpc_support_ssh_key[0].id]
   image   = data.ibm_is_image.supp_vm_image[0].id
   profile = "cx2d-8x16"
   # Profiles: https://cloud.ibm.com/docs/vpc?topic=vpc-profiles&interface=ui
@@ -179,7 +169,7 @@ resource "ibm_is_instance" "supp_vm_vsi" {
     security_groups = [ibm_is_security_group.supp_vm_sg[0].id]
   }
 
-  user_data = templatefile("${path.cwd}/modules/0_vpc_support/templates/cloud-init.yaml.tpl", {
+  user_data = templatefile("${path.cwd}/modules/1_vpc_support/templates/cloud-init.yaml.tpl", {
     domain : split("//", split(":", var.openshift_api_url)[0])[0],
   })
 }

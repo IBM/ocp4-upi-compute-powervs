@@ -27,7 +27,7 @@ resource "ibm_pi_instance" "worker" {
 
   pi_user_data = base64encode(
     templatefile(
-      "${path.cwd}/modules/3_worker/templates/worker.ign",
+      "${path.cwd}/modules/4_worker/templates/worker.ign",
       { ignition_url : var.ignition_url,
         name : base64encode("${var.name_prefix}-worker-${count.index}"),
   }))
@@ -44,6 +44,6 @@ data "ibm_pi_instance_ip" "worker" {
   depends_on = [time_sleep.wait_3_minutes]
 
   pi_instance_name     = ibm_pi_instance.worker[count.index].pi_instance_name
-  pi_network_name      = data.ibm_pi_network.network.pi_network_name
+  pi_network_name      = var.powervs_dhcp_network_name
   pi_cloud_instance_id = var.powervs_service_instance_id
 }

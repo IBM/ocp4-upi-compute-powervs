@@ -1,26 +1,6 @@
 # This file is maintained automatically by "terraform init".
 # Manual edits may be lost in future updates.
 
-provider "registry.terraform.io/community-terraform-providers/ignition" {
-  version     = "2.1.3"
-  constraints = "~> 2.1.3"
-  hashes = [
-    "h1:INoLu3YibMW6tKlHhlQaD6/E7CeImSA+zreQFUlExjU=",
-    "zh:07f04b36d85710e88d883ff923bf048cbe4064cc618269ade121b867b9098a8b",
-    "zh:0c28253682958a57114b97176749b10ceff34ed459d2192607f0a1bee76a7452",
-    "zh:2a14a322d3b0edeafe276493f55080862609c3b5b2c62322a2ff59949e99eed9",
-    "zh:2b8a7717a2b7a5301ef1de538c0c60b7bb0f21e98f3383c9fff1e751cfea637a",
-    "zh:4fbee1f51942e65bdd35b8f742680bd4de4d1c06b8f2c6f13c989c6fbac2749a",
-    "zh:559d5960594ff0b979d2c3311809e131a2616bb095bdd9c6eb50ea6c8f6b140d",
-    "zh:688a47fcda72200c10babe555ce935db315c08c16f17a56f3ffcfdc336d77e70",
-    "zh:6b2b2b296e8de40ed30481e4d0641443aa9a14d59d987a324052b3c50441cbb3",
-    "zh:92ac3ed3c454e995e21552755b2ea84fd87bcbad9e844eb7c581986e88535cb3",
-    "zh:ca83c7c94e7adcfd4e0dbd7681ca34c05b9ae27298e886c75010f609bc4399d7",
-    "zh:d820747d3f463e442558d94ec390bf3dc28a8bddb8752738d983752af2644188",
-    "zh:ffe22bf5d12a52b8dcb76de4d605f93655e474901bc2d6b86ec8d6e4792c6b03",
-  ]
-}
-
 provider "registry.terraform.io/hashicorp/null" {
   version     = "3.2.1"
   constraints = "~> 3.2.1"

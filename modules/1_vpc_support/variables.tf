@@ -27,9 +27,9 @@ variable "vpc_zone" {
   default     = ""
 }
 
-variable "dns_vm_image_name" {
+variable "supp_vm_image_name" {
   type        = string
-  description = "The image name for the DNS VM."
+  description = "The image name for the support VM."
   default     = "ibm-centos-stream-9-amd64-3"
 }
 

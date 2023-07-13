@@ -23,6 +23,11 @@ output "powervs_dhcp_network_id" {
   value      = module.network.powervs_dhcp_network_id
 }
 
+output "powervs_dhcp_network_name" {
+  depends_on = [module.network]
+  value      = module.network.powervs_dhcp_network_name
+}
+
 output "rhcos_image_id" {
   depends_on = [module.images]
   value      = module.images.rhcos_image_id
