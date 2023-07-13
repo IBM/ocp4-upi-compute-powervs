@@ -9,21 +9,20 @@
 resource "ibm_pi_instance" "worker" {
   count = var.worker["count"]
 
-  pi_memory        = var.worker["memory"]
-  pi_processors    = var.worker["processors"]
-  pi_instance_name = "${var.name_prefix}-worker-${count.index}"
+  pi_cloud_instance_id = var.powervs_service_instance_id
+  pi_instance_name     = "${var.name_prefix}-worker-${count.index}"
 
-  pi_proc_type = var.processor_type
-  pi_image_id  = local.worker_image_id
-  pi_sys_type  = var.system_type
-
-  pi_cloud_instance_id = var.service_instance_id
+  pi_sys_type   = var.system_type
+  pi_proc_type  = var.processor_type
+  pi_memory     = var.worker["memory"]
+  pi_processors = var.worker["processors"]
+  pi_image_id   = var.rhcos_image_id
 
   pi_network {
-    network_id = data.ibm_pi_network.network.id
+    network_id = var.powervs_dhcp_network_id
   }
 
-  pi_key_pair_name = var.public_key_name
+  pi_key_pair_name = var.key_name
   pi_health_status = "WARNING"
 
   pi_user_data = base64encode(
@@ -46,14 +45,5 @@ data "ibm_pi_instance_ip" "worker" {
 
   pi_instance_name     = ibm_pi_instance.worker[count.index].pi_instance_name
   pi_network_name      = data.ibm_pi_network.network.pi_network_name
-  pi_cloud_instance_id = var.service_instance_id
-}
-
-data "ibm_pi_instance_ip" "worker_public_ip" {
-  count      = var.worker["count"]
-  depends_on = [time_sleep.wait_3_minutes]
-
-  pi_instance_name     = ibm_pi_instance.worker[count.index].pi_instance_name
-  pi_network_name      = data.ibm_pi_network.network.pi_network_name
-  pi_cloud_instance_id = var.service_instance_id
+  pi_cloud_instance_id = var.powervs_service_instance_id
 }

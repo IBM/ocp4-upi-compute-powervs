@@ -52,7 +52,7 @@ module "vpc_support" {
   }
   depends_on = [module.checks]
 
-  source            = "./modules/0_vpc_support"
+  source            = "./modules/1_vpc_support"
   vpc_name          = var.vpc_name
   vpc_region        = var.vpc_region
   vpc_zone          = var.vpc_zone
@@ -66,7 +66,7 @@ module "pvs_prepare" {
   providers = {
     ibm = ibm.powervs
   }
-  source = "./modules/1_pvs_prepare"
+  source = "./modules/2_pvs_prepare"
 
   ansible_repo_name                  = var.ansible_repo_name
   bastion                            = var.bastion
@@ -109,7 +109,7 @@ module "support" {
     ibm = ibm.powervs
   }
   depends_on = [module.pvs_prepare]
-  source     = "./modules/2_pvs_support"
+  source     = "./modules/3_pvs_support"
 
   private_key_file         = var.private_key_file
   ssh_agent                = var.ssh_agent
@@ -129,25 +129,23 @@ module "worker" {
     ibm = ibm.powervs
   }
   depends_on = [module.support]
-  source     = "./modules/3_worker"
+  source     = "./modules/4_worker"
 
-  bastion_ip             = module.pvs_prepare.bastion_ip[0]
-  worker                 = var.worker
-  rhcos_image_name       = var.rhcos_image_name
-  service_instance_id    = var.powervs_service_instance_id
-  system_type            = var.system_type
-  public_key_name        = var.public_key_name
-  processor_type         = var.processor_type
-  name_prefix            = local.name_prefix
-  powervs_network_name   = var.powervs_network_name
-  powervs_dns_forwarders = var.powervs_dns_forwarders == "" ? [] : [for dns in split(";", var.powervs_dns_forwarders) : trimspace(dns)]
-  ignition_url           = "http://${module.pvs_prepare.bastion_ip[0]}:8080/worker.ign"
+  key_name                    = module.pvs_prepare.pvs_pubkey_name
+  name_prefix                 = local.name_prefix
+  powervs_service_instance_id = var.powervs_service_instance_id
+  powervs_dhcp_network_id     = module.pvs_prepare.powervs_dhcp_network_id
+  processor_type              = var.processor_type
+  rhcos_image_name            = module.pvs_prepare.rhcos_image_id
+  system_type                 = var.system_type
+  worker                      = var.worker
+  ignition_url                = "http://${module.pvs_prepare.bastion_ip[0]}:8080/worker.ign"
   # Eventually, this should be a bit more dynamic and include MachineConfigPool
 }
 
 module "post" {
   depends_on = [module.worker]
-  source     = "./modules/4_post"
+  source     = "./modules/5_post"
 
   ssh_agent         = var.ssh_agent
   bastion_public_ip = module.pvs_prepare.bastion_public_ip

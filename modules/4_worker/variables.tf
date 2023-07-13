@@ -3,7 +3,15 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
+variable "ignition_url" {}
+variable "key_name" {}
 variable "name_prefix" {}
+variable "powervs_service_instance_id" {}
+variable "powervs_dhcp_network_id" {}
+variable "processor_type" {}
+variable "rhcos_image_id" {}
+variable "system_type" {}
+
 variable "worker" {
   type = object({ count = number, memory = string, processors = string })
   default = {
@@ -16,24 +24,3 @@ variable "worker" {
     error_message = "The worker.count value must be greater than 1."
   }
 }
-
-variable "rhcos_image_name" {}
-
-variable "powervs_network_name" {}
-
-
-variable "system_type" {}
-variable "public_key_name" {}
-variable "processor_type" {}
-
-variable "service_instance_id" {
-  type        = string
-  description = "The cloud instance ID of your account"
-  default     = ""
-}
-
-variable "bastion_ip" {}
-
-
-variable "powervs_dns_forwarders" {}
-variable "ignition_url" {}
