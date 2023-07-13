@@ -1,5 +1,0 @@
----
-
-ibmcloud_dl_endpoint_net_cidr: "${ibmcloud_dl_endpoint_net_cidr}"
-ibmcloud_http_proxy: "${ibmcloud_http_proxy}"
-ocp_node_net_gw: "${ocp_node_net_gw}"
