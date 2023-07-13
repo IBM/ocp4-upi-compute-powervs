@@ -150,7 +150,7 @@ data "ibm_is_image" "supp_vm_image" {
 }
 
 resource "ibm_is_instance" "supp_vm_vsi" {
-  count = 1
+  count      = 1
   depends_on = [ibm_is_ssh_key.vpc_support_ssh_key]
 
   name    = "${var.vpc_name}-dns-vsi"
