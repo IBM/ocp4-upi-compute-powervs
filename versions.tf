@@ -13,10 +13,6 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.5.1"
     }
-    ignition = {
-      source  = "community-terraform-providers/ignition"
-      version = "~> 2.1.3"
-    }
     null = {
       source  = "hashicorp/null"
       version = "~> 3.2.1"

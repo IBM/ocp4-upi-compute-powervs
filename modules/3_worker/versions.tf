@@ -9,13 +9,10 @@ terraform {
       source  = "hashicorp/null"
       version = "~> 3.2.1"
     }
-    ignition = {
-      source  = "community-terraform-providers/ignition"
-      version = "~> 2.1.3"
-    }
     ibm = {
-      source  = "IBM-Cloud/ibm"
-      version = "~> 1.55.0"
+      source                = "IBM-Cloud/ibm"
+      version               = "~> 1.55.0"
+      configuration_aliases = [ibm]
     }
   }
   required_version = ">= 1.5.0"

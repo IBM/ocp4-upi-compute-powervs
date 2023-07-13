@@ -143,7 +143,7 @@
         validate_certs: false
         headers: "Accept: application/vnd.coreos.ignition+json;version=3.2.0"
       environment:
-        https_proxy: https://{{ vpc_support_server_ip }}:8080
+        https_proxy: http://{{ vpc_support_server_ip }}:3128
 
     - name: Make ignition file readable
       ansible.builtin.file:

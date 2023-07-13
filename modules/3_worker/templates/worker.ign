@@ -4,7 +4,7 @@
         "config": {
             "merge": [
                 {
-                    "source": "http://${ignition_url}:80/worker.ign"
+                    "source": "http://${ignition_url}:8080/worker.ign"
                 }
             ]
         }

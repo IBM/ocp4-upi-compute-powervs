@@ -10,5 +10,7 @@ variable "rhel_username" {}
 variable "bastion_ip" {}
 variable "bastion_public_ip" {}
 variable "openshift_client_tarball" {}
-variable "openshift_api_url" {}
 variable "vpc_support_server_ip" {}
+variable "openshift_api_url" {}
+variable "openshift_user" {}
+variable "openshift_pass" {}

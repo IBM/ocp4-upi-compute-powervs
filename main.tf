@@ -105,6 +105,9 @@ module "pvs_prepare" {
 }
 
 module "support" {
+  providers = {
+    ibm = ibm.powervs
+  }
   depends_on = [module.pvs_prepare]
   source     = "./modules/2_pvs_support"
 
@@ -115,13 +118,18 @@ module "support" {
   bastion_ip               = module.pvs_prepare.bastion_ip[0]
   bastion_public_ip        = module.pvs_prepare.bastion_public_ip[0]
   openshift_client_tarball = var.openshift_client_tarball
-  openshift_api_url        = var.openshift_api_url
   vpc_support_server_ip    = module.vpc_support.vpc_support_server_ip
+  openshift_api_url        = var.openshift_api_url
+  openshift_user           = var.openshift_user
+  openshift_pass           = var.openshift_pass
 }
 
 module "worker" {
+  providers = {
+    ibm = ibm.powervs
+  }
   depends_on = [module.support]
-  source     = "./modules/4_worker"
+  source     = "./modules/3_worker"
 
   bastion_ip             = module.pvs_prepare.bastion_ip[0]
   worker                 = var.worker
@@ -133,14 +141,13 @@ module "worker" {
   name_prefix            = local.name_prefix
   powervs_network_name   = var.powervs_network_name
   powervs_dns_forwarders = var.powervs_dns_forwarders == "" ? [] : [for dns in split(";", var.powervs_dns_forwarders) : trimspace(dns)]
-
-  # Eventually, this should be a bit more dynamic - include the MachineConfigPool
-  ignition_url = "http://${module.pvs_prepare.bastion_ip[0]}:8080/worker.ign"
+  ignition_url           = "http://${module.pvs_prepare.bastion_ip[0]}:8080/worker.ign"
+  # Eventually, this should be a bit more dynamic and include MachineConfigPool
 }
 
 module "post" {
   depends_on = [module.worker]
-  source     = "./modules/5_post"
+  source     = "./modules/4_post"
 
   ssh_agent         = var.ssh_agent
   bastion_public_ip = module.pvs_prepare.bastion_public_ip

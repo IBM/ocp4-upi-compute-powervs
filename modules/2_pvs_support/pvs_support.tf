@@ -59,4 +59,15 @@ ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support.log ansible-p
 EOF
     ]
   }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
+oc login \
+  "${var.openshift_api_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
+oc annotate ns openshift-cluster-csi-drivers \
+    scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
+EOF
+    ]
+  }
 }
