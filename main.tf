@@ -51,8 +51,8 @@ module "vpc_support" {
     ibm = ibm.vpc
   }
   depends_on = [module.checks]
-
   source            = "./modules/1_vpc_support"
+
   vpc_name          = var.vpc_name
   vpc_region        = var.vpc_region
   vpc_zone          = var.vpc_zone
@@ -66,6 +66,7 @@ module "pvs_prepare" {
   providers = {
     ibm = ibm.powervs
   }
+  depends_on = [module.vpc_support]
   source = "./modules/2_pvs_prepare"
 
   ansible_repo_name                  = var.ansible_repo_name
