@@ -6,8 +6,8 @@
 locals {
   ansible_post_path = "/root/ocp4-upi-compute-powervs/post"
   ansible_vars = {
-    region      = var.ibmcloud_region
-    zone        = var.ibmcloud_zone
+    region      = var.vpc_region
+    zone        = var.vpc_zone
     system_type = var.system_type
     nfs_server  = var.nfs_server
     nfs_path    = var.nfs_path

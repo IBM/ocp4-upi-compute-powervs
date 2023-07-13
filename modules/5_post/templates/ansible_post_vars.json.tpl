@@ -2,6 +2,9 @@
 node_labels: {
   "topology.kubernetes.io/region": "${region}",
   "topology.kubernetes.io/zone": "${zone}",
+  "failure-domain.beta.kubernetes.io/region": "${region}",
+  "failure-domain.beta.kubernetes.io/zone": "${zone}",
+  "vpc-block-csi-driver-labels": "",
   "node.kubernetes.io/instance-type": "${system_type}"
 }
 

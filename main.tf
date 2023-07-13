@@ -153,6 +153,6 @@ module "post" {
   ibmcloud_region   = var.vpc_region
   ibmcloud_zone     = var.vpc_zone
   system_type       = var.system_type
-  nfs_server        = var.nfs_server
+  nfs_server        = module.vpc_support.vpc_support_server_ip
   nfs_path          = var.nfs_path
 }
