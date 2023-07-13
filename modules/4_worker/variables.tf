@@ -38,7 +38,5 @@ variable "worker" {
     error_message = "The worker.count value must be greater than 1."
   }
 }
-
-variable "workers_version" {}
 variable "powervs_dns_forwarders" {}
 variable "ignition_url" {}

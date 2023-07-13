@@ -4,37 +4,25 @@
 ################################################################
 
 locals {
-  helpernode_vars = {
-    cluster_domain    = var.cluster_domain
-    name_prefix       = var.name_prefix
-    cluster_id        = var.cluster_id
-    name_prefix       = var.name_prefix
-    bastion_ip        = var.bastion_ip
-    bastion_name      = "${var.name_prefix}-bastion-0"
-    isHA              = false
-    bastion_master_ip = var.bastion_ip
-    bastion_backup_ip = []
-    forwarders        = var.vpc_dns_forwarders
-    client_tarball    = var.openshift_client_tarball
-    install_tarball   = var.openshift_install_tarball
-  }
-
+  # The Inventory File
   helpernode_inventory = {
     rhel_username = var.rhel_username
     bastion_ip    = var.bastion_ip
   }
+
+  helpernode_vars = {
+    client_tarball               = var.openshift_client_tarball
+    openshift_machine_config_url = replace(var.openshift_api_url, ":6443", "")
+    vpc_support_server_ip        = var.vpc_support_server_ip
+  }
 }
 
 resource "null_resource" "config" {
-  triggers = {
-    version = var.ansible_support_version
-  }
-
   connection {
     type        = "ssh"
     user        = var.rhel_username
     host        = var.bastion_public_ip[0]
-    private_key = var.private_key
+    private_key = file(var.private_key_file)
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"
   }
@@ -54,20 +42,20 @@ resource "null_resource" "config" {
   }
 
   provisioner "file" {
-    content     = templatefile("${path.module}/templates/helpernode_inventory", local.helpernode_inventory)
+    content     = templatefile("${path.module}/templates/inventory.tpl", local.helpernode_inventory)
     destination = "ocp4-upi-compute-powervs/support/inventory"
   }
 
   provisioner "file" {
-    content     = templatefile("${path.module}/templates/helpernode_vars.yaml", local.helpernode_vars)
-    destination = "ocp4-upi-compute-powervs/support/helpernode_vars.yaml"
+    content     = templatefile("${path.module}/templates/vars.yaml.tpl", local.helpernode_vars)
+    destination = "ocp4-upi-compute-powervs/support/vars.yaml"
   }
 
   provisioner "remote-exec" {
     inline = [<<EOF
 echo 'Running ocp4-upi-compute-powervs playbook...'
 cd ocp4-upi-compute-powervs/support
-ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support.log ansible-playbook -e @helpernode_vars.yaml tasks/main.yml --become
+ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support.log ansible-playbook -e @vars.yaml tasks/main.yml --become
 EOF
     ]
   }

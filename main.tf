@@ -108,22 +108,15 @@ module "support" {
   depends_on = [module.pvs_prepare]
   source     = "./modules/2_pvs_support"
 
-  bastion_ip        = module.pvs_prepare.bastion_ip[0]
-  bastion_public_ip = module.pvs_prepare.bastion_public_ip
-  cluster_domain    = var.cluster_domain
-  cluster_id        = local.cluster_id
-  name_prefix       = local.name_prefix
-  node_prefix       = local.node_prefix
-
-  rhel_username = var.rhel_username
-  private_key   = local.private_key
-  ssh_agent     = var.ssh_agent
-
-  openshift_install_tarball = var.openshift_install_tarball
-  openshift_client_tarball  = var.openshift_client_tarball
-  ansible_support_version   = var.ansible_support_version
-
-  connection_timeout = var.connection_timeout
+  private_key_file         = var.private_key_file
+  ssh_agent                = var.ssh_agent
+  connection_timeout       = var.connection_timeout
+  rhel_username            = var.rhel_username
+  bastion_ip               = module.pvs_prepare.bastion_ip[0]
+  bastion_public_ip        = module.pvs_prepare.bastion_public_ip[0]
+  openshift_client_tarball = var.openshift_client_tarball
+  openshift_api_url        = var.openshift_api_url
+  vpc_support_server_ip    = module.vpc_support.vpc_support_server_ip
 }
 
 module "worker" {
@@ -143,8 +136,6 @@ module "worker" {
 
   # Eventually, this should be a bit more dynamic - include the MachineConfigPool
   ignition_url = "http://${module.pvs_prepare.bastion_ip[0]}:8080/worker.ign"
-
-  workers_version = var.workers_version
 }
 
 module "post" {

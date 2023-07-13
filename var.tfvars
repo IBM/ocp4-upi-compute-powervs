@@ -17,9 +17,10 @@ powervs_region              = "<region>"
 powervs_zone                = "<zone>"
 
 # OpenShift Cluster
-openshift_api_url = "<openshift_cluster_API_URL>"
-openshift_user    = "<openshift_cluster_user>"
-openshift_pass    = "<openshift_cluster_pass>"
+openshift_api_url        = "<openshift_cluster_API_URL>"
+openshift_user           = "<openshift_cluster_user>"
+openshift_pass           = "<openshift_cluster_pass>"
+openshift_client_tarball = "<openshift_client_tarball_url>"
 
 # Power Instance Configuration
 processor_type = "shared"

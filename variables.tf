@@ -249,11 +249,6 @@ variable "powervs_network_name" {
 ### OpenShift variables
 ################################################################
 
-variable "openshift_install_tarball" {
-  type    = string
-  default = "https://mirror.openshift.com/pub/openshift-v4/multi/clients/ocp/stable/ppc64le/openshift-install-linux.tar.gz"
-}
-
 variable "openshift_client_tarball" {
   type    = string
   default = "https://mirror.openshift.com/pub/openshift-v4/multi/clients/ocp/stable/ppc64le/openshift-client-linux.tar.gz"
@@ -473,19 +468,6 @@ locals {
   public_key_file  = var.public_key_file == "" ? "${path.cwd}/data/id_rsa.pub" : var.public_key_file
   private_key      = var.private_key == "" ? file(coalesce(local.private_key_file, "/dev/null")) : var.private_key
   public_key       = var.public_key == "" ? file(coalesce(local.public_key_file, "/dev/null")) : var.public_key
-}
-
-### Development Specific Triggers
-variable "ansible_support_version" {
-  type        = string
-  description = "Trigger for ansible code refresh"
-  default     = "1"
-}
-
-variable "workers_version" {
-  type        = string
-  description = "Trigger for workers to be rebuilt via version change"
-  default     = "1"
 }
 
 ################################################################
