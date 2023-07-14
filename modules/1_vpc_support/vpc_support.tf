@@ -28,19 +28,24 @@ data "ibm_is_security_groups" "supp_vm_sgs" {
 }
 
 locals {
-  sgs = [for x in data.ibm_is_security_groups.supp_vm_sgs.security_groups : x if x.name == "${var.vpc_name}-supp-sg"]
+  sgs = [for x in data.ibm_is_security_groups.supp_vm_sgs.security_groups : x.id if x.name == "${var.vpc_name}-supp-sg"]
 }
 
 resource "ibm_is_security_group" "supp_vm_sg" {
-  count = length(local.sgs) == 0 ? 0 : 1
+  count = local.sgs == [] ? 1 : 0
 
-  name           = "${var.vpc_name}-dns-sg"
+  name           = "${var.vpc_name}-supp-sg"
   vpc            = data.ibm_is_vpc.vpc.id
   resource_group = data.ibm_is_vpc.vpc.resource_group
 }
 
+data "ibm_is_security_group" "supp_vm_sg_refresh" {
+  depends_on = [ibm_is_security_group.supp_vm_sg]
+  name       = "${var.vpc_name}-supp-sg"
+}
+
 locals {
-  sg_id = length(local.sgs) == 1 ? local.sgs[0].id : ibm_is_security_group.supp_vm_sg[0].id
+  sg_id = data.ibm_is_security_group.supp_vm_sg_refresh.id
 }
 
 # allow all outgoing network traffic
@@ -172,7 +177,7 @@ locals {
 
 resource "ibm_is_instance" "supp_vm_vsi" {
   # Create if it doesn't exist
-  count      = length(local.vsis) == 0 ? 0 : 1
+  count      = local.vsis == [] ? 1 : 2
   depends_on = [ibm_is_ssh_key.vpc_support_ssh_key]
 
   name    = "${var.vpc_name}-supp-vsi"
