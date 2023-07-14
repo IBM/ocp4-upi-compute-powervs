@@ -16,7 +16,7 @@ locals {
 }
 
 data "ibm_pi_image" "bastion" {
-  count                = length(local.catalog_bastion_image) == 0 ? 1 : 0
+  count                = 1
   pi_cloud_instance_id = var.powervs_service_instance_id
   pi_image_name        = var.rhel_image_name
 }
