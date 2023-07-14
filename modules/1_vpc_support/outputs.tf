@@ -8,5 +8,5 @@ output "vpc_support_server_ip" {
 }
 
 output "vpc_crn" {
-  value = data.ibm_is_vpc.ex_vpc.crn
+  value = data.ibm_is_vpc.vpc.crn
 }
