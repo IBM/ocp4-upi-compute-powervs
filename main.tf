@@ -125,12 +125,26 @@ module "support" {
   openshift_pass           = var.openshift_pass
 }
 
+module "transit_gateway" {
+  providers = {
+    ibm = ibm.vpc
+  }
+  depends_on = [module.pvs_prepare]
+  source     = "./modules/4_transit_gateway"
+
+  cloud_conn_name    = var.cloud_conn_name
+  cluster_id         = var.cluster_id
+  vpc_name           = var.vpc_name
+  vpc_crn            = module.vpc_support.vpc_crn
+  transit_gateway_id = module.vpc_support.transit_gateway_id
+}
+
 module "worker" {
   providers = {
     ibm = ibm.powervs
   }
-  depends_on = [module.support]
-  source     = "./modules/4_worker"
+  depends_on = [module.transit_gateway]
+  source     = "./modules/5_worker"
 
   key_name                    = module.pvs_prepare.pvs_pubkey_name
   name_prefix                 = local.name_prefix
@@ -147,7 +161,7 @@ module "worker" {
 
 module "post" {
   depends_on = [module.worker]
-  source     = "./modules/5_post"
+  source     = "./modules/6_post"
 
   ssh_agent         = var.ssh_agent
   bastion_public_ip = module.pvs_prepare.bastion_public_ip

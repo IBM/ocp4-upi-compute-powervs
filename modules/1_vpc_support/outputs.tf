@@ -10,3 +10,7 @@ output "vpc_support_server_ip" {
 output "vpc_crn" {
   value = data.ibm_is_vpc.vpc.crn
 }
+
+output "transit_gateway_id" {
+  value = ibm_tg_gateway.mac_tg_gw.id
+}

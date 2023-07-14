@@ -15,6 +15,6 @@ resource "ibm_tg_gateway" "mac_tg_gw" {
 resource "ibm_tg_connection" "test_ibm_tg_connection" {
   gateway      = ibm_tg_gateway.mac_tg_gw.id
   network_type = "vpc"
-  name         = "${var.vpc_name}-conn"
+  name         = "${var.vpc_name}-vpc-conn"
   network_id   = data.ibm_is_vpc.vpc.resource_crn
 }

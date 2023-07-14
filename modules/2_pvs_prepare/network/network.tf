@@ -37,7 +37,7 @@ resource "ibm_pi_dhcp" "new_dhcp_service" {
 resource "ibm_pi_cloud_connection" "new_cloud_connection" {
   count                              = var.cloud_conn_name == "" ? 1 : 0
   pi_cloud_instance_id               = var.powervs_service_instance_id
-  pi_cloud_connection_name           = "cloud-con-${var.cluster_id}"
+  pi_cloud_connection_name           = "cloud-conn-${var.cluster_id}"
   pi_cloud_connection_speed          = 100
   pi_cloud_connection_global_routing = true
   # Dev Note: Preference for Transit Gateway.

@@ -28,7 +28,7 @@ resource "ibm_pi_instance" "worker" {
   # docs/development.md describes the worker.ign file
   pi_user_data = base64encode(
     templatefile(
-      "${path.cwd}/modules/4_worker/templates/worker.ign",
+      "${path.cwd}/modules/5_worker/templates/worker.ign",
       { ignition_url : var.ignition_url,
         name : base64encode("${var.name_prefix}-worker-${count.index}"),
   }))
