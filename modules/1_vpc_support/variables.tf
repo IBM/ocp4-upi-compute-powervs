@@ -52,3 +52,5 @@ variable "openshift_api_url" {
   description = "The API URL of the OpenShift Cluster"
   default     = "https://api.example.ocp-multiarch.xyz:6443"
 }
+
+variable "powervs_machine_cidr" {}
