@@ -22,13 +22,17 @@ data "ibm_is_vpc" "vpc" {
   name = var.vpc_name
 }
 
-# Loads the Security Group so we can avoid duplication
-data "ibm_is_security_group" "supp_vm_sg" {
-  name = "${var.vpc_name}-supp-sg"
+# Loads the Security Groups so we can avoid duplication
+data "ibm_is_security_groups" "supp_vm_sgs" {
+  vpc_id = data.ibm_is_vpc.vpc.id
+}
+
+locals {
+  sgs = [for x in data.ibm_is_security_groups.supp_vm_sgs.security_groups : x if x.name == "${var.vpc_name}-supp-sg"]
 }
 
 resource "ibm_is_security_group" "supp_vm_sg" {
-  count = data.ibm_is_security_group.supp_vm_sg ? 0 : 1
+  count = length(local.sgs) == 0 ? 0 : 1
 
   name           = "${var.vpc_name}-dns-sg"
   vpc            = data.ibm_is_vpc.vpc.id
@@ -36,7 +40,7 @@ resource "ibm_is_security_group" "supp_vm_sg" {
 }
 
 locals {
-  sg_id = data.ibm_is_security_group.supp_vm_sg ? data.ibm_is_security_group.supp_vm_sg.id : ibm_is_security_group.supp_vm_sg[0].id
+  sg_id = length(local.sgs) == 1 ? local.sgs[0].id : ibm_is_security_group.supp_vm_sg[0].id
 }
 
 # allow all outgoing network traffic
@@ -158,13 +162,17 @@ data "ibm_is_image" "supp_vm_image" {
   name  = var.supp_vm_image_name
 }
 
-data "ibm_is_instance" "supp_vm_vsi" {
-  name = "${var.vpc_name}-supp-vsi"
+data "ibm_is_instances" "vsis" {
+  vpc_name = var.vpc_name
+}
+
+locals {
+  vsis = [for x in data.ibm_is_instances.vsis.instances : x if x.id == "${var.vpc_name}-supp-vsi"]
 }
 
 resource "ibm_is_instance" "supp_vm_vsi" {
   # Create if it doesn't exist
-  count      = data.ibm_is_instance.supp_vm_vsi ? 0 : 1
+  count      = length(local.vsis) == 0 ? 0 : 1
   depends_on = [ibm_is_ssh_key.vpc_support_ssh_key]
 
   name    = "${var.vpc_name}-supp-vsi"
