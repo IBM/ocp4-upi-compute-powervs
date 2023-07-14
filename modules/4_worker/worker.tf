@@ -25,6 +25,7 @@ resource "ibm_pi_instance" "worker" {
   pi_key_pair_name = var.key_name
   pi_health_status = "WARNING"
 
+  # docs/development.md describes the worker.ign file
   pi_user_data = base64encode(
     templatefile(
       "${path.cwd}/modules/4_worker/templates/worker.ign",
