@@ -45,7 +45,7 @@ module "network" {
   enable_snat                 = var.enable_snat
   cluster_id                  = var.cluster_id
   cloud_conn_name             = var.cloud_conn_name
-  vpc_crn                     = var.vpc_crn
+  #vpc_crn                     = var.vpc_crn
 }
 
 module "bastion" {

@@ -102,7 +102,6 @@ module "pvs_prepare" {
   rhel_smt                           = var.rhel_smt
   ssh_agent                          = var.ssh_agent
   system_type                        = var.system_type
-  vpc_crn                            = module.vpc_support.vpc_crn
   vpc_support_server_ip              = module.vpc_support.vpc_support_server_ip
 }
 

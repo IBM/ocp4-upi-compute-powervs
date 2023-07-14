@@ -12,4 +12,4 @@ variable "vpc_support_server_ip" {}
 variable "enable_snat" {}
 variable "cluster_id" {}
 variable "cloud_conn_name" {}
-variable "vpc_crn" {}
+#variable "vpc_crn" {}
