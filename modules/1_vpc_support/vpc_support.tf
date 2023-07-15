@@ -50,13 +50,17 @@ resource "ibm_is_security_group" "supp_vm_sg" {
   resource_group = data.ibm_is_vpc.vpc.resource_group
 }
 
-data "ibm_is_security_group" "supp_vm_sg_refresh" {
-  depends_on = [ibm_is_security_group.supp_vm_sg]
-  name       = "${var.vpc_name}-supp-sg"
+# reload the Security Groups so we can avoid duplication
+data "ibm_is_security_groups" "supp_vm_sgs_ref" {
+  depends_on = [
+    ibm_is_security_group.supp_vm_sg
+    ]
+  vpc_id = data.ibm_is_vpc.vpc.id
 }
 
 locals {
-  sg_id = data.ibm_is_security_group.supp_vm_sg_refresh.id
+  sgs_refresh = [for x in data.ibm_is_security_groups.supp_vm_sgs_ref.security_groups : x.id if x.name == "${var.vpc_name}-supp-sg"]
+  sg_id = local.sgs_refresh[0]
 }
 
 # allow all outgoing network traffic
