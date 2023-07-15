@@ -11,6 +11,7 @@ data "ibm_pi_catalog_images" "catalog_images" {
 
 locals {
   catalog_bastion_image = [for x in data.ibm_pi_catalog_images.catalog_images.images : x if x.name == var.rhel_image_name]
+  rhel_image = [for x in data.ibm_pi_catalog_images.catalog_images.images : x if x.name == "rhcos-${var.rhcos_import_image_storage_type}-image"]
   bastion_image_id      = length(local.catalog_bastion_image) == 0 ? data.ibm_pi_image.bastion[0].id : local.catalog_bastion_image[0].image_id
   bastion_storage_pool  = length(local.catalog_bastion_image) == 0 ? data.ibm_pi_image.bastion[0].storage_pool : local.catalog_bastion_image[0].storage_pool
 }
@@ -40,8 +41,12 @@ locals {
   rhcos_import_bucket_region = var.rhcos_import_image_region_override != "" ? "${var.rhcos_import_image_region_override}" : lookup(local.powervs_vpc_region_map, var.powervs_region, "au-syd")
 }
 
+locals {
+  rhcos_should_import = local.rhel_image == [] && var.rhcos_import_image ? 1 : 0
+}
+
 resource "ibm_pi_image" "rhcos_image_import" {
-  count = var.rhcos_import_image ? 1 : 0
+  count = local.rhcos_should_import
 
   pi_cloud_instance_id      = var.powervs_service_instance_id
   pi_image_name             = "rhcos-${var.rhcos_import_image_storage_type}-image"
