@@ -12,7 +12,7 @@ resource "ibm_tg_gateway" "mac_tg_gw" {
 }
 
 # Ref: https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/tg_connection
-resource "ibm_tg_connection" "test_ibm_tg_connection" {
+resource "ibm_tg_connection" "vpc_tg_connection" {
   gateway      = ibm_tg_gateway.mac_tg_gw.id
   network_type = "vpc"
   name         = "${var.vpc_name}-vpc-conn"
