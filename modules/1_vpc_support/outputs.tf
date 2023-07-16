@@ -12,5 +12,5 @@ output "vpc_crn" {
 }
 
 output "transit_gateway_id" {
-  value = ibm_tg_gateway.mac_tg_gw.id
+  value = ibm_tg_gateway.mac_tg_gw[0].id
 }
