@@ -22,7 +22,7 @@ locals {
 
 # Ref: https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/tg_connection
 resource "ibm_tg_connection" "vpc_tg_connection" {
-    count = tg_conn == [] ? 1 : 0
+  count        = tg_conn == [] ? 1 : 0
   gateway      = ibm_tg_gateway.mac_tg_gw.id
   network_type = "vpc"
   name         = "${var.vpc_name}-vpc-conn"
