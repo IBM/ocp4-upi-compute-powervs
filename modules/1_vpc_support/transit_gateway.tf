@@ -17,12 +17,12 @@ data "ibm_tg_gateway" "mac_tg_gw_check" {
 }
 
 locals {
-  tg_conn = [for x in data.ibm_tg_gateway.sgs.mac_tg_gw_check.connections : x if x.name == "${var.vpc_name}-vpc-conn"]
+  tg_conn = [for x in data.ibm_tg_gateway.mac_tg_gw_check.connections : x if x.name == "${var.vpc_name}-vpc-conn"]
 }
 
 # Ref: https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/tg_connection
 resource "ibm_tg_connection" "vpc_tg_connection" {
-  count        = tg_conn == [] ? 1 : 0
+  count        = local.tg_conn == [] ? 1 : 0
   gateway      = ibm_tg_gateway.mac_tg_gw.id
   network_type = "vpc"
   name         = "${var.vpc_name}-vpc-conn"
