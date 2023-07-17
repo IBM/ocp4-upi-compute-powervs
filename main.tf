@@ -75,7 +75,7 @@ module "pvs_prepare" {
   bastion_health_status              = var.bastion_health_status
   cloud_conn_name                    = var.cloud_conn_name
   cluster_domain                     = var.cluster_domain
-  cluster_id                         = var.cluster_id
+  cluster_id                         = local.cluster_id
   connection_timeout                 = var.connection_timeout
   enable_snat                        = var.enable_snat
   powervs_machine_cidr               = var.powervs_machine_cidr
@@ -133,7 +133,7 @@ module "transit_gateway" {
   source     = "./modules/4_transit_gateway"
 
   cloud_conn_name    = var.cloud_conn_name
-  cluster_id         = var.cluster_id
+  cluster_id         = local.cluster_id
   vpc_name           = var.vpc_name
   vpc_crn            = module.vpc_support.vpc_crn
   transit_gateway_id = module.vpc_support.transit_gateway_id
