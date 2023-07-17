@@ -26,7 +26,7 @@ resource "random_id" "label" {
 locals {
   cluster_id = var.cluster_id == "" ? random_id.label[0].hex : (var.cluster_id_prefix == "" ? var.cluster_id : "${var.cluster_id_prefix}-${var.cluster_id}")
   # Generates vm_id as combination of vm_id_prefix + (random_id or user-defined vm_id)
-  name_prefix = var.name_prefix == "" ? random_id.label[0].hex : "${var.name_prefix}"
+  name_prefix = var.name_prefix == "" ? "mac-" + random_id.label[0].hex : "${var.name_prefix}"
   node_prefix = var.use_zone_info_for_names ? "${var.powervs_zone}-" : ""
 }
 
@@ -79,7 +79,7 @@ module "pvs_prepare" {
   connection_timeout                 = var.connection_timeout
   enable_snat                        = var.enable_snat
   powervs_machine_cidr               = var.powervs_machine_cidr
-  name_prefix                        = var.name_prefix
+  name_prefix                        = local.name_prefix
   powervs_region                     = var.powervs_region
   powervs_service_instance_id        = var.powervs_service_instance_id
   private_key                        = var.private_key
