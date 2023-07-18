@@ -15,6 +15,10 @@ locals {
     openshift_machine_config_url = replace(var.openshift_api_url, ":6443", "")
     vpc_support_server_ip        = var.vpc_support_server_ip
   }
+
+  cidrs = {
+    cidrs_ipv4 = var.cidrs
+  }
 }
 
 resource "null_resource" "config" {
@@ -51,8 +55,15 @@ resource "null_resource" "config" {
     destination = "ocp4-upi-compute-powervs/support/vars.yaml"
   }
 
+  # Copies the custom route for env3
+  provisioner "file" {
+    source      = templatefile("${path.module}/templates/route-env3.tpl", local.cidrs)
+    destination = "/etc/sysconfig/network-scripts/route-env3"
+  }
+
   provisioner "remote-exec" {
     inline = [<<EOF
+ifup env3
 echo 'Running ocp4-upi-compute-powervs playbook...'
 cd ocp4-upi-compute-powervs/support
 ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support.log ansible-playbook -e @vars.yaml tasks/main.yml --become

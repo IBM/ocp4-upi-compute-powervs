@@ -106,12 +106,26 @@ module "pvs_prepare" {
   vpc_support_server_ip              = module.vpc_support.vpc_support_server_ip
 }
 
+module "transit_gateway" {
+  providers = {
+    ibm = ibm.vpc
+  }
+  depends_on = [module.pvs_prepare]
+  source     = "./modules/3_transit_gateway"
+
+  cloud_conn_name    = var.cloud_conn_name
+  cluster_id         = local.cluster_id
+  vpc_name           = var.vpc_name
+  vpc_crn            = module.vpc_support.vpc_crn
+  transit_gateway_id = module.vpc_support.transit_gateway_id
+}
+
 module "support" {
   providers = {
     ibm = ibm.powervs
   }
-  depends_on = [module.pvs_prepare, module.transit_gateway]
-  source     = "./modules/3_pvs_support"
+  depends_on = [module.transit_gateway]
+  source     = "./modules/4_pvs_support"
 
   private_key_file         = var.private_key_file
   ssh_agent                = var.ssh_agent
@@ -124,20 +138,7 @@ module "support" {
   openshift_api_url        = var.openshift_api_url
   openshift_user           = var.openshift_user
   openshift_pass           = var.openshift_pass
-}
-
-module "transit_gateway" {
-  providers = {
-    ibm = ibm.vpc
-  }
-  depends_on = [module.pvs_prepare]
-  source     = "./modules/4_transit_gateway"
-
-  cloud_conn_name    = var.cloud_conn_name
-  cluster_id         = local.cluster_id
-  vpc_name           = var.vpc_name
-  vpc_crn            = module.vpc_support.vpc_crn
-  transit_gateway_id = module.vpc_support.transit_gateway_id
+  cidrs = module.transit_gateway.mac_vpc_subnets
 }
 
 module "worker" {

@@ -3,6 +3,10 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-output "mac_tg_gateway" {
-  value = data.ibm_tg_gateway.mac_tg_gw.connections
+data "ibm_is_vpc" "mac_vpc" {
+  name = var.vpc_name
+}
+
+data "ibm_is_subnets" "vpc_subnets" {
+  routing_table_name = data.ibm_is_vpc.mac_vpc.default_routing_table_name
 }

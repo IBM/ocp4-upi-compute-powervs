@@ -14,3 +14,4 @@ variable "vpc_support_server_ip" {}
 variable "openshift_api_url" {}
 variable "openshift_user" {}
 variable "openshift_pass" {}
+variable "cidrs" {}
