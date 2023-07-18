@@ -138,7 +138,7 @@ module "support" {
   openshift_api_url        = var.openshift_api_url
   openshift_user           = var.openshift_user
   openshift_pass           = var.openshift_pass
-  cidrs = module.transit_gateway.mac_vpc_subnets
+  cidrs                    = module.transit_gateway.mac_vpc_subnets
 }
 
 module "worker" {
