@@ -138,7 +138,6 @@ resource "ibm_is_security_group_rule" "nfs_3_vm_sg_ssh_all" {
 
 # allow all incoming network traffic on port 111
 resource "ibm_is_security_group_rule" "nfs_4_vm_sg_ssh_all" {
-
   count     = 1
   group     = local.sg_id
   direction = "inbound"
@@ -165,7 +164,6 @@ resource "ibm_is_security_group_rule" "supp_vm_sg_supp_all" {
 
 # allow all incoming network traffic for ping
 resource "ibm_is_security_group_rule" "supp_vm_sg_ping_all" {
-
   count     = 1
   group     = local.sg_id
   direction = "inbound"
@@ -192,7 +190,7 @@ locals {
 
 resource "ibm_is_instance" "supp_vm_vsi" {
   # Create if it doesn't exist
-  count      = local.vsis == [] ? 1 : 2
+  count      = local.vsis == [] ? 1 : 0
   depends_on = [data.ibm_is_ssh_key.vpc_support_ssh_key]
 
   name    = "${var.vpc_name}-supp-vsi"
