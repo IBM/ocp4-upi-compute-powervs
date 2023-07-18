@@ -27,7 +27,7 @@ module "keys" {
 
   powervs_service_instance_id = var.powervs_service_instance_id
   name_prefix                 = var.name_prefix
-  public_key_file            = var.public_key_file
+  public_key_file             = var.public_key_file
 }
 
 module "network" {

@@ -83,7 +83,7 @@ module "pvs_prepare" {
   powervs_region                     = var.powervs_region
   powervs_service_instance_id        = var.powervs_service_instance_id
   private_key                        = var.private_key
-  public_key_file                   = var.public_key_file
+  public_key_file                    = var.public_key_file
   private_network_mtu                = var.private_network_mtu
   processor_type                     = var.processor_type
   powervs_dns_forwarders             = var.powervs_dns_forwarders == "" ? [] : [for dns in split(";", var.powervs_dns_forwarders) : trimspace(dns)]
