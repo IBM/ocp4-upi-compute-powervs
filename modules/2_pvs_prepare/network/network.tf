@@ -23,7 +23,7 @@ data "ibm_pi_dhcps" "dhcp_services" {
   pi_cloud_instance_id = var.powervs_service_instance_id
 }
 
-resource "ibm_pi_dhcp" "new_dhcp_service" {
+resource "new_dhcp_service" "new_dhcp_service" {
   count                  = var.powervs_network_name == "" ? 1 : 0
   pi_cloud_instance_id   = var.powervs_service_instance_id
   pi_cloud_connection_id = data.ibm_pi_cloud_connection.cloud_connection.id
@@ -32,6 +32,13 @@ resource "ibm_pi_dhcp" "new_dhcp_service" {
   pi_dhcp_snat_enabled   = var.enable_snat
   # the pi_dhcp_name param will be prefixed by the DHCP ID when created, so keep it short here:
   pi_dhcp_name = var.cluster_id
+}
+
+# Dev Note: injects a delay the network destroy.
+# Othweriwse, this message comes up: One or more ports have an IP allocation from this subnet.
+resource "time_sleep" "wait_30_seconds" {
+  depends_on       = [new_dhcp_service.new_dhcp_service]
+  destroy_duration = "30s"
 }
 
 resource "ibm_pi_cloud_connection" "new_cloud_connection" {
