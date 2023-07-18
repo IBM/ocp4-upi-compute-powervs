@@ -110,7 +110,7 @@ module "support" {
   providers = {
     ibm = ibm.powervs
   }
-  depends_on = [module.pvs_prepare]
+  depends_on = [module.pvs_prepare, module.transit_gateway]
   source     = "./modules/3_pvs_support"
 
   private_key_file         = var.private_key_file
@@ -144,7 +144,7 @@ module "worker" {
   providers = {
     ibm = ibm.powervs
   }
-  depends_on = [module.transit_gateway]
+  depends_on = [module.support]
   source     = "./modules/5_worker"
 
   key_name                    = module.pvs_prepare.pvs_pubkey_name
