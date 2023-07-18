@@ -10,7 +10,7 @@ variable "system_type" {}
 variable "processor_type" {}
 variable "bastion_health_status" {}
 variable "key_name" {}
-variable "private_key" {}
+variable "private_key_file" {}
 variable "public_key" {}
 variable "ssh_agent" {}
 variable "connection_timeout" {}

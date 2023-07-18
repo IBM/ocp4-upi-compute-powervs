@@ -82,7 +82,7 @@ module "pvs_prepare" {
   name_prefix                        = local.name_prefix
   powervs_region                     = var.powervs_region
   powervs_service_instance_id        = var.powervs_service_instance_id
-  private_key                        = var.private_key
+  private_key_file                   = var.private_key_file
   public_key_file                    = var.public_key_file
   private_network_mtu                = var.private_network_mtu
   processor_type                     = var.processor_type

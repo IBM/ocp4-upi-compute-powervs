@@ -53,7 +53,7 @@ resource "null_resource" "bastion_init" {
     type        = "ssh"
     user        = var.rhel_username
     host        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
-    private_key = var.private_key
+    private_key = file(var.private_key_file)
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"
   }
@@ -63,7 +63,7 @@ resource "null_resource" "bastion_init" {
     ]
   }
   provisioner "file" {
-    content     = var.private_key
+    content     = file(var.private_key_file)
     destination = ".ssh/id_rsa"
   }
   provisioner "file" {
@@ -105,7 +105,7 @@ resource "null_resource" "bastion_register" {
   triggers = {
     external_ip        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
     rhel_username      = var.rhel_username
-    private_key        = var.private_key
+    private_key        = file(var.private_key_file)
     ssh_agent          = var.ssh_agent
     connection_timeout = var.connection_timeout
   }
@@ -174,7 +174,7 @@ resource "null_resource" "enable_repos" {
     type        = "ssh"
     user        = var.rhel_username
     host        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
-    private_key = var.private_key
+    private_key = file(var.private_key_file)
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"
   }
@@ -210,7 +210,7 @@ resource "null_resource" "manage_packages" {
     type        = "ssh"
     user        = var.rhel_username
     host        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
-    private_key = var.private_key
+    private_key = file(var.private_key_file)
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"
   }

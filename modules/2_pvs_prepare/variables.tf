@@ -15,7 +15,7 @@ variable "powervs_machine_cidr" {}
 variable "name_prefix" {}
 variable "powervs_region" {}
 variable "powervs_service_instance_id" {}
-variable "private_key" {}
+variable "private_key_file" {}
 variable "private_network_mtu" {}
 variable "processor_type" {}
 variable "powervs_dns_forwarders" {}

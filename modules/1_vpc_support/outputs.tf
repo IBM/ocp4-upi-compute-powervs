@@ -12,5 +12,5 @@ output "vpc_crn" {
 }
 
 output "transit_gateway_id" {
-  value = local.tg == [] ? ibm_tg_gateway.mac_tg_gw[0].id : local.tg[0].id
+  value = local.tg == [] ? ibm_tg_gateway.mac_tg_gw[0] : local.tg[0]
 }

@@ -11,7 +11,7 @@ output "name_prefix" {
   value = local.name_prefix
 }
 
-output "bastion_private_vip" {
+output "bastion_private_ip" {
   value = module.pvs_prepare.bastion_ip
 }
 

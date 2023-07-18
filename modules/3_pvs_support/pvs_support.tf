@@ -7,7 +7,7 @@ locals {
   # The Inventory File
   helpernode_inventory = {
     rhel_username = var.rhel_username
-    bastion_ip    = var.bastion_ip
+    bastion_ip    = [var.bastion_ip]
   }
 
   helpernode_vars = {
@@ -21,7 +21,7 @@ resource "null_resource" "config" {
   connection {
     type        = "ssh"
     user        = var.rhel_username
-    host        = var.bastion_public_ip[0]
+    host        = var.bastion_public_ip
     private_key = file(var.private_key_file)
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"

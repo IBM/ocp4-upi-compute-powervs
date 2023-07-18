@@ -8,7 +8,7 @@ data "ibm_dl_gateway" "pvs_dl" {
 }
 
 resource "ibm_tg_connection" "powervs_ibm_tg_connection" {
-  gateway      = var.transit_gateway_id
+  gateway      = var.transit_gateway_id.id
   network_type = "directlink"
   name         = "${var.vpc_name}-pvs-conn"
   network_id   = data.ibm_dl_gateway.pvs_dl.crn
