@@ -7,5 +7,5 @@
 resource "ibm_pi_key" "key" {
   pi_cloud_instance_id = var.powervs_service_instance_id
   pi_key_name          = "${var.name_prefix}-keypair"
-  pi_ssh_key           = var.public_key
+  pi_ssh_key           = file(var.public_key_file)
 }

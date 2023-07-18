@@ -20,6 +20,7 @@ variable "private_network_mtu" {}
 variable "processor_type" {}
 variable "powervs_dns_forwarders" {}
 variable "public_key" {}
+variable "public_key_file" {}
 variable "powervs_network_name" {}
 variable "rhcos_image_name" {}
 variable "rhcos_import_image" {}

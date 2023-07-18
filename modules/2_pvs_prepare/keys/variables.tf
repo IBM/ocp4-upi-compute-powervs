@@ -5,4 +5,4 @@
 
 variable "powervs_service_instance_id" {}
 variable "name_prefix" {}
-variable "public_key" {}
+variable "public_key_file" {}
