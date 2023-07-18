@@ -185,7 +185,7 @@ data "ibm_is_instances" "vsis" {
 }
 
 locals {
-  vsis = [for x in data.ibm_is_instances.vsis.instances : x if x.id == "${var.vpc_name}-supp-vsi"]
+  vsis = [for x in data.ibm_is_instances.vsis.instances : x if x.name == "${var.vpc_name}-supp-vsi"]
 }
 
 resource "ibm_is_instance" "supp_vm_vsi" {
