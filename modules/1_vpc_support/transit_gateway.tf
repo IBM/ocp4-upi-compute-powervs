@@ -33,8 +33,19 @@ resource "ibm_tg_connection" "vpc_tg_connection" {
 
 # Condition 1: Transit Gateway Does Exists, so just update
 # Ref: https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/tg_connection
-resource "ibm_tg_connection" "vpc_tg_connection_update" {
+
+# Check to see if the connection exists
+data "ibm_tg_gateway" "existing_tg" {
   count = local.tg == [] ? 0 : 1
+  name = local.tg[0].name
+}
+
+locals {
+  v_tg_conns    = [for x in data.ibm_tg_gateway.existing_tg[0].connections : x if x.name == "${var.vpc_name}-vpc-conn" ]
+}
+
+resource "ibm_tg_connection" "vpc_tg_connection_update" {
+  count = local.tg == [] && local.v_tg_conns == [] ? 0 : 1
 
   gateway      = local.tg[0].id
   network_type = "vpc"
