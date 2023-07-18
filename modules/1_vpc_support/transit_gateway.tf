@@ -41,7 +41,7 @@ data "ibm_tg_gateway" "existing_tg" {
 }
 
 locals {
-  v_tg_conns = [for x in data.ibm_tg_gateway.existing_tg[0].connections : x if x.name == "${var.vpc_name}-vpc-conn"]
+  v_tg_conns = [for x in data.ibm_tg_gateway.existing_tg[0].connections : x if x.name == "${var.vpc_name}-vc"]
 }
 
 resource "ibm_tg_connection" "vpc_tg_connection_update" {
@@ -49,6 +49,6 @@ resource "ibm_tg_connection" "vpc_tg_connection_update" {
 
   gateway      = local.tg[0].id
   network_type = "vpc"
-  name         = "${var.vpc_name}-vpc-conn"
+  name         = "${var.vpc_name}-vc"
   network_id   = data.ibm_is_vpc.vpc.resource_crn
 }
