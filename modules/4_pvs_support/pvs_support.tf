@@ -58,11 +58,12 @@ resource "null_resource" "config" {
   # Copies the custom route for env3
   provisioner "file" {
     source      = templatefile("${path.module}/templates/route-env3.tpl", local.cidrs)
-    destination = "/etc/sysconfig/network-scripts/route-env3"
+    destination = "ocp4-upi-compute-powervs/support/route-env3.tmp"
   }
 
   provisioner "remote-exec" {
     inline = [<<EOF
+cp ocp4-upi-compute-powervs/support/route-env3.tmp /etc/sysconfig/network-scripts/route-env3
 ifup env3
 echo 'Running ocp4-upi-compute-powervs playbook...'
 cd ocp4-upi-compute-powervs/support
@@ -77,7 +78,7 @@ export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc login \
   "${var.openshift_api_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
 oc annotate ns openshift-cluster-csi-drivers \
-    scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
+  scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
 EOF
     ]
   }
