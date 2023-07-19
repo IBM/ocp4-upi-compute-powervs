@@ -14,6 +14,10 @@ terraform {
       version               = "~> 1.55.0"
       configuration_aliases = [ibm]
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "0.9.1"
+    }
   }
   required_version = ">= 1.5.0"
 }

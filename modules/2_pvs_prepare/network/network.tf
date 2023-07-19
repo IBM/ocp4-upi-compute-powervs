@@ -23,7 +23,7 @@ data "ibm_pi_dhcps" "dhcp_services" {
   pi_cloud_instance_id = var.powervs_service_instance_id
 }
 
-resource "new_dhcp_service" "new_dhcp_service" {
+resource "ibm_pi_dhcp" "new_dhcp_service" {
   count                  = var.powervs_network_name == "" ? 1 : 0
   pi_cloud_instance_id   = var.powervs_service_instance_id
   pi_cloud_connection_id = data.ibm_pi_cloud_connection.cloud_connection.id
@@ -37,7 +37,7 @@ resource "new_dhcp_service" "new_dhcp_service" {
 # Dev Note: injects a delay the network destroy.
 # Othweriwse, this message comes up: One or more ports have an IP allocation from this subnet.
 resource "time_sleep" "wait_30_seconds" {
-  depends_on       = [new_dhcp_service.new_dhcp_service]
+  depends_on       = [ibm_pi_dhcp.new_dhcp_service]
   destroy_duration = "30s"
 }
 
