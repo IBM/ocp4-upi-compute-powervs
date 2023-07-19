@@ -57,13 +57,12 @@ resource "null_resource" "config" {
 
   # Copies the custom route for env3
   provisioner "file" {
-    source      = templatefile("${path.module}/templates/route-env3.tpl", local.cidrs)
-    destination = "ocp4-upi-compute-powervs/support/route-env3.tmp"
+    content     = templatefile("${path.module}/templates/route-env3.tpl", local.cidrs)
+    destination = "/etc/sysconfig/network-scripts/route-env3"
   }
 
   provisioner "remote-exec" {
     inline = [<<EOF
-cp ocp4-upi-compute-powervs/support/route-env3.tmp /etc/sysconfig/network-scripts/route-env3
 ifup env3
 echo 'Running ocp4-upi-compute-powervs playbook...'
 cd ocp4-upi-compute-powervs/support
