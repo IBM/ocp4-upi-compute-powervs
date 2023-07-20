@@ -11,6 +11,11 @@ output "name_prefix" {
   value = local.name_prefix
 }
 
+output "vpc_check_key" {
+  description = "The VPC SSH Key that was added/checked against existing keys"
+  value       = module.vpc_support.cur
+}
+
 output "bastion_private_ip" {
   value = module.pvs_prepare.bastion_ip
 }

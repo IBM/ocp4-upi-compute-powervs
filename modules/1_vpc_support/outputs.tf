@@ -3,6 +3,10 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
+output "vpc_check_key" {
+  value = local.check_key
+}
+
 output "vpc_support_server_ip" {
   value = local.vsis == [] ? ibm_is_instance.supp_vm_vsi[0].primary_network_interface[0].primary_ip.0.address : local.vsis[0].primary_network_interface[0].primary_ip.0.address
 }
