@@ -25,8 +25,21 @@ resource "ibm_is_ssh_key" "vpc_support_ssh_key_cond_create" {
   resource_group = data.ibm_is_vpc.vpc.resource_group
 }
 
-data "ibm_is_ssh_key" "vpc_support_ssh_key" {
-  name = "${var.vpc_name}-keypair"
+data "ibm_is_ssh_keys" "vpc_support_ssh_keys" {
+}
+
+locals {
+  keys = [for x in data.ibm_is_ssh_keys.vpc_support_ssh_keys.keys : x if x.name == "${var.vpc_name}-keypair"]
+}
+
+resource "ibm_is_ssh_key" "vpc_support_ssh_key" {
+  count = local.keys == [] ? 1 : 0
+  name       = "${var.vpc_name}-keypair"
+  public_key = file(var.public_key_file)
+}
+
+locals { 
+  key_id = local.keys == [] ? ibm_is_ssh_key.vpc_support_ssh_key[0].id : local.keys[0].id
 }
 
 data "ibm_is_vpc" "vpc" {
@@ -191,12 +204,11 @@ locals {
 resource "ibm_is_instance" "supp_vm_vsi" {
   # Create if it doesn't exist
   count      = local.vsis == [] ? 1 : 0
-  depends_on = [data.ibm_is_ssh_key.vpc_support_ssh_key]
 
   name    = "${var.vpc_name}-supp-vsi"
   vpc     = data.ibm_is_vpc.vpc.id
   zone    = data.ibm_is_vpc.vpc.subnets[0].zone
-  keys    = [data.ibm_is_ssh_key.vpc_support_ssh_key.id]
+  keys    = [local.key_id]
   image   = data.ibm_is_image.supp_vm_image[0].id
   profile = "cx2d-8x16"
   # Profiles: https://cloud.ibm.com/docs/vpc?topic=vpc-profiles&interface=ui
