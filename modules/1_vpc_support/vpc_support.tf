@@ -33,12 +33,12 @@ locals {
 }
 
 resource "ibm_is_ssh_key" "vpc_support_ssh_key" {
-  count = local.keys == [] ? 1 : 0
+  count      = local.keys == [] ? 1 : 0
   name       = "${var.vpc_name}-keypair"
   public_key = file(var.public_key_file)
 }
 
-locals { 
+locals {
   key_id = local.keys == [] ? ibm_is_ssh_key.vpc_support_ssh_key[0].id : local.keys[0].id
 }
 
@@ -203,7 +203,7 @@ locals {
 
 resource "ibm_is_instance" "supp_vm_vsi" {
   # Create if it doesn't exist
-  count      = local.vsis == [] ? 1 : 0
+  count = local.vsis == [] ? 1 : 0
 
   name    = "${var.vpc_name}-supp-vsi"
   vpc     = data.ibm_is_vpc.vpc.id
