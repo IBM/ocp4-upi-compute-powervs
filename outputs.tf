@@ -13,7 +13,7 @@ output "name_prefix" {
 
 output "vpc_check_key" {
   description = "The VPC SSH Key that was added/checked against existing keys"
-  value       = module.vpc_support.cur
+  value       = module.vpc_support.vpc_check_key
 }
 
 output "bastion_private_ip" {

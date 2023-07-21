@@ -10,8 +10,8 @@ variable "bastion_public_ip" {
 }
 variable "ssh_agent" {}
 variable "private_key_file" {}
-variable "vpc_region" {}
-variable "vpc_zone" {}
+variable "powervs_region" {}
+variable "powervs_zone" {}
 variable "system_type" {}
 variable "nfs_server" {}
 variable "nfs_path" {}
