@@ -4,6 +4,7 @@
 ################################################################
 
 data "ibm_tg_gateways" "mac_tg_gws" {
+  # Region is implicit
 }
 
 locals {
