@@ -168,8 +168,8 @@ module "post" {
   ssh_agent         = var.ssh_agent
   bastion_public_ip = module.pvs_prepare.bastion_public_ip
   private_key_file  = var.private_key_file
-  powervs_region        = var.powervs_region
-  powervs_zone          = var.powervs_zone
+  powervs_region    = var.powervs_region
+  powervs_zone      = var.powervs_zone
   system_type       = var.system_type
   nfs_server        = module.vpc_support.vpc_support_server_ip
   nfs_path          = var.nfs_path
