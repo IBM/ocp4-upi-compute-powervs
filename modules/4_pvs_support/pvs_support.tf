@@ -52,7 +52,7 @@ resource "null_resource" "config" {
 
   provisioner "file" {
     content     = templatefile("${path.module}/templates/vars.yaml.tpl", local.helpernode_vars)
-    destination = "ocp4-upi-compute-powervs/support/vars.yaml"
+    destination = "ocp4-upi-compute-powervs/support/vars/main.yml"
   }
 
   # Copies the custom route for env3
