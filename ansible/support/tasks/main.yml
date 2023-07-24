@@ -2,7 +2,6 @@
 - hosts: all
   vars_files:
     - ../vars/main.yml
-    - ../vars/ports.yml
   handlers:
   - import_tasks: ../handlers/main.yml
 
@@ -26,7 +25,7 @@
       - httpd
       - vim
       - bash-completion
-      - libselinux-python
+#      - libselinux-python
       - podman
       - nfs-utils
       - git
@@ -58,9 +57,9 @@
       permanent: yes
       immediate: yes
       state: enabled
-      port: "{{ item[0] }}"
+      port: "{{ item.port }}/{{ item.proto }}"
     run_once: true
-    with_nested:
+    with_items:
       - "{{ ports }}"
 
   - name: Best effort SELinux repair - Apache
