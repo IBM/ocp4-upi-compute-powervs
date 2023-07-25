@@ -11,6 +11,11 @@ output "name_prefix" {
   value = local.name_prefix
 }
 
+output "vpc_support_server_ip" {
+  description = "The VPC Support Machine's IP - nfs/dns forwarder"
+  value = module.vpc_support.vpc_support_server_ip
+}
+
 output "vpc_check_key" {
   description = "The VPC SSH Key that was added/checked against existing keys"
   value       = module.vpc_support.vpc_check_key
