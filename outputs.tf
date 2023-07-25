@@ -13,7 +13,7 @@ output "name_prefix" {
 
 output "vpc_support_server_ip" {
   description = "The VPC Support Machine's IP - nfs/dns forwarder"
-  value = module.vpc_support.vpc_support_server_ip
+  value       = module.vpc_support.vpc_support_server_ip
 }
 
 output "vpc_check_key" {
