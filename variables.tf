@@ -12,6 +12,11 @@ variable "ibmcloud_api_key" {
   type        = string
   description = "IBM Cloud API key associated with user's identity"
   default     = "<key>"
+
+  validation {
+    condition     = var.ibmcloud_api_key != "<key>"
+    error_message = "The api key is empty, check that the -var-file= is set properly"
+  }
 }
 
 ################################################################
