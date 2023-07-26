@@ -128,7 +128,8 @@ COREOS_NAME=$(echo ${COREOS_FILE} | sed 's|\.ova\.gz||' | tr '.' '-' | sed 's|-0
 # RHEL_IMAGE_NAME
 if [ -z "${RHEL_IMAGE_NAME}" ]
 then
-    echo "ERROR: RHEL_IMAGE_NAME is not set"
+    echo "WARNING: RHEL_IMAGE_NAME is not set"
+    RHEL_IMAGE_NAME="CentOS-Stream-8"
 fi
 
 # creates the var file
