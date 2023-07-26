@@ -3,6 +3,56 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
+# Ref: VPC Regions https://cloud.ibm.com/docs/overview?topic=overview-locations
+# Ref: PowerVS Regions https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-creating-power-virtual-server
+# Ref: https://cluster-api-ibmcloud.sigs.k8s.io/reference/regions-zones-mapping.html
+
+# If the PowerVS Region or Zone is empty, the code auto-populates the zone/region information
+locals {
+  vpc_pvs = {
+    us-south = {
+        region = "us-south",
+        zone = "us-south"
+    },
+    us-east = {
+      region = "us-east",
+      zone = "us-east"
+    },
+    br-sao = {
+      region = "sao",
+      zone = "sao01"
+    },
+    ca-tor = {
+      region = "tor",
+      zone = "tor01"
+    },
+    eu-de = {
+      region = "eu-de",
+      zone = "eu-de-1"
+    },
+    eu-gb = {
+      region = "lon",
+      zone = "lon06"
+    },
+    au-syd = {
+      region = "syd",
+      zone = "syd05"
+    },
+    jp-tok = {
+      region = "tok",
+      zone = "tok04"
+    },
+    jp-osa = {
+      region = "osa",
+      zone = "osa21"
+    }
+  }
+
+  powervs_region = "${var.vpc_region}" != "" ? "${var.vpc_region}" : lookup(local.vpc_pvs, var.vpc_region, "syd").region
+  powervs_zone = "${var.vpc_region}" != "" ? "${var.vpc_zone}" : lookup(local.vpc_pvs, var.vpc_region, "syd05").zone
+}
+
+
 data "ibm_is_vpc" "ibm_is_vpc" {
   name = var.vpc_name
 

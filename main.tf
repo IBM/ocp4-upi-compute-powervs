@@ -12,8 +12,8 @@ provider "ibm" {
 
 provider "ibm" {
   ibmcloud_api_key = var.ibmcloud_api_key
-  region           = var.powervs_region
-  zone             = var.powervs_zone
+  region           = module.checks.powervs_region
+  zone             = module.checks.powervs_zone
   alias            = "powervs"
 }
 
@@ -80,7 +80,7 @@ module "pvs_prepare" {
   enable_snat                        = var.enable_snat
   powervs_machine_cidr               = var.powervs_machine_cidr
   name_prefix                        = local.name_prefix
-  powervs_region                     = var.powervs_region
+  powervs_region                     = module.checks.powervs_region
   powervs_service_instance_id        = var.powervs_service_instance_id
   private_key_file                   = var.private_key_file
   public_key_file                    = var.public_key_file
@@ -168,8 +168,8 @@ module "post" {
   ssh_agent         = var.ssh_agent
   bastion_public_ip = module.pvs_prepare.bastion_public_ip
   private_key_file  = var.private_key_file
-  powervs_region    = var.powervs_region
-  powervs_zone      = var.powervs_zone
+  powervs_region    = module.checks.powervs_region
+  powervs_zone      = module.checks.powervs_zone
   system_type       = var.system_type
   nfs_server        = module.vpc_support.vpc_support_server_ip
   nfs_path          = var.nfs_path
