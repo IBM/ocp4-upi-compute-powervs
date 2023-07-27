@@ -140,8 +140,8 @@ variable "bastion_health_status" {
 # Centos default is CentOS-Stream-8
 variable "rhel_image_name" {
   type        = string
-  description = "Name of the RHEL image that you want to use for the bastion node"
-  default     = "rhel-8.6"
+  description = "Name of the RHEL or Centos image that you want to use for the bastion node"
+  default     = "CentOS-Stream-8"
 }
 
 variable "rhel_username" {

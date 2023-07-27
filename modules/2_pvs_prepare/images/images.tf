@@ -21,8 +21,9 @@ data "ibm_pi_image" "bastion" {
   pi_image_name        = var.rhel_image_name
 }
 
+# Only run if we expect the image to exist.
 data "ibm_pi_image" "rhcos_check" {
-  count                = 1
+  count                = var.rhcos_import_image ? 0 : 1
   pi_cloud_instance_id = var.powervs_service_instance_id
   pi_image_name        = var.rhcos_image_name
 }
@@ -46,12 +47,8 @@ locals {
   rhcos_import_bucket_region = var.rhcos_import_image_region_override != "" ? "${var.rhcos_import_image_region_override}" : lookup(local.powervs_vpc_region_map, var.powervs_region, "au-syd")
 }
 
-locals {
-  rhcos_should_import = data.ibm_pi_image.rhcos_check == [] && var.rhcos_import_image ? 1 : 0
-}
-
 resource "ibm_pi_image" "rhcos_image_import" {
-  count = local.rhcos_should_import
+  count = var.rhcos_import_image ? 1 : 0
 
   pi_cloud_instance_id      = var.powervs_service_instance_id
   pi_image_name             = "rhcos-${var.rhcos_import_image_storage_type}-image"
