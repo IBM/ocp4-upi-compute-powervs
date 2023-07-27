@@ -29,7 +29,13 @@ variable "vpc_zone" {
 
 variable "powervs_region" {
   type        = string
-  description = "The IBM Cloud region where you want to create the workers"
+  description = "The IBM Cloud region where you want to create the PowerVS workers"
+  default     = ""
+}
+
+variable "powervs_zone" {
+  type        = string
+  description = "The IBM Cloud zone where you want to create the PowerVSworkers"
   default     = ""
 }
 

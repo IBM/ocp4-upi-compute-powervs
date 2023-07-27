@@ -48,8 +48,8 @@ locals {
     }
   }
 
-  powervs_region = "${var.vpc_region}" != "" ? "${var.vpc_region}" : lookup(local.vpc_pvs, var.vpc_region, "syd").region
-  powervs_zone   = "${var.vpc_region}" != "" ? "${var.vpc_zone}" : lookup(local.vpc_pvs, var.vpc_region, "syd05").zone
+  powervs_region = "${var.powervs_region}" != "" ? "${var.powervs_region}" : lookup(local.vpc_pvs, var.vpc_region, "syd").region
+  powervs_zone   = "${var.powervs_zone}" != "" ? "${var.powervs_zone}" : lookup(local.vpc_pvs, var.vpc_region, "syd05").zone
 }
 
 

@@ -42,6 +42,7 @@ module "checks" {
   vpc_region            = var.vpc_region
   vpc_zone              = var.vpc_zone
   powervs_region        = var.powervs_region
+  powervs_zone          = var.powervs_zone
   override_region_check = var.override_region_check
 }
 
