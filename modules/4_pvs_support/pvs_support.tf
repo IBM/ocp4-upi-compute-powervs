@@ -40,7 +40,7 @@ resource "null_resource" "kubeconfig" {
 
   # Copies the kubeconfig to specific folder
   provisioner "file" {
-    content      = file(var.kubeconfig_file)
+    content     = file(var.kubeconfig_file)
     destination = "/root/.kube/config"
   }
 
@@ -104,8 +104,8 @@ EOF
 
 # Two different paths to update the namespace.
 resource "null_resource" "config_non" {
-  count = fileexists(var.kubeconfig_file) ? 0 : 1
-  depends_on = [ null_resource.config, null_resource.kubeconfig ]
+  count      = fileexists(var.kubeconfig_file) ? 0 : 1
+  depends_on = [null_resource.config, null_resource.kubeconfig]
   connection {
     type        = "ssh"
     user        = var.rhel_username
@@ -127,8 +127,8 @@ EOF
 }
 
 resource "null_resource" "config_kube" {
-  count = fileexists(var.kubeconfig_file) ? 1 : 0
-  depends_on = [ null_resource.config, null_resource.kubeconfig ]
+  count      = fileexists(var.kubeconfig_file) ? 1 : 0
+  depends_on = [null_resource.config, null_resource.kubeconfig]
   connection {
     type        = "ssh"
     user        = var.rhel_username
