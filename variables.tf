@@ -85,6 +85,13 @@ variable "openshift_pass" {
   default     = ""
 }
 
+variable "kubeconfig_file" {
+  type        = string
+  description = "Path to kubeconfig file"
+  default     = "data/kubeconfig"
+  # if empty, will default to ${path.cwd}/data/kubeconfig
+}
+
 ################################################################
 # The PowerVS Instance configuration settings
 ################################################################

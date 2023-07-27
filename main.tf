@@ -138,6 +138,7 @@ module "support" {
   openshift_api_url        = var.openshift_api_url
   openshift_user           = var.openshift_user
   openshift_pass           = var.openshift_pass
+  kubeconfig_file          = var.kubeconfig_file
   cidrs                    = module.transit_gateway.mac_vpc_subnets
 }
 

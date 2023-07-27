@@ -21,6 +21,36 @@ locals {
   }
 }
 
+resource "null_resource" "kubeconfig" {
+  count = fileexists(var.kubeconfig_file) ? 1 : 0
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = var.bastion_public_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p /root/.kube"
+    ]
+  }
+
+  # Copies the kubeconfig to specific folder
+  provisioner "file" {
+    content      = file(var.kubeconfig_file)
+    destination = "/root/.kube/config"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p /root/.kube"
+    ]
+  }
+}
+
 resource "null_resource" "config" {
   connection {
     type        = "ssh"
@@ -70,13 +100,47 @@ ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support.log ansible-p
 EOF
     ]
   }
+}
 
+# Two different paths to update the namespace.
+resource "null_resource" "config_non" {
+  count = fileexists(var.kubeconfig_file) ? 0 : 1
+  depends_on = [ null_resource.config, null_resource.kubeconfig ]
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = var.bastion_public_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc login \
   "${var.openshift_api_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
 oc annotate ns openshift-cluster-csi-drivers \
+  scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
+EOF
+    ]
+  }
+}
+
+resource "null_resource" "config_kube" {
+  count = fileexists(var.kubeconfig_file) ? 1 : 0
+  depends_on = [ null_resource.config, null_resource.kubeconfig ]
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = var.bastion_public_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
+  provisioner "remote-exec" {
+    inline = [<<EOF
+export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
+oc annotate --kubeconfig /root/.kube/kubeconfig ns openshift-cluster-csi-drivers \
   scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
 EOF
     ]
