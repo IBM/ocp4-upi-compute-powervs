@@ -52,6 +52,9 @@
       state: started
       enabled: yes
 
+  - name: Disable fcontext
+    shell: "semanage fcontext -a -t httpd_sys_rw_content_t /var/www/html/worker.ign || true"
+
   - name: Open up firewall ports
     firewalld:
       permanent: yes

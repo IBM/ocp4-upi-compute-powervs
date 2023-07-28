@@ -10,9 +10,10 @@ locals {
     bastion_ip    = [var.bastion_ip]
   }
 
+  # you must use the api-int url so the bastion routes over the correct interface.
   helpernode_vars = {
     client_tarball               = var.openshift_client_tarball
-    openshift_machine_config_url = replace(var.openshift_api_url, ":6443", "")
+    openshift_machine_config_url = replace(replace(var.openshift_api_url, ":6443", ""), "://api.", "://api-int.")
     vpc_support_server_ip        = var.vpc_support_server_ip
   }
 
@@ -38,9 +39,9 @@ resource "null_resource" "kubeconfig" {
     ]
   }
 
-  # Copies the kubeconfig to specific folder
+  # Copies the kubeconfig to specific folder and replace api 
   provisioner "file" {
-    content     = file(var.kubeconfig_file)
+    content     = replace(file(var.kubeconfig_file), "://api.", "://api-int.")
     destination = "/root/.kube/config"
   }
 

@@ -110,6 +110,12 @@ resource "ibm_is_security_group_rule" "cp_internal_sg_r2" {
   }
 }
 
+# Adds the VPC Support machine to the target
+resource "ibm_is_security_group_target" "example" {
+  security_group = local.cp_internal_sg[0].id
+  target         = ibm_is_instance.supp_vm_vsi.id
+}
+
 # sg-kube-api-lb
 # TCP (IN) 	22623 	192.168.200.0/24
 # TCP (Out) 	22623 	192.168.200.0/24

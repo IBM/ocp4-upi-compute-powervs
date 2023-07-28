@@ -23,8 +23,10 @@ write_files:
 - path: /etc/squid/squid.conf
   permissions: '0640'
   content: |
-    acl ibm_endpoints dstdomain .${domain}
-    http_access deny !ibm_endpoints
+    acl localnet src 10.0.0.0/8
+    acl localnet src 172.16.0.0/12
+    acl localnet src 192.168.0.0/16
+    http_access deny !localnet
     http_port 3128
     coredump_dir /var/spool/squid
 runcmd:
