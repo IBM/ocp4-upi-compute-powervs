@@ -82,7 +82,7 @@ resource "null_resource" "config" {
 
   provisioner "file" {
     content     = templatefile("${path.module}/templates/vars.yaml.tpl", local.helpernode_vars)
-    destination = "ocp4-upi-compute-powervs/support/vars/main.yml"
+    destination = "ocp4-upi-compute-powervs/support/vars/vars.yaml"
   }
 
   # Copies the custom route for env3
@@ -96,7 +96,7 @@ resource "null_resource" "config" {
 ifup env3
 echo 'Running ocp4-upi-compute-powervs playbook...'
 cd ocp4-upi-compute-powervs/support
-ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support.log ansible-playbook -e @vars.yaml tasks/main.yml --become
+ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support.log ansible-playbook -e @vars/vars.yaml tasks/main.yml --become
 EOF
     ]
   }

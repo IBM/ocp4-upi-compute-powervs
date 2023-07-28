@@ -57,7 +57,7 @@
       permanent: yes
       immediate: yes
       state: enabled
-      port: "{{ item.port }}/{{ item.proto }}"
+      port: "{{ item }}"
     run_once: true
     with_items:
       - "{{ ports }}"
@@ -101,11 +101,6 @@
     file:
       path: /usr/local/bin/README.md
       state: absent
-
-  - name: Set the local resolv.conf file
-    template:
-      src: ../templates/resolv.conf.j2
-      dest: /etc/resolv.conf
 
   - name: Restarting NetworkManager
     service:

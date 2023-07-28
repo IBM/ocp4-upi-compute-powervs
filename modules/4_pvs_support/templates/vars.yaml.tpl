@@ -3,6 +3,9 @@ ocp_client: "${client_tarball}"
 openshift_machine_config_url: "${openshift_machine_config_url}:22623/config/worker"
 vpc_support_server_ip: "${vpc_support_server_ip}"
 ports:
+- 67/udp
+- 53/tcp
+- 53/udp
 - 443/tcp
 - 80/tcp
 - 8080/tcp
