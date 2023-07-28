@@ -23,7 +23,7 @@ locals {
 # TCP 6443 192.168.200.0/24 (API)
 
 resource "ibm_is_security_group_rule" "control_plane_sg_mc" {
-  count = local.control_plane_sg[0].rules 
+  count     = local.control_plane_sg[0].rules
   group     = local.control_plane_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
