@@ -37,7 +37,7 @@ resource "ibm_is_instance" "supp_vm_vsi" {
 
   primary_network_interface {
     subnet          = data.ibm_is_vpc.vpc.subnets[0].id
-    security_groups = [local.sg_id]
+    security_groups = [local.sg_id, local.cp_internal_sg[0].id]
   }
 
   user_data = templatefile("${path.cwd}/modules/1_vpc_support/templates/cloud-init.yaml.tpl", {})

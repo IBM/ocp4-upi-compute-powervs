@@ -23,7 +23,6 @@ locals {
 # TCP 6443 192.168.200.0/24 (API)
 
 resource "ibm_is_security_group_rule" "control_plane_sg_mc" {
-  count     = local.control_plane_sg[0].rules
   group     = local.control_plane_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -109,12 +108,6 @@ resource "ibm_is_security_group_rule" "cp_internal_sg_r2" {
     port_min = 10257
     port_max = 10259
   }
-}
-
-# Adds the VPC Support machine to the target
-resource "ibm_is_security_group_target" "cp_internal_supp_vm" {
-  security_group = local.cp_internal_sg[0].id
-  target         = ibm_is_instance.supp_vm_vsi[0].id
 }
 
 # sg-kube-api-lb
