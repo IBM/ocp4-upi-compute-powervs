@@ -40,7 +40,5 @@ resource "ibm_is_instance" "supp_vm_vsi" {
     security_groups = [local.sg_id]
   }
 
-  user_data = templatefile("${path.cwd}/modules/1_vpc_support/templates/cloud-init.yaml.tpl", {
-    domain : split("//", split(":", var.openshift_api_url)[0])[0],
-  })
+  user_data = templatefile("${path.cwd}/modules/1_vpc_support/templates/cloud-init.yaml.tpl", {})
 }
