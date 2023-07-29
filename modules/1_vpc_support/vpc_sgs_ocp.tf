@@ -22,7 +22,12 @@ locals {
 # TCP 22623 192.168.200.0/24 (MachineConfig)
 # TCP 6443 192.168.200.0/24 (API)
 
+locals { 
+  control_plane_sg_rule_exists_hashes = [ for x in local.control_plane_sg[0].rules : format("%s/%s/%s/%s/%s", x.protocol, x.direction, x.port_min, x.port_max, coalesce(x.remote[0].cidr_block, "EMPTY")) ]
+}
+
 resource "ibm_is_security_group_rule" "control_plane_sg_mc" {
+  count = contains(local.control_plane_sg_rule_exists_hashes, format("%s%s","tcp/inbound/22623/22623/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.control_plane_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -33,6 +38,7 @@ resource "ibm_is_security_group_rule" "control_plane_sg_mc" {
 }
 
 resource "ibm_is_security_group_rule" "control_plane_sg_api" {
+  count = contains(local.control_plane_sg_rule_exists_hashes, format("%s%s","tcp/inbound/6443/6443/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.control_plane_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -48,7 +54,12 @@ resource "ibm_is_security_group_rule" "control_plane_sg_api" {
 #UDP 	4789 	192.168.200.0/24
 #TCP 	22 	192.168.200.0/24
 
+locals { 
+  cluster_wide_sg_rule_exists_hashes = [ for x in local.cluster_wide_sg[0].rules : format("%s/%s/%s/%s/%s", x.protocol, x.direction, x.port_min, x.port_max, coalesce(x.remote[0].cidr_block, "EMPTY")) ]
+}
+
 resource "ibm_is_security_group_rule" "cluster_wide_sg_6081" {
+  count = contains(local.cluster_wide_sg_rule_exists_hashes, format("%s%s","tcp/inbound/6081/6081/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.cluster_wide_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -59,6 +70,7 @@ resource "ibm_is_security_group_rule" "cluster_wide_sg_6081" {
 }
 
 resource "ibm_is_security_group_rule" "cluster_wide_sg_any" {
+  count = contains(local.cluster_wide_sg_rule_exists_hashes, "all/outbound/0/0/0.0.0.0/0") ? 0 : 1
   group     = local.cluster_wide_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -67,6 +79,7 @@ resource "ibm_is_security_group_rule" "cluster_wide_sg_any" {
 }
 
 resource "ibm_is_security_group_rule" "cluster_wide_sg_4789" {
+  count = contains(local.cluster_wide_sg_rule_exists_hashes, format("%s%s","udp/inbound/4789/4789/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.cluster_wide_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -77,6 +90,7 @@ resource "ibm_is_security_group_rule" "cluster_wide_sg_4789" {
 }
 
 resource "ibm_is_security_group_rule" "cluster_wide_sg_ssh" {
+  count = contains(local.cluster_wide_sg_rule_exists_hashes, format("%s%s","tcp/inbound/22/22/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.cluster_wide_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -90,7 +104,12 @@ resource "ibm_is_security_group_rule" "cluster_wide_sg_ssh" {
 #TCP 	2379-2380 	192.168.200.0/24
 #TCP 	10257-10259 	192.168.200.0/24
 
+locals { 
+  cp_internal_sg_rule_exists_hashes = [ for x in local.cp_internal_sg[0].rules : format("%s/%s/%s/%s/%s", x.protocol, x.direction, x.port_min, x.port_max, coalesce(x.remote[0].cidr_block, "EMPTY")) ]
+}
+
 resource "ibm_is_security_group_rule" "cp_internal_sg_r1" {
+  count = contains(local.cp_internal_sg_rule_exists_hashes, format("%s%s","tcp/inbound/2379/2380/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.cp_internal_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -101,6 +120,7 @@ resource "ibm_is_security_group_rule" "cp_internal_sg_r1" {
 }
 
 resource "ibm_is_security_group_rule" "cp_internal_sg_r2" {
+  count = contains(local.cp_internal_sg_rule_exists_hashes, format("%s%s","tcp/inbound/10257/10259/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.cp_internal_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -117,7 +137,12 @@ resource "ibm_is_security_group_rule" "cp_internal_sg_r2" {
 # TCP (Out) 	80 	192.168.200.0/24
 # TCP (Out) 	443 	192.168.200.0/24
 
+locals { 
+  kube_api_lb_sg_rule_exists_hashes = [ for x in local.kube_api_lb_sg[0].rules : format("%s/%s/%s/%s/%s", x.protocol, x.direction, x.port_min, x.port_max, coalesce(x.remote[0].cidr_block, "EMPTY")) ]
+}
+
 resource "ibm_is_security_group_rule" "kube_api_lb_sg_mc" {
+  count = contains(local.kube_api_lb_sg_rule_exists_hashes, format("%s%s","tcp/inbound/22623/22623/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.kube_api_lb_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -128,6 +153,7 @@ resource "ibm_is_security_group_rule" "kube_api_lb_sg_mc" {
 }
 
 resource "ibm_is_security_group_rule" "kube_api_lb_sg_mc_out" {
+  count = contains(local.kube_api_lb_sg_rule_exists_hashes, format("%s%s","tcp/outbound/22623/22623/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.kube_api_lb_sg[0].id
   direction = "outbound"
   remote    = var.powervs_machine_cidr
@@ -138,6 +164,7 @@ resource "ibm_is_security_group_rule" "kube_api_lb_sg_mc_out" {
 }
 
 resource "ibm_is_security_group_rule" "kube_api_lb_sg_api_out" {
+  count = contains(local.kube_api_lb_sg_rule_exists_hashes, format("%s%s","tcp/outbound/6443/6443/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.kube_api_lb_sg[0].id
   direction = "outbound"
   remote    = var.powervs_machine_cidr
@@ -148,6 +175,7 @@ resource "ibm_is_security_group_rule" "kube_api_lb_sg_api_out" {
 }
 
 resource "ibm_is_security_group_rule" "kube_api_lb_sg_http_out" {
+  count = contains(local.kube_api_lb_sg_rule_exists_hashes, format("%s%s","tcp/outbound/80/80/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.kube_api_lb_sg[0].id
   direction = "outbound"
   remote    = var.powervs_machine_cidr
@@ -158,6 +186,7 @@ resource "ibm_is_security_group_rule" "kube_api_lb_sg_http_out" {
 }
 
 resource "ibm_is_security_group_rule" "kube_api_lb_sg_https_out" {
+  count = contains(local.kube_api_lb_sg_rule_exists_hashes, format("%s%s","tcp/outbound/443/443/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.kube_api_lb_sg[0].id
   direction = "outbound"
   remote    = var.powervs_machine_cidr
@@ -175,7 +204,12 @@ resource "ibm_is_security_group_rule" "kube_api_lb_sg_https_out" {
 # TCP (IN) 	9000-9999 	192.168.200.0/24
 # TCP (IN) 	10250 	192.168.200.0/24
 
+locals { 
+  openshift_net_sg_rule_exists_hashes = [ for x in local.openshift_net_sg[0].rules : format("%s/%s/%s/%s/%s", x.protocol, x.direction, x.port_min, x.port_max, coalesce(x.remote[0].cidr_block, "EMPTY")) ]
+}
+
 resource "ibm_is_security_group_rule" "openshift_net_sg_r1_in_tcp" {
+  count = contains(local.openshift_net_sg_rule_exists_hashes, format("%s%s","tcp/inbound/30000/32767/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.openshift_net_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -186,6 +220,7 @@ resource "ibm_is_security_group_rule" "openshift_net_sg_r1_in_tcp" {
 }
 
 resource "ibm_is_security_group_rule" "openshift_net_sg_r1_in_udp" {
+  count = contains(local.openshift_net_sg_rule_exists_hashes, format("%s%s","udp/inbound/30000/32767/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.openshift_net_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -196,6 +231,7 @@ resource "ibm_is_security_group_rule" "openshift_net_sg_r1_in_udp" {
 }
 
 resource "ibm_is_security_group_rule" "openshift_net_sg_500" {
+  count = contains(local.openshift_net_sg_rule_exists_hashes, format("%s%s","udp/inbound/500/500/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.openshift_net_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -206,6 +242,7 @@ resource "ibm_is_security_group_rule" "openshift_net_sg_500" {
 }
 
 resource "ibm_is_security_group_rule" "openshift_net_sg_r2_in_tcp" {
+  count = contains(local.openshift_net_sg_rule_exists_hashes, format("%s%s","tcp/inbound/9000/9999/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.openshift_net_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -216,6 +253,7 @@ resource "ibm_is_security_group_rule" "openshift_net_sg_r2_in_tcp" {
 }
 
 resource "ibm_is_security_group_rule" "openshift_net_sg_r2_in_udp" {
+  count = contains(local.openshift_net_sg_rule_exists_hashes, format("%s%s","udp/inbound/9000/9999/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.openshift_net_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -226,6 +264,7 @@ resource "ibm_is_security_group_rule" "openshift_net_sg_r2_in_udp" {
 }
 
 resource "ibm_is_security_group_rule" "openshift_net_sg_10250_out" {
+  count = contains(local.openshift_net_sg_rule_exists_hashes, format("%s%s","tcp/inbound/10250/10250/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.openshift_net_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
