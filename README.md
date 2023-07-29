@@ -6,14 +6,9 @@ The [`ocp4-upi-compute-powervs` project](https://github.com/ibm/ocp4-upi-compute
 
 1. Requires Terraform v1.4.0 or Higher
 2. A PowerVS Service 
-3. A PowerVS subnet (`ocp-net`) with L2 network communication open between hosts on the subnet.
-4. A PowerVS subnet (`ocp-net-cc`) where the Cloud Connection is going to be setup.
-5. An RHCOS Image loaded to the PowerVS Service
-6. An RHEL/Centos Image loaded to the PowerVS Service
-7. An Existing OpenShift Container Platform Cluster (on Power or Intel VPC)
-8. A downloaded ignition file stored (in data folder) using: 
-  - `curl -k http://api.demo.ocp-multiarch.xyz:22623/config/worker -o worker.ign -H "Accept: application/vnd.coreos.ignition+json;version=3.2.0"`
-  - `oc extract -n openshift-machine-api secret/worker-user-data --keys=userData --to=-`
+3. An RHCOS Image loaded to the PowerVS Service
+4. An RHEL/Centos Image loaded to the PowerVS Service
+5. An Existing OpenShift Container Platform Cluster (configured with IBMCloud VPC)
 
 ## Commands
 
