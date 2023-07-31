@@ -17,6 +17,7 @@ module "images" {
   rhcos_import_image_filename        = var.rhcos_import_image_filename
   rhcos_import_image_storage_type    = var.rhcos_import_image_storage_type
   rhcos_import_image_region_override = var.rhcos_import_image_region_override
+  name_prefix                        = var.name_prefix
 }
 
 module "keys" {

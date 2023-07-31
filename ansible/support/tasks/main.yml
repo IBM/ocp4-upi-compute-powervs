@@ -137,8 +137,8 @@
         validate_certs: false
         headers:
           "Accept": "application/vnd.coreos.ignition+json;version=3.2.0"
-      environment:
-        https_proxy: http://{{ vpc_support_server_ip }}:3128
+      #environment:
+      #  https_proxy: http://{{ vpc_support_server_ip }}:3128
 
     - name: Make ignition file readable
       ansible.builtin.file:
@@ -149,7 +149,7 @@
 
     - name: Make ignition file readable
       ansible.builtin.file:
-        path: /var/www/html/worker.ign
+        path: /var/www/html/ignition/worker.ign
         owner: nobody
         group: nobody
         mode: u+rw,g-rx,o-rx

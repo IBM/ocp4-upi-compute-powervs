@@ -18,3 +18,5 @@ variable "rhcos_import_image_storage_type" {}
 
 ### Prerelease images are only in us-east
 variable "rhcos_import_image_region_override" {}
+
+variable "name_prefix" {}
