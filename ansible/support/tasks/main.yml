@@ -53,7 +53,7 @@
       enabled: yes
 
   - name: Disable fcontext
-    shell: "semanage fcontext -a -t httpd_sys_rw_content_t /var/www/html/worker.ign || true"
+    shell: "semanage fcontext -a -t httpd_sys_rw_content_t /var/www/html/ignition/worker.ign || true"
 
   - name: Open up firewall ports
     firewalld:
@@ -64,9 +64,6 @@
     run_once: true
     with_items:
       - "{{ ports }}"
-
-  - name: Best effort SELinux repair - Apache
-    shell: "restorecon -vR /var/www/html || true"
 
   - name: Systemd daemon reload
     systemd:
@@ -136,7 +133,7 @@
     - name: Downloading the ignition file
       get_url:
         url: "{{ openshift_machine_config_url }}"
-        dest: /var/www/html/worker.ign
+        dest: /var/www/html/ignition/worker.ign
         validate_certs: false
         headers:
           "Accept": "application/vnd.coreos.ignition+json;version=3.2.0"
@@ -156,3 +153,6 @@
         owner: nobody
         group: nobody
         mode: u+rw,g-rx,o-rx
+
+  - name: Best effort SELinux repair - Apache
+    shell: "restorecon -vR /var/www/html/ignition || true"

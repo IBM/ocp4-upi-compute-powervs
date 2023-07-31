@@ -23,14 +23,6 @@ resource "null_resource" "post_kube" {
     agent       = var.ssh_agent
   }
 
-  #create .kube directory
-  provisioner "remote-exec" {
-    inline = [
-      "hostname",
-      "mkdir -p /root/.kube"
-    ]
-  }
-
   #copies the ansible/post to specific folder
   provisioner "file" {
     source      = "ansible/post"

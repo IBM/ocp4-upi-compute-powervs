@@ -44,12 +44,6 @@ resource "null_resource" "kubeconfig" {
     content     = replace(file(var.kubeconfig_file), "://api.", "://api-int.")
     destination = "/root/.kube/config"
   }
-
-  provisioner "remote-exec" {
-    inline = [
-      "mkdir -p /root/.kube"
-    ]
-  }
 }
 
 resource "null_resource" "config" {
@@ -141,7 +135,7 @@ resource "null_resource" "config_kube" {
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
-oc annotate --kubeconfig /root/.kube/kubeconfig ns openshift-cluster-csi-drivers \
+oc annotate --kubeconfig /root/.kube/config ns openshift-cluster-csi-drivers \
   scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
 EOF
     ]
