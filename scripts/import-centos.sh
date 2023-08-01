@@ -7,10 +7,16 @@
 
 # Helper file to import the centos image using the ibmcloud cli
 
+IBMCLOUD=ibmcloud
+if [[ $(type -t ic) == function ]]
+then
+    IBMCLOUD=ic
+fi
+
 ibmcloud plugin install power-iaas -f
 
-POWERVS_CRN=$(ibmcloud pi sl 2>&1 | grep ${SERVICE_INSTANCE_ID} | awk '{print $1}')
-ibmcloud pi st "${POWERVS_CRN}"
+POWERVS_CRN=$(${IBMCLOUD} pi sl 2>&1 | grep ${SERVICE_INSTANCE_ID} | awk '{print $1}')
+${IBMCLOUD} pi st "${POWERVS_CRN}"
 
-ibmcloud pi image-create CentOS-Stream-8
+${IBMCLOUD} pi image-create CentOS-Stream-8
 echo "Finished importing CentOS-Stream-8"
