@@ -22,3 +22,7 @@ output "powervs_dhcp_network_id" {
 output "powervs_dhcp_network_name" {
   value = data.ibm_pi_dhcp.dhcp_service.network_name
 }
+
+output "powervs_dhcp_service" {
+  value = data.ibm_pi_dhcp.dhcp_service
+}

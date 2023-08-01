@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-output "bastion_ip" {
+output "bastion_private_ip" {
   depends_on = [null_resource.bastion_init]
-  value      = data.ibm_pi_instance_ip.bastion_ip.*.ip
+  value      = local.bastion_private_ip
 }
 
 output "bastion_public_ip" {

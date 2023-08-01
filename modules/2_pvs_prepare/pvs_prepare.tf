@@ -84,4 +84,5 @@ module "bastion" {
   rhel_subscription_username      = var.rhel_subscription_username
   rhel_subscription_password      = var.rhel_subscription_password
   rhel_subscription_activationkey = var.rhel_subscription_activationkey
+  dhcp_service                    = module.network.powervs_dhcp_service
 }

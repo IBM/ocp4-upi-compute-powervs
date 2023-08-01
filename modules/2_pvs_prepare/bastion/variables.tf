@@ -31,3 +31,4 @@ variable "bastion_public_network_cidr" {}
 variable "powervs_dhcp_network_id" {}
 variable "powervs_dhcp_network_name" {}
 variable "powervs_dhcp_network_cidr" {}
+variable "dhcp_service" {}

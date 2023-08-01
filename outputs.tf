@@ -22,7 +22,7 @@ output "vpc_check_key" {
 }
 
 output "bastion_private_ip" {
-  value = module.pvs_prepare.bastion_ip
+  value = module.pvs_prepare.bastion_private_ip
 }
 
 output "bastion_public_ip" {

@@ -132,7 +132,7 @@ module "support" {
   ssh_agent                = var.ssh_agent
   connection_timeout       = var.connection_timeout
   rhel_username            = var.rhel_username
-  bastion_ip               = module.pvs_prepare.bastion_ip[0]
+  bastion_ip               = module.pvs_prepare.bastion_private_ip[0]
   bastion_public_ip        = module.pvs_prepare.bastion_public_ip[0]
   openshift_client_tarball = var.openshift_client_tarball
   vpc_support_server_ip    = module.vpc_support.vpc_support_server_ip
@@ -159,7 +159,7 @@ module "worker" {
   rhcos_image_id              = module.pvs_prepare.rhcos_image_id
   system_type                 = var.system_type
   worker                      = var.worker
-  ignition_ip                 = module.pvs_prepare.bastion_ip[0]
+  ignition_ip                 = module.pvs_prepare.bastion_private_ip[0]
   # Eventually, this should be a bit more dynamic and include MachineConfigPool
 }
 
