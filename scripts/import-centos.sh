@@ -11,9 +11,9 @@ IBMCLOUD=ibmcloud
 if [[ $(type -t ic) == function ]]
 then
     IBMCLOUD=ic
+else 
+    ibmcloud plugin install power-iaas -f
 fi
-
-ibmcloud plugin install power-iaas -f
 
 POWERVS_CRN=$(${IBMCLOUD} pi sl 2>&1 | grep ${SERVICE_INSTANCE_ID} | awk '{print $1}')
 ${IBMCLOUD} pi st "${POWERVS_CRN}"
