@@ -5,6 +5,14 @@
     - ../vars/main.yml
 
   tasks:
+  - name: populate /etc/environment
+    lineinfile:
+      path: "/etc/environment"
+      state: present
+      regexp: "^HTTPS_PROXY="
+      line: "HTTPS_PROXY=http://{{ nfs_server }}:3128"
+    become: yes
+
   - name: Get CSRs
     shell: "oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name'"
     register: csr_list
@@ -34,11 +42,7 @@
 
   - name: Create openshift-powervm-rmc project
     when: projects_list.stdout.find("openshift-powervm-rmc") == -1
-    k8s:
-      name: "{{ project_name }}"
-      api_version: project.openshift.io/v1
-      kind: Project
-      state: present
+    shell: "oc new-project {{ project_name }}"
 
   - name: Create openshift-powervm-rmc serviceaccount
     k8s:
@@ -79,4 +83,3 @@
   - name: Setup NFS storage if NFS_SERVER is provided
     import_tasks: nfs_provisioner.yaml
     when: nfs_server != "none"
-

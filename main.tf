@@ -159,7 +159,7 @@ module "worker" {
   rhcos_image_id              = module.pvs_prepare.rhcos_image_id
   system_type                 = var.system_type
   worker                      = var.worker
-  ignition_url                = "http://${module.pvs_prepare.bastion_ip[0]}:8080/worker.ign"
+  ignition_ip                = "${module.pvs_prepare.bastion_ip[0]}"
   # Eventually, this should be a bit more dynamic and include MachineConfigPool
 }
 

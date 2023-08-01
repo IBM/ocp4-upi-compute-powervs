@@ -109,6 +109,10 @@ resource "null_resource" "config_non" {
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"
   }
+
+  # Dev Note: Running the following should show you amd64
+  # ❯ oc get ns openshift-cluster-csi-drivers -oyaml | yq -r '.metadata.annotations' | grep amd64
+  # scheduler.alpha.kubernetes.io/node-selector: kubernetes.io/arch=amd64
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
