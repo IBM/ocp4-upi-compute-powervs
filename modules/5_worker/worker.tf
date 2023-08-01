@@ -29,7 +29,7 @@ resource "ibm_pi_instance" "worker" {
   pi_user_data = base64encode(
     templatefile(
       "${path.cwd}/modules/5_worker/templates/worker.ign",
-      { 
+      {
         ignition_ip : var.ignition_ip,
         name : base64encode("${var.name_prefix}-worker-${count.index}"),
   }))
