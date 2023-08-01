@@ -42,7 +42,7 @@
 
   - name: Create openshift-powervm-rmc project
     when: projects_list.stdout.find("openshift-powervm-rmc") == -1
-    shell: "oc new-project {{ project_name }}"
+    shell: "oc apply -f files/rmc-ns.yaml"
 
   - name: Create openshift-powervm-rmc serviceaccount
     k8s:

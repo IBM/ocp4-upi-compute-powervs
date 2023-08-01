@@ -140,19 +140,13 @@
       #environment:
       #  https_proxy: http://{{ vpc_support_server_ip }}:3128
 
-    - name: Make ignition file readable
+    - name: Make ignition file readable through the www dir
       ansible.builtin.file:
-        path: /var/www/html/
-        owner: nobody
-        group: nobody
-        mode: u+rw,g-rx,o-rx
-
-    - name: Make ignition file readable
-      ansible.builtin.file:
-        path: /var/www/html/ignition/worker.ign
-        owner: nobody
-        group: nobody
-        mode: u+rw,g-rx,o-rx
+        path: /var/www
+        owner: apache
+        group: apache
+        recurse: true 
+        mode: u+rwx,g-rx,o-rx
 
   - name: Best effort SELinux repair - Apache
     shell: "restorecon -vR /var/www/html/ignition || true"
