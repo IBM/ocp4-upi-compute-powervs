@@ -45,7 +45,7 @@
     shell: "oc apply -f files/rmc-ns.yaml"
 
   - name: Create openshift-powervm-rmc serviceaccount
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition:
         api_version: v1
@@ -58,7 +58,7 @@
     shell: "oc adm policy add-scc-to-user -z openshift-powervm-rmc privileged -n openshift-powervm-rmc"
 
   - name: Deploy openshift-powervm-rmc DaemonSet
-    k8s:
+    kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', '../templates/rsct-daemonset.yml.j2') }}"
 
@@ -71,7 +71,7 @@
       msg: "Nodes with ppc64le : {{ node_names.stdout_lines }}"
 
   - name: Add labels defined in node_labels to ppc64le Nodes
-    k8s:
+    kubernetes.core.k8s:
       state: present
       kind: Node
       name: "{{ item }}"

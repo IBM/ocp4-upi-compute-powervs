@@ -235,9 +235,10 @@ resource "null_resource" "manage_packages" {
   }
 }
 
+
 ### Grab the Bastion Data
 data "ibm_pi_dhcp" "dhcp_server" {
-  depends_on           = [null_resource.manage_packages]
+  depends_on           = [null_resource.manage_packages, ibm_pi_instance.bastion]
   pi_cloud_instance_id = var.powervs_service_instance_id
   pi_dhcp_id           = var.dhcp_service.dhcp_id
 }

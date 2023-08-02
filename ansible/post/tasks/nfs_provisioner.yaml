@@ -1,10 +1,10 @@
 - name: Create nfs-provisioner Project
-  k8s:
+  kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('template', '../templates/nfs-ns.yml') }}"
   
 - name: Create RBAC for nfs-provisioner
-  k8s:
+  kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('template', '../templates/nfs-rbac.yml') }}"
 
@@ -12,12 +12,12 @@
   shell: "oc adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:nfs-provisioner:nfs-client-provisioner"
 
 - name: Create Deployment for nfs-provisioner
-  k8s:
+  kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('template', '../templates/nfs-deployment.yml.j2') }}"
 
 - name: Create Storage Class for nfs
-  k8s:
+  kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('template', '../templates/nfs-sc.yml') }}"
 
