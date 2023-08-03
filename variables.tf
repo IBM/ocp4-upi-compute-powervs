@@ -491,3 +491,9 @@ variable "override_region_check" {
   description = "Set to true if you want to skip region checks."
   default     = false
 }
+
+variable "vpc_supp_public_ip" {
+   type        = bool
+   description = "Set to true if you want to skip region checks."
+   default     = false
+}
