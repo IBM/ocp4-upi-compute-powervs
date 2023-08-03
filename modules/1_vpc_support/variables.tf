@@ -53,4 +53,10 @@ variable "openshift_api_url" {
   default     = "https://api.example.ocp-multiarch.xyz:6443"
 }
 
+variable "vpc_supp_public_ip" {
+   type        = bool
+   description = "Set to true if you want to skip region checks."
+   default     = false
+}
+
 variable "powervs_machine_cidr" {}

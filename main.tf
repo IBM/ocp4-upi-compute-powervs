@@ -61,6 +61,7 @@ module "vpc_support" {
   public_key_file      = var.public_key_file
   openshift_api_url    = var.openshift_api_url
   powervs_machine_cidr = var.powervs_machine_cidr
+  vpc_supp_public_ip   = var.vpc_supp_public_ip
 }
 
 ### Prepares the PowerVS workspace for Day-2 Workers
