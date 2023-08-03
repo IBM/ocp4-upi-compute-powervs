@@ -5,7 +5,13 @@
     - ../vars/main.yml
 
   tasks:
-  - name: populate /etc/environment
+  - name: Install Pre-requisites
+    pip:
+      name:
+        - kubernetes
+        - openshift
+
+  - name: Populate /etc/environment
     lineinfile:
       path: "/etc/environment"
       state: present
@@ -23,30 +29,32 @@
 
   - name: Print PPC Node count and CSRs
     debug:
-      msg: "PPC Worker Node count is : {{ ppc_nodes_count.stdout }}, Pending CSR List is : {{ csr_list.stdout }}"
+      msg: "PPC Worker Node count Before Approving CSR is : {{ ppc_nodes_count.stdout }}, Pending CSR List is : {{ csr_list.stdout }}"
 
   # Run approve command till we have all ppc workers ready. 'xargs -r ' is used to ignore empty stdin.
   - name: Approve Worker CSRs
     shell: "oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name' | xargs -r oc adm certificate approve"
-    until: lookup('pipe','oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | grep -w Ready | wc -l') == ppc_nodes_count.stdout
-    retries: 10
+    until: lookup('pipe','oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | grep -w Ready | wc -l') > "0"
+    retries: 20
     delay: 30
-    when: csr_list.stdout != ""
+    when: csr_list.stdout != "" or ppc_nodes_count.stdout == "0"
 
   - name: Ensure able to fetch project list
-    shell: "oc get projects"
+    shell: "oc get projects -v=10"
     register: projects_list
     until: projects_list.stdout.find("default") != -1
     retries: 20
     delay: 30
 
   - name: Create openshift-powervm-rmc project
-    when: projects_list.stdout.find("openshift-powervm-rmc") == -1
-    shell: "oc apply -f files/rmc-ns.yaml"
+    when: projects_list.stdout.find(project_name) == -1
+    shell: "oc adm new-project {{ project_name }}"
+#    shell: "oc apply -f files/rmc-ns.yaml"
 
   - name: Create openshift-powervm-rmc serviceaccount
     kubernetes.core.k8s:
       state: present
+      proxy: "http://{{ nfs_server }}:3128"
       definition:
         api_version: v1
         kind: ServiceAccount
@@ -55,11 +63,12 @@
           namespace: "{{ project_name }}"
 
   - name: Add privileged scc to openshift-powervm-rmc serviceaccount
-    shell: "oc adm policy add-scc-to-user -z openshift-powervm-rmc privileged -n openshift-powervm-rmc"
+    shell: "oc adm policy add-scc-to-user -z {{ rmc_name }} privileged -n {{ project_name }}"
 
   - name: Deploy openshift-powervm-rmc DaemonSet
     kubernetes.core.k8s:
       state: present
+      proxy: "http://{{ nfs_server }}:3128"
       definition: "{{ lookup('template', '../templates/rsct-daemonset.yml.j2') }}"
 
   - name: Get Nodes with ppc64le architecture
@@ -73,6 +82,7 @@
   - name: Add labels defined in node_labels to ppc64le Nodes
     kubernetes.core.k8s:
       state: present
+      proxy: "http://{{ nfs_server }}:3128"
       kind: Node
       name: "{{ item }}"
       definition:
@@ -83,3 +93,4 @@
   - name: Setup NFS storage if NFS_SERVER is provided
     import_tasks: nfs_provisioner.yaml
     when: nfs_server != "none"
+
