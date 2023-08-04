@@ -4,11 +4,11 @@ The [`ocp4-upi-compute-powervs` project](https://github.com/ibm/ocp4-upi-compute
 
 ## Prerequisites
 
-1. Requires Terraform v1.4.0 or Higher
+1. Requires Terraform v1.5.0 or Higher
 2. A PowerVS Service 
 3. An RHCOS Image loaded to the PowerVS Service
-4. An RHEL/Centos Image loaded to the PowerVS Service
-5. An Existing OpenShift Container Platform Cluster (configured with IBMCloud VPC)
+4. Optional: An RHEL/Centos Image loaded to the PowerVS Service
+5. An Existing OpenShift Container Platform Cluster installed on IBMCloud VPC.
 
 ## Commands
 
@@ -37,6 +37,16 @@ Note: The PowerVS and IBMCloud VPC regions must be compatible.
 ```
 ❯ terraform destroy -var-file=var.tfvars
 ```
+
+Note, the `destroy` command leaves the Node resource in place, and destroys the virtual server. You must delete the Node manually.
+
+## Cluster Details
+
+There are some important points to mention:
+
+1. The Power Bastion node uses a https proxy to forward requests to the Cluster's internal api load balancer. This setting is configured in /etc/environment on the Power Bastion.
+2. NFS is used as the storage provider across nodes.
+
 
 ## Contributing
 
