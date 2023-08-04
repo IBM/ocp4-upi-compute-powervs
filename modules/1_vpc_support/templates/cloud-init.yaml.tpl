@@ -4,6 +4,7 @@ packages:
   - bind
   - bind-utils
   - httpd
+  - mod_ssl
   - nfs-utils
   - squid
 write_files:
@@ -32,8 +33,6 @@ write_files:
 runcmd:
   - export MYIP=`hostname -I`; sed -i.bak "s/MYIP/$MYIP/" /tmp/named-conf-edit.sed
   - sed -i.orig -f /tmp/named-conf-edit.sed /etc/named.conf
-  - systemctl enable named.service nfs-server
-  - systemctl start named.service nfs-server
+  - systemctl enable named.service nfs-server squid
+  - systemctl start named.service nfs-server squid
   - mkdir -p /export && chmod -R 777 /export
-  - systemctl enable squid
-  - systemctl start squid

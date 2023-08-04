@@ -132,7 +132,6 @@ module "support" {
   ssh_agent                = var.ssh_agent
   connection_timeout       = var.connection_timeout
   rhel_username            = var.rhel_username
-  bastion_ip               = module.pvs_prepare.bastion_private_ip[0]
   bastion_public_ip        = module.pvs_prepare.bastion_public_ip[0]
   openshift_client_tarball = var.openshift_client_tarball
   vpc_support_server_ip    = module.vpc_support.vpc_support_server_ip
