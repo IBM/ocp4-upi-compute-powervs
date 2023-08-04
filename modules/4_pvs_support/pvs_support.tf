@@ -160,7 +160,8 @@ resource "null_resource" "adjust_mtu" {
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc patch Network.operator.openshift.io cluster --type=merge --patch \
   '{"spec": { "migration": { "mtu": { "network": { "from": 1400, "to": 9000 } , "machine": { "to" : 9100} } } } }'
- oc wait mcp/master --for condition=updated --timeout=30m
+oc wait mcp/master --for condition=updated --timeout=30m
+oc wait mcp/worker --for condition=updated --timeout=30m
 EOF
     ]
   }
