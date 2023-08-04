@@ -14,7 +14,7 @@ locals {
   }
 }
 
-resource "null_resource" "post_kube" {
+resource "null_resource" "post_setup" {
   connection {
     type        = "ssh"
     user        = "root"
@@ -32,7 +32,7 @@ resource "null_resource" "post_kube" {
 
 #command to run ansible playbook on Bastion
 resource "null_resource" "post_ansible" {
-  depends_on = [null_resource.post_kube]
+  depends_on = [null_resource.post_setup]
   connection {
     type        = "ssh"
     user        = "root"

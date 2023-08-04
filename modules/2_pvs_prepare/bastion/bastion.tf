@@ -235,7 +235,6 @@ resource "null_resource" "manage_packages" {
   }
 }
 
-
 ### Grab the Bastion Data
 data "ibm_pi_dhcp" "dhcp_server" {
   depends_on           = [null_resource.manage_packages, ibm_pi_instance.bastion]
@@ -244,5 +243,7 @@ data "ibm_pi_dhcp" "dhcp_server" {
 }
 
 locals {
-  bastion_private_ip = [for lease in data.ibm_pi_dhcp.dhcp_server.leases : lease if lease.instance_mac == ibm_pi_instance.bastion[0].pi_network[0].mac_address]
+  # Dev Note: Leases should return the IP, however, they are returning empty as of v1.55.0
+  #bastion_private_ip = [for lease in data.ibm_pi_dhcp.dhcp_server.leases : lease if lease.instance_mac == ibm_pi_instance.bastion[0].pi_network[0].mac_address]
+  bastion_private_ip = data.ibm_pi_instance_ip.bastion_public_ip.*.ip
 }

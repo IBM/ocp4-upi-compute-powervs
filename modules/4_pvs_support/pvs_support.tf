@@ -7,7 +7,6 @@ locals {
   # The Inventory File
   helpernode_inventory = {
     rhel_username = var.rhel_username
-    bastion_ip    = [var.bastion_ip]
   }
 
   # you must use the api-int url so the bastion routes over the correct interface.
@@ -141,6 +140,27 @@ resource "null_resource" "config_kube" {
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc annotate --kubeconfig /root/.kube/config ns openshift-cluster-csi-drivers \
   scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
+EOF
+    ]
+  }
+}
+
+resource "null_resource" "adjust_mtu" {
+  depends_on = [null_resource.config_kube, null_resource.config_non]
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = var.bastion_public_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
+  provisioner "remote-exec" {
+    inline = [<<EOF
+export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
+oc patch Network.operator.openshift.io cluster --type=merge --patch \
+  '{"spec": { "migration": { "mtu": { "network": { "from": 1400, "to": 9000 } , "machine": { "to" : 9100} } } } }'
+ oc wait mcp/master --for condition=updated --timeout=30m
 EOF
     ]
   }

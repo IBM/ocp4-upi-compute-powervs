@@ -7,7 +7,6 @@ variable "private_key_file" {}
 variable "ssh_agent" {}
 variable "connection_timeout" {}
 variable "rhel_username" {}
-variable "bastion_ip" {}
 variable "bastion_public_ip" {}
 variable "openshift_client_tarball" {}
 variable "vpc_support_server_ip" {}
