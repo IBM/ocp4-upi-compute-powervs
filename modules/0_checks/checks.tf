@@ -48,11 +48,11 @@ locals {
     }
   }
 
-  powervs_region = "${var.powervs_region}" != "" ? "${var.powervs_region}" : lookup(local.vpc_pvs, var.vpc_region, { region = "syd"}).region
-  powervs_zone   = "${var.powervs_zone}" != "" ? "${var.powervs_zone}" : lookup(local.vpc_pvs, var.vpc_region, { zone = "syd05"}).zone
+  powervs_region = "${var.powervs_region}" != "" ? "${var.powervs_region}" : lookup(local.vpc_pvs, var.vpc_region, { region = "syd" }).region
+  powervs_zone   = "${var.powervs_zone}" != "" ? "${var.powervs_zone}" : lookup(local.vpc_pvs, var.vpc_region, { zone = "syd05" }).zone
 
   # Finds the expected region
-  expected_region = lookup(local.vpc_pvs, "${local.powervs_region}", { region = "syd"}).region
+  expected_region = lookup(local.vpc_pvs, "${local.powervs_region}", { region = "syd" }).region
 }
 
 data "ibm_is_vpc" "ibm_is_vpc" {
