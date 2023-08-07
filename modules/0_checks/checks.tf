@@ -48,10 +48,12 @@ locals {
     }
   }
 
-  powervs_region = "${var.powervs_region}" != "" ? "${var.powervs_region}" : lookup(local.vpc_pvs, var.vpc_region, "syd").region
-  powervs_zone   = "${var.powervs_zone}" != "" ? "${var.powervs_zone}" : lookup(local.vpc_pvs, var.vpc_region, "syd05").zone
-}
+  powervs_region = "${var.powervs_region}" != "" ? "${var.powervs_region}" : lookup(local.vpc_pvs, var.vpc_region, { region = "syd" }).region
+  powervs_zone   = "${var.powervs_zone}" != "" ? "${var.powervs_zone}" : lookup(local.vpc_pvs, var.vpc_region, { zone = "syd05" }).zone
 
+  # Finds the expected region
+  expected_region = lookup(local.vpc_pvs, "${local.powervs_region}", { region = "syd" }).region
+}
 
 data "ibm_is_vpc" "ibm_is_vpc" {
   name = var.vpc_name
@@ -59,7 +61,7 @@ data "ibm_is_vpc" "ibm_is_vpc" {
   lifecycle {
     # Confirms the PVS/VPC regions are compatible.
     postcondition {
-      condition     = var.override_region_check || length(regexall("${var.powervs_region}", "${var.vpc_region}")) > 0
+      condition     = var.override_region_check || "${local.expected_region}" == "${local.powervs_region}" || length(regexall("${var.powervs_region}", "${var.vpc_region}")) > 0
       error_message = "ERROR: Kindly confirm VPC region - ${var.vpc_region} and PowerVS region - ${var.powervs_region} are compatible; false"
     }
   }
