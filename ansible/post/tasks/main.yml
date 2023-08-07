@@ -33,8 +33,11 @@
 
   # Run approve command till we have all ppc workers ready. 'xargs -r ' is used to ignore empty stdin.
   - name: Approve Worker CSRs
-    shell: "oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name' | xargs -r oc adm certificate approve"
-    until: lookup('pipe','oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | grep -w Ready | wc -l') > "0"
+    # Approve CSR till you don't get PPC worker node with ready status for defined time
+    shell: "oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name' | xargs -r oc adm certificate approve && oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | grep -w Ready | wc -l"
+    register: ready_count_result
+    #until: lookup('pipe','oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | grep -w Ready | wc -l') > "0"
+    until: "ready_count_result.stdout.find('0') == -1"
     retries: 20
     delay: 30
     when: csr_list.stdout != "" or ppc_nodes_count.stdout == "0"
