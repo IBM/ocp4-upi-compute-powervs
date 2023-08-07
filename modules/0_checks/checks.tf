@@ -47,12 +47,26 @@ locals {
       zone   = "osa21"
     }
   }
+  # Certain regions don't have a good mapping
+  no_overlap_map_pvs_vpc = {
+    eu-gb = {
+      region = "lon",
+    }
+  }
 
   powervs_region = "${var.powervs_region}" != "" ? "${var.powervs_region}" : lookup(local.vpc_pvs, var.vpc_region, { region = "syd" }).region
   powervs_zone   = "${var.powervs_zone}" != "" ? "${var.powervs_zone}" : lookup(local.vpc_pvs, var.vpc_region, { zone = "syd05" }).zone
 
-  # Finds the expected region
-  expected_region = lookup(local.vpc_pvs, "${local.powervs_region}", { region = "syd" }).region
+  # Logic to confirm the region check under various configurations is valid.
+  # Dev Note: we did the mapping, so short circuit.
+  empty_powervs_region = "${var.powervs_region}" != "" && "${var.powervs_zone}" != ""
+  # Dev Note: match the VPC_region, it should not be empty
+  region_name_overlap = length(regexall("${local.powervs_region}", "${var.vpc_region}")) > 0
+  # Dev Note: eu-gb doesn't have a great overlap with regions, so we have a map incase there is more than one of these.
+  no_overlap    = "${var.powervs_region}" != "" ? "${var.powervs_region}" : lookup(local.no_overlap_map_pvs_vpc, var.vpc_region, { zone = "falseX" }).region
+  no_overlap_ok = local.no_overlap == "${var.powervs_region}"
+  # Dev Note: since the expression is complicated we've broken it down to separate steps
+  should_skip_region_check = var.override_region_check || local.empty_powervs_region || local.region_name_overlap || local.no_overlap_ok
 }
 
 data "ibm_is_vpc" "ibm_is_vpc" {
@@ -61,7 +75,7 @@ data "ibm_is_vpc" "ibm_is_vpc" {
   lifecycle {
     # Confirms the PVS/VPC regions are compatible.
     postcondition {
-      condition     = var.override_region_check || "${local.expected_region}" == "${local.powervs_region}" || length(regexall("${var.powervs_region}", "${var.vpc_region}")) > 0
+      condition     = local.should_skip_region_check
       error_message = "ERROR: Kindly confirm VPC region - ${var.vpc_region} and PowerVS region - ${var.powervs_region} are compatible; false"
     }
   }
