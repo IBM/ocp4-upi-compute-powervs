@@ -1,11 +1,13 @@
 - name: Create nfs-provisioner Project
   kubernetes.core.k8s:
     state: present
+    proxy: "http://{{ nfs_server }}:3128"
     definition: "{{ lookup('template', '../templates/nfs-ns.yml') }}"
   
 - name: Create RBAC for nfs-provisioner
   kubernetes.core.k8s:
     state: present
+    proxy: "http://{{ nfs_server }}:3128"
     definition: "{{ lookup('template', '../templates/nfs-rbac.yml') }}"
 
 - name: Setup Authorization
@@ -14,11 +16,13 @@
 - name: Create Deployment for nfs-provisioner
   kubernetes.core.k8s:
     state: present
+    proxy: "http://{{ nfs_server }}:3128"
     definition: "{{ lookup('template', '../templates/nfs-deployment.yml.j2') }}"
 
 - name: Create Storage Class for nfs
   kubernetes.core.k8s:
     state: present
+    proxy: "http://{{ nfs_server }}:3128"
     definition: "{{ lookup('template', '../templates/nfs-sc.yml') }}"
 
 - name: Ensure nfs-provisioner Pod is up and running fine
