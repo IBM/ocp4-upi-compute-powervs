@@ -160,6 +160,30 @@ resource "null_resource" "adjust_mtu" {
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc patch Network.operator.openshift.io cluster --type=merge --patch \
   '{"spec": { "migration": { "mtu": { "network": { "from": 1400, "to": 9000 } , "machine": { "to" : 9100} } } } }'
+EOF
+    ]
+  }
+}
+
+# The MTU change may take a few minutes
+resource "time_sleep" "wait_5_minutes" {
+  depends_on      = [null_resource.adjust_mtu]
+  create_duration = "5m"
+}
+
+resource "null_resource" "wait_on_mcp" {
+  depends_on = [time_sleep.wait_5_minutes]
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = var.bastion_public_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
+  provisioner "remote-exec" {
+    inline = [<<EOF
+export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc wait mcp/master --for condition=updated --timeout=30m
 oc wait mcp/worker --for condition=updated --timeout=30m
 EOF

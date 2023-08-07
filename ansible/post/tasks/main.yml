@@ -38,7 +38,7 @@
     register: ready_count_result
     #until: lookup('pipe','oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | grep -w Ready | wc -l') > "0"
     until: "ready_count_result.stdout.find('0') == -1"
-    retries: 20
+    retries: 100
     delay: 30
     when: csr_list.stdout != "" or ppc_nodes_count.stdout == "0"
 
