@@ -197,19 +197,20 @@ resource "ibm_is_security_group_rule" "kube_api_lb_sg_https_out" {
 }
 
 # sg-openshift-net
-# TCP (IN) 	30000-32767 	192.168.200.0/24
-# UDP (IN) 	30000-32767 	192.168.200.0/24
+# TCP (IN) 	30000-65000 	192.168.200.0/24
+# UDP (IN) 	30000-65000 	192.168.200.0/24
 # UDP (IN) 	500 	192.168.200.0/24
 # UDP (IN) 	9000-9999 	192.168.200.0/24
 # TCP (IN) 	9000-9999 	192.168.200.0/24
 # TCP (IN) 	10250 	192.168.200.0/24
+# Dev Note: originally used 32767 and it's too low. Changed to 65000
 
 locals {
   openshift_net_sg_rule_exists_hashes = [for x in local.openshift_net_sg[0].rules : format("%s/%s/%s/%s/%s", x.protocol, x.direction, x.port_min, x.port_max, coalesce(x.remote[0].cidr_block, "EMPTY"))]
 }
 
 resource "ibm_is_security_group_rule" "openshift_net_sg_r1_in_tcp" {
-  count     = contains(local.openshift_net_sg_rule_exists_hashes, format("%s%s", "tcp/inbound/30000/32767/", var.powervs_machine_cidr)) ? 0 : 1
+  count     = contains(local.openshift_net_sg_rule_exists_hashes, format("%s%s", "tcp/inbound/30000/65000/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.openshift_net_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
@@ -220,7 +221,7 @@ resource "ibm_is_security_group_rule" "openshift_net_sg_r1_in_tcp" {
 }
 
 resource "ibm_is_security_group_rule" "openshift_net_sg_r1_in_udp" {
-  count     = contains(local.openshift_net_sg_rule_exists_hashes, format("%s%s", "udp/inbound/30000/32767/", var.powervs_machine_cidr)) ? 0 : 1
+  count     = contains(local.openshift_net_sg_rule_exists_hashes, format("%s%s", "udp/inbound/30000/65000/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.openshift_net_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
