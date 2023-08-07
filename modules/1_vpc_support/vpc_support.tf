@@ -44,9 +44,9 @@ resource "ibm_is_instance" "supp_vm_vsi" {
 }
 
 resource "ibm_is_floating_ip" "supp_vm_fip" {
-   resource_group = data.ibm_is_vpc.vpc.resource_group
-   count  = local.vsis == [] ? 1 : 0
-   name   = "${var.vpc_name}-supp-floating-ip"
-   target = ibm_is_instance.supp_vm_vsi[0].primary_network_interface[0].id
+  resource_group = data.ibm_is_vpc.vpc.resource_group
+  count          = local.vsis == [] ? 1 : 0
+  name           = "${var.vpc_name}-supp-floating-ip"
+  target         = ibm_is_instance.supp_vm_vsi[0].primary_network_interface[0].id
 }
 
