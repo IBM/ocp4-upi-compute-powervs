@@ -8,10 +8,10 @@ metadata:
     workload.openshift.io/allowed: management
   labels:
     kubernetes.io/metadata.name: openshift-powervm-rmc
-    name: openshift-powervm-rmc
+    name: "{{ rmc_name }}"
     openshift.io/run-level: ""
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/enforce: privileged
     pod-security.kubernetes.io/warn: privileged
     security.openshift.io/scc.podSecurityLabelSync: "false"
-  name: openshift-powervm-rmc
+  name: "{{ project_name }}"
