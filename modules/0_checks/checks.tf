@@ -59,7 +59,7 @@ locals {
 
   # Logic to confirm the region check under various configurations is valid.
   # Dev Note: we did the mapping, so short circuit.
-  empty_powervs_region = "${var.powervs_region}" != "" && "${var.powervs_zone}" != ""
+  empty_powervs_region = "${var.powervs_region}" == "" && "${var.powervs_zone}" == ""
   # Dev Note: match the VPC_region, it should not be empty
   region_name_overlap = length(regexall("${local.powervs_region}", "${var.vpc_region}")) > 0
   # Dev Note: eu-gb doesn't have a great overlap with regions, so we have a map incase there is more than one of these.
@@ -76,7 +76,7 @@ data "ibm_is_vpc" "ibm_is_vpc" {
     # Confirms the PVS/VPC regions are compatible.
     postcondition {
       condition     = local.should_skip_region_check
-      error_message = "ERROR: Kindly confirm VPC region - ${var.vpc_region} and PowerVS region - ${var.powervs_region} are compatible; false"
+      error_message = "ERROR: Kindly confirm VPC region - ${var.vpc_region} and PowerVS region - ${var.powervs_region} are compatible"
     }
   }
 }

@@ -11,7 +11,6 @@ locals {
 
 resource "ibm_is_security_group" "supp_vm_sg" {
   count = local.sgs == [] ? 1 : 0
-
   name           = "${var.vpc_name}-supp-sg"
   vpc            = data.ibm_is_vpc.vpc.id
   resource_group = data.ibm_is_vpc.vpc.resource_group
