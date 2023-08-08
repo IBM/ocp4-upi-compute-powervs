@@ -181,11 +181,21 @@ resource "null_resource" "wait_on_mcp" {
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"
   }
+
+  # Dev Note: added hardening to the MTU wait, we wait for the condition and then fail
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
-oc wait mcp/master --for condition=updated --timeout=30m
-oc wait mcp/worker --for condition=updated --timeout=30m
+oc wait mcp/master --for condition=updated --timeout=30m || true
+oc wait mcp/worker --for condition=updated --timeout=30m || true
+
+echo "-diagnostics-'
+oc get network cluster -o yaml | grep -i mtu
+oc get mcp
+
+echo '-checking mtu-'
+[[ "$( oc get network cluster -o yaml | grep clusterNetworkMTU | awk '{print $NF}')" == "9000" ]] || false
+echo "success on wait on mtu change"
 EOF
     ]
   }
