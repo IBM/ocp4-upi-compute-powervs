@@ -166,13 +166,13 @@ EOF
 }
 
 # The MTU change may take a few minutes
-resource "time_sleep" "wait_5_minutes" {
+resource "time_sleep" "wait_2_minutes" {
   depends_on      = [null_resource.adjust_mtu]
-  create_duration = "5m"
+  create_duration = "2m"
 }
 
 resource "null_resource" "wait_on_mcp" {
-  depends_on = [time_sleep.wait_5_minutes]
+  depends_on = [time_sleep.wait_2_minutes]
   connection {
     type        = "ssh"
     user        = var.rhel_username
