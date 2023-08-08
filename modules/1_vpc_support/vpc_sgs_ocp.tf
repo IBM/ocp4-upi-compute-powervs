@@ -59,11 +59,11 @@ locals {
 }
 
 resource "ibm_is_security_group_rule" "cluster_wide_sg_6081" {
-  count     = contains(local.cluster_wide_sg_rule_exists_hashes, format("%s%s", "tcp/inbound/6081/6081/", var.powervs_machine_cidr)) ? 0 : 1
+  count     = contains(local.cluster_wide_sg_rule_exists_hashes, format("%s%s", "udp/inbound/6081/6081/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.cluster_wide_sg[0].id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
-  tcp {
+  udp {
     port_min = 6081
     port_max = 6081
   }
