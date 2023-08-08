@@ -27,7 +27,7 @@
 
 # installs supporting files
 setup_files () {
-    ibmcloud plugin install power-iaas -f
+    ibmcloud plugin install power-iaas is -f
 }
 
 # format file var.tfvars
