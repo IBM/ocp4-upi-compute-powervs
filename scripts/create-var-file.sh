@@ -85,7 +85,7 @@ else
             ("syd04") echo "syd" ;;
             ("syd05") echo "syd" ;;
             ("tok04") echo "tok" ;;
-            ("tok04") echo "osa" ;;
+            ("osa21") echo "osa" ;;
             (*) echo "$status" ;;
         esac)
 fi
