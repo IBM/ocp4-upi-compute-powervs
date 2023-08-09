@@ -200,3 +200,25 @@ EOF
     ]
   }
 }
+
+
+resource "null_resource" "keep_dns_on_vpc" {
+  depends_on = [null_resource.wait_on_mcp]
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = var.bastion_public_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
+
+  # Dev Note: put the dns nodes on the VPC machines
+  provisioner "remote-exec" {
+    inline = [<<EOF
+export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
+oc patch dns.operator/default -p '{ "spec" : {"nodePlacement": {"nodeSelector": {"kubernetes.io/arch" : "amd64"}}}}' --type merge
+EOF
+    ]
+  }
+}
