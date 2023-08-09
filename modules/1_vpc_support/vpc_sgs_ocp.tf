@@ -53,6 +53,7 @@ resource "ibm_is_security_group_rule" "control_plane_sg_api" {
 #ICMP 	Any 	192.168.200.0/24
 #UDP 	4789 	192.168.200.0/24
 #TCP 	22 	192.168.200.0/24
+#TCP - 9100 192.168.200.0/24
 
 locals {
   cluster_wide_sg_rule_exists_hashes = [for x in local.cluster_wide_sg[0].rules : format("%s/%s/%s/%s/%s", x.protocol, x.direction, x.port_min, x.port_max, coalesce(x.remote[0].cidr_block, "EMPTY"))]
@@ -97,6 +98,28 @@ resource "ibm_is_security_group_rule" "cluster_wide_sg_ssh" {
   tcp {
     port_min = 22
     port_max = 22
+  }
+}
+
+resource "ibm_is_security_group_rule" "cluster_wide_sg_9100" {
+  count     = contains(local.cluster_wide_sg_rule_exists_hashes, format("%s%s", "tcp/inbound/9100/9100/", var.powervs_machine_cidr)) ? 0 : 1
+  group     = local.cluster_wide_sg[0].id
+  direction = "inbound"
+  remote    = var.powervs_machine_cidr
+  tcp {
+    port_min = 9100
+    port_max = 9100
+  }
+}
+
+resource "ibm_is_security_group_rule" "cluster_wide_sg_9537" {
+  count     = contains(local.cluster_wide_sg_rule_exists_hashes, format("%s%s", "tcp/inbound/9537/9537/", var.powervs_machine_cidr)) ? 0 : 1
+  group     = local.cluster_wide_sg[0].id
+  direction = "inbound"
+  remote    = var.powervs_machine_cidr
+  tcp {
+    port_min = 9537
+    port_max = 9537
   }
 }
 
