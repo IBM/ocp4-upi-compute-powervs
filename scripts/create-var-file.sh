@@ -25,10 +25,13 @@
 # - Command: yq
 # - Command: jq
 
-# installs supporting files
-setup_files () {
-    ibmcloud plugin install power-iaas is -f
-}
+IBMCLOUD=ibmcloud
+if [[ $(type -t ic) == function ]]
+then
+    IBMCLOUD=ic
+else 
+    ${IBMCLOUD} plugin install power-iaas -f
+fi
 
 # format file var.tfvars
 create_var_file () {
@@ -55,7 +58,7 @@ else
     VPC_ZONE=$(yq -r '.controlPlane.platform.ibmcloud.zones[0]' ${INSTALL_CONFIG_FILE})
 
     VPC_NAME_PREFIX=$(yq -r '.metadata.name' ${INSTALL_CONFIG_FILE})
-    VPC_NAME=$(ibmcloud is vpcs --output json | jq -r '.[] | select(.name | contains("'${VPC_NAME_PREFIX}'")).name')
+    VPC_NAME=$(${IBMCLOUD} is vpcs --output json | jq -r '.[] | select(.name | contains("'${VPC_NAME_PREFIX}'")).name')
 fi
 
 if [ -z "${POWERVS_SERVICE_INSTANCE_ID}" ]
@@ -68,7 +71,7 @@ else
     # To get the CRN...
     # POWERVS_CRN=$(ibmcloud resource service-instances --output json | jq -r '.[] | select(.guid == "'${POWERVS_SERVICE_INSTANCE_ID}'").id')
     # ibmcloud pi st "${POWERVS_CRN}"
-    POWERVS_ZONE=$(ibmcloud resource service-instances --output json | jq -r '.[] | select(.guid == "'${POWERVS_SERVICE_INSTANCE_ID}'").region_id')
+    POWERVS_ZONE=$(${IBMCLOUD} resource service-instances --output json | jq -r '.[] | select(.guid == "'${POWERVS_SERVICE_INSTANCE_ID}'").region_id')
     POWERVS_REGION=$(
         case "$status" in
             ("dal12") echo "dal" ;;

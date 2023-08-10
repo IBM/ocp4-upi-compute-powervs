@@ -5,6 +5,14 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
+IBMCLOUD=ibmcloud
+if [[ $(type -t ic) == function ]]
+then
+    IBMCLOUD=ic
+else 
+    ibmcloud plugin install power-iaas -f
+fi
+
 if [ -z "${WORKSPACE_NAME}" ]
 then 
     echo "Failed: no workspace name set"
@@ -26,5 +34,5 @@ fi
 SERVICE_NAME=power-iaas
 SERVICE_PLAN_NAME=power-virtual-server-group
 
-ibmcloud resource service-instance-create "${WORKSPACE_NAME}" \
+${IBMCLOUD} resource service-instance-create "${WORKSPACE_NAME}" \
     "${SERVICE_NAME}" "${SERVICE_PLAN_NAME}" "${REGION}" -g "${RESOURCE_GROUP}"
