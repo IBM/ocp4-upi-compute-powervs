@@ -18,6 +18,7 @@ locals {
 
   cidrs = {
     cidrs_ipv4 = var.cidrs
+    gateway    = cidrhost(var.powervs_machine_cidr, 1)
   }
 }
 

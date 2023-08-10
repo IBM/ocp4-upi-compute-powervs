@@ -141,6 +141,7 @@ module "support" {
   openshift_pass           = var.openshift_pass
   kubeconfig_file          = var.kubeconfig_file
   cidrs                    = module.transit_gateway.mac_vpc_subnets
+  powervs_machine_cidr     = var.powervs_machine_cidr
 }
 
 module "worker" {

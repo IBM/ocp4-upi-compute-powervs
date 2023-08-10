@@ -15,3 +15,4 @@ variable "openshift_user" {}
 variable "openshift_pass" {}
 variable "kubeconfig_file" {}
 variable "cidrs" {}
+variable "powervs_machine_cidr" {}
