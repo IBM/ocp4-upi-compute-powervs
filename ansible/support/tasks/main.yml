@@ -137,8 +137,21 @@
         validate_certs: false
         headers:
           "Accept": "application/vnd.coreos.ignition+json;version=3.2.0"
-      #environment:
-      #  https_proxy: http://{{ vpc_support_server_ip }}:3128
+      ignore_errors: true
+
+    - name: Downloading the ignition file using a https_proxy
+      get_url:
+        url: "{{ openshift_machine_config_url }}"
+        dest: /var/www/html/ignition/worker.ign
+        validate_certs: false
+        headers:
+          "Accept": "application/vnd.coreos.ignition+json;version=3.2.0"
+      ignore_errors: true
+      environment:
+        https_proxy: http://{{ vpc_support_server_ip }}:3128
+
+    - name: Verify the ignition file exists
+      ansible.builtin.shell: stat /var/www/html/ignition/worker.ign
 
     - name: Make ignition file readable through the www dir
       ansible.builtin.file:
