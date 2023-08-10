@@ -25,7 +25,6 @@
       - httpd
       - vim
       - bash-completion
-#      - libselinux-python
       - podman
       - nfs-utils
       - git
