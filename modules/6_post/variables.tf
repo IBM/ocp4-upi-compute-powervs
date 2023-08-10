@@ -15,3 +15,5 @@ variable "powervs_zone" {}
 variable "system_type" {}
 variable "nfs_server" {}
 variable "nfs_path" {}
+variable "name_prefix" {}
+variable "worker" {}

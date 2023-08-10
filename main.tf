@@ -176,4 +176,6 @@ module "post" {
   system_type       = var.system_type
   nfs_server        = module.vpc_support.vpc_support_server_ip
   nfs_path          = var.nfs_path
+  name_prefix       = local.name_prefix
+  worker            = var.worker
 }

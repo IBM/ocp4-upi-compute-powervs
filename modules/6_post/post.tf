@@ -56,3 +56,25 @@ resource "null_resource" "post_ansible" {
     ]
   }
 }
+
+# Dev Note: only on destroy - remove the worker
+resource "null_resource" "destroy_worker" {
+  count      = var.worker["count"]
+  depends_on = [null_resource.post_ansible]
+  connection {
+    type        = "ssh"
+    user        = "root"
+    private_key = file(var.private_key_file)
+    host        = var.bastion_public_ip[0]
+    agent       = var.ssh_agent
+  }
+
+  provisioner "remote-exec" {
+    when       = "destroy"
+    on_failure = "continue"
+    inline     = <<EOF
+export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
+oc delete node/${var.name_prefix}-worker-${count.index}
+EOF
+  }
+}
