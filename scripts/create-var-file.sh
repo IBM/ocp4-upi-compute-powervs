@@ -131,7 +131,7 @@ COREOS_NAME=$(echo ${COREOS_FILE} | sed 's|\.ova\.gz||' | tr '.' '-' | sed 's|-0
 # RHEL_IMAGE_NAME
 if [ -z "${RHEL_IMAGE_NAME}" ]
 then
-    echo "WARNING: RHEL_IMAGE_NAME is not set"
+    echo "WARNING: RHEL_IMAGE_NAME is not set, defaulting to 'CentOS-Stream-8'"
     RHEL_IMAGE_NAME="CentOS-Stream-8"
 fi
 
@@ -157,7 +157,7 @@ private_key_file = "data/id_rsa"
 
 # Example file name: rhcos-414-92-202307050443-0-ppc64le-powervs.ova.gz
 rhcos_import_image                 = true
-rhcos_import_image_filename        = "${COREOS_FILE}"
+rhcos_import_image_filename        = "${COREOS_NAME}-0-ppc64le-powervs.ova.gz"
 rhcos_import_image_region_override = "us-east"
 
 processor_type = "shared"
