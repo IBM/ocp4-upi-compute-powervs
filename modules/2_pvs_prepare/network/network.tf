@@ -46,8 +46,8 @@ resource "ibm_pi_cloud_connection" "new_cloud_connection" {
   depends_on                          = [time_sleep.wait_30_seconds]
   count                               = var.cloud_conn_name == "" ? 1 : 0
   pi_cloud_instance_id                = var.powervs_service_instance_id
-  pi_cloud_connection_name            = "cloud-conn-${var.cluster_id}"
-  pi_cloud_connection_speed           = 100
+  pi_cloud_connection_name            = "mac-cloud-conn-${var.cluster_id}"
+  pi_cloud_connection_speed           = 1000
   pi_cloud_connection_global_routing  = true
   pi_cloud_connection_transit_enabled = true
   # Dev Note: Preference for Transit Gateway.
