@@ -34,16 +34,16 @@
   # Run approve command till we have all ppc workers ready. 'xargs -r ' is used to ignore empty stdin.
   - name: Approve Worker CSRs
     # Approve CSR till you don't get PPC worker node with ready status for defined time
-    shell: "oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name' | xargs -r oc adm certificate approve && oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | grep -w Ready | wc -l"
+    shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name' | xargs -r oc adm certificate approve && oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | grep -w Ready | wc -l"
     register: ready_count_result
     #until: lookup('pipe','oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | grep -w Ready | wc -l') > "0"
     until: "ready_count_result.stdout.find('0') == -1"
-    retries: 100
+    retries: 120
     delay: 30
     when: csr_list.stdout != "" or ppc_nodes_count.stdout == "0"
 
   - name: Ensure able to fetch project list
-    shell: "oc get projects"
+    shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get projects -v=10"
     register: projects_list
     until: projects_list.stdout.find("default") != -1
     retries: 20
@@ -68,7 +68,7 @@
           namespace: "{{ project_name }}"
 
   - name: Add privileged scc to openshift-powervm-rmc serviceaccount
-    shell: "oc adm policy add-scc-to-user -z {{ rmc_name }} privileged -n {{ project_name }}"
+    shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc adm policy add-scc-to-user -z {{ rmc_name }} privileged -n {{ project_name }}"
 
   - name: Deploy openshift-powervm-rmc DaemonSet
     kubernetes.core.k8s:
@@ -77,7 +77,7 @@
       definition: "{{ lookup('template', '../templates/rsct-daemonset.yml.j2') }}"
 
   - name: Get Nodes with ppc64le architecture
-    shell: "oc get nodes -l kubernetes.io/arch=ppc64le | awk '(NR>1) { print $1 }'"
+    shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get nodes -l kubernetes.io/arch=ppc64le | awk '(NR>1) { print $1 }'"
     register: node_names
 
   - name: Print Node names with ppc64le architecture
@@ -98,3 +98,4 @@
   - name: Setup NFS storage if NFS_SERVER is provided
     import_tasks: nfs_provisioner.yaml
     when: nfs_server != "none"
+
