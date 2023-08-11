@@ -7,12 +7,21 @@
 
 # Helper file to import the centos image using the ibmcloud cli
 
-IBMCLOUD=ibmcloud
-if [[ $(type -t ic) == function ]]
+if [ ! -z "${1}" ]
 then
+    IBMCLOUD_HOME_FOLDER="${1}"
+    function ic() {
+        HOME=${IBMCLOUD_HOME_FOLDER} ibmcloud "$@"
+    }
     IBMCLOUD=ic
 else 
-    ibmcloud plugin install power-iaas -f
+    IBMCLOUD=ibmcloud
+    if [[ $(type -t ic) == function ]]
+    then
+        IBMCLOUD=ic
+    else 
+        ibmcloud plugin install power-iaas -f
+    fi
 fi
 
 POWERVS_CRN=$(${IBMCLOUD} pi sl 2>&1 | grep ${SERVICE_INSTANCE_ID} | awk '{print $1}')
