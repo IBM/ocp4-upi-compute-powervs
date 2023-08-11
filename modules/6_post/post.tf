@@ -75,8 +75,8 @@ resource "null_resource" "destroy_worker" {
     type        = "ssh"
     user        = "root"
     private_key = self.triggers.private_key
-    host        = self.triggers.bastion_public_ip
-    agent       = self.triggers.ssh_agent
+    host        = self.triggers.host
+    agent       = self.triggers.agent
   }
 
   provisioner "remote-exec" {

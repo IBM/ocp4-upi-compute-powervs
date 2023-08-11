@@ -33,6 +33,15 @@ else
     ${IBMCLOUD} plugin install power-iaas -f
 fi
 
+if [ ! -z "${1}" ]
+then
+    IBMCLOUD_HOME_FOLDER="${1}"
+    function ic() {
+    HOME=${IBMCLOUD_HOME_FOLDER} ibmcloud "$@"
+    }
+    IBMCLOUD=ic
+fi
+
 # format file var.tfvars
 create_var_file () {
 
@@ -168,5 +177,4 @@ worker                = { memory = "16", processors = "1", "count" = 1 }
 EOFXEOF
 }
 
-setup_files
 create_var_file
