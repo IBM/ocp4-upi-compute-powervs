@@ -82,7 +82,7 @@ else
     # ibmcloud pi st "${POWERVS_CRN}"
     POWERVS_ZONE=$(${IBMCLOUD} resource service-instances --output json | jq -r '.[] | select(.guid == "'${POWERVS_SERVICE_INSTANCE_ID}'").region_id')
     POWERVS_REGION=$(
-        case "$status" in
+        case "$POWERVS_ZONE" in
             ("dal12") echo "dal" ;;
             ("us-south") echo "us-south" ;;
             ("wdc06") echo "wdc" ;;
@@ -98,8 +98,10 @@ else
             ("syd05") echo "syd" ;;
             ("tok04") echo "tok" ;;
             ("osa21") echo "osa" ;;
-            (*) echo "$status" ;;
+            (*) echo "$POWERVS_ZONE" ;;
         esac)
+    echo "REGION: ${POWERVS_REGION}"
+    echo "ZONE: ${POWERVS_ZONE}"
 fi
 
 # OpenShift URL
