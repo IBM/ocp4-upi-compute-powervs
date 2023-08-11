@@ -89,3 +89,23 @@ EOF
     ]
   }
 }
+
+resource "null_resource" "debug_taints" {
+  depends_on = [null_resource.destroy_worker]
+  connection {
+    type        = "ssh"
+    user        = "root"
+    private_key = file(var.private_key_file)
+    host        = var.bastion_public_ip[0]
+    agent       = var.ssh_agent
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+export HTTPS_PROXY="http://${var.nfs_server}:3128"
+oc get nodes -owide
+oc get nodes -l 'kubernetes.io/arch=ppc64le' -o yaml | yq -r '.items[].spec'
+EOF
+    ]
+  }
+}
