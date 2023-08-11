@@ -43,7 +43,7 @@
     when: csr_list.stdout != "" or ppc_nodes_count.stdout == "0"
 
   - name: Ensure able to fetch project list
-    shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get projects -v=10"
+    shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get projects"
     register: projects_list
     until: projects_list.stdout.find("default") != -1
     retries: 20
