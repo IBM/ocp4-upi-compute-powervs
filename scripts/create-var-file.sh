@@ -24,6 +24,11 @@
 # - Command: ibmcloud
 # - Command: yq
 # - Command: jq
+EXPECTED_NODES=$2
+if [ -z "${EXPECTED_NODES}" ]
+then
+    EXPECTED_NODES=1
+fi
 
 IBMCLOUD=ibmcloud
 if [[ $(type -t ic) == function ]]
@@ -175,7 +180,7 @@ processor_type = "shared"
 system_type    = "e980"
 bastion_health_status = "WARNING"
 bastion               = { memory = "16", processors = "1", "count" = 1 }
-worker                = { memory = "16", processors = "1", "count" = 1 }
+worker                = { memory = "16", processors = "1", "count" = ${EXPECTED_NODES} }
 EOFXEOF
 }
 
