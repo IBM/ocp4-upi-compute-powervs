@@ -46,11 +46,12 @@ locals {
   v_tg_conns = local.tg == [] ? (data.ibm_tg_gateway.existing_tg != [] ? [for x in data.ibm_tg_gateway.existing_tg[0].connections : x if x.name == "${var.vpc_name}-vc"] : []) : []
 }
 
-resource "ibm_tg_connection" "vpc_tg_connection_update" {
-  count = local.tg == [] && local.v_tg_conns == [] ? 0 : 1
+# Dev Note: this block cares about existing transit gateways.
+# resource "ibm_tg_connection" "vpc_tg_connection_update" {
+#   count = local.tg == [] && local.v_tg_conns == [] ? 0 : 1
 
-  gateway      = local.tg[0].id
-  network_type = "vpc"
-  name         = "${var.vpc_name}-vc"
-  network_id   = data.ibm_is_vpc.vpc.resource_crn
-}
+#   gateway      = local.tg[0].id
+#   network_type = "vpc"
+#   name         = "${var.vpc_name}-conn"
+#   network_id   = data.ibm_is_vpc.vpc.resource_crn
+# }
