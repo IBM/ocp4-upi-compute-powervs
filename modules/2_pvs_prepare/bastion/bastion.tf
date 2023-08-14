@@ -209,7 +209,7 @@ resource "null_resource" "manage_packages" {
     inline = [
       <<EOF
 sudo yum install -y wget jq git net-tools vim python3 tar \
-  || sleep 60s 
+  || sleep 60s \
   && sudo yum install -y wget jq git net-tools vim python3 tar
 EOF
     ]
