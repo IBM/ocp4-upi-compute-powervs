@@ -4,7 +4,7 @@
 ################################################################
 
 data "ibm_dl_gateway" "pvs_dl" {
-  name = var.cloud_conn_name == "" ? "cloud-conn-${var.cluster_id}" : var.cloud_conn_name
+  name = var.cloud_conn_name == "" ? "mac-cloud-conn-${var.cluster_id}" : var.cloud_conn_name
 }
 
 resource "ibm_tg_connection" "powervs_ibm_tg_connection" {
