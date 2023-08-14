@@ -268,7 +268,7 @@ echo "CIDRs are:"
 oc get Network.config.openshift.io cluster -ojson | jq -r '.spec.clusterNetwork[].cidr'
 [[ "$(oc get Network.config.openshift.io cluster -ojson | jq -r '.spec.clusterNetwork[].cidr')" != "${var.powervs_machine_cidr}" ]] \
   && oc get Network.config.openshift.io cluster -o json \
-  | jq '.spec.clusterNetwork += [{"cidr": "${var.powervs_machine_cidr}", "hostPrefix": ${local.hostPrefix}}]'
+  | jq '.spec.clusterNetwork += [{"cidr": "${var.powervs_machine_cidr}", "hostPrefix": ${local.hostPrefix}}]' \
   | oc apply -f -
 EOF
     ]
