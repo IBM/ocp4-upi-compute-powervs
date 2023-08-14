@@ -245,7 +245,7 @@ EOF
 }
 
 locals {
-  hostPrefix = split("/", "${var.powervs_machine_cidr}")[0]
+  hostPrefix = split("/", "${var.powervs_machine_cidr}")[1]
 }
 
 resource "null_resource" "alter_network_cluster_config" {
