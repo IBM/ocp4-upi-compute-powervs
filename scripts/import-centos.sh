@@ -14,6 +14,7 @@ then
         HOME=${IBMCLOUD_HOME_FOLDER} ibmcloud "$@"
     }
     IBMCLOUD=ic
+    SERVICE_INSTANCE_ID="${2}"
 else 
     IBMCLOUD=ibmcloud
     if [[ $(type -t ic) == function ]]
@@ -24,7 +25,7 @@ else
     fi
 fi
 
-POWERVS_CRN=$(${IBMCLOUD} pi sl 2>&1 | grep ${SERVICE_INSTANCE_ID} | awk '{print $1}')
+POWERVS_CRN=$(${IBMCLOUD} pi sl 2>&1 | grep "${SERVICE_INSTANCE_ID}" | awk '{print $1}')
 ${IBMCLOUD} pi st "${POWERVS_CRN}"
 
 ${IBMCLOUD} pi image-create CentOS-Stream-8
