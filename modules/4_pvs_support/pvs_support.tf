@@ -244,6 +244,10 @@ EOF
   }
 }
 
+locals { 
+  hostPrefix = split("/","${var.powervs_machine_cidr}")[0]
+}
+
 resource "null_resource" "alter_network_cluster_config" {
   depends_on = [null_resource.keep_imagepruner_on_vpc]
   connection {
@@ -263,7 +267,7 @@ dnf install -y jq
 echo "CIDRs are:"
 oc get Network.config.openshift.io cluster -ojson | jq -r '.spec.clusterNetwork[].cidr'
 oc get Network.config.openshift.io cluster -o json \
-  | jq '.spec.clusterNetwork[].cidr += ["${var.powervs_machine_cidr}"]'  \
+  | jq '.spec.clusterNetwork += [{"cidr": "${var.powervs_machine_cidr}", "hostPrefix": ${local.hostPrefix}}]'
   | oc apply -f -
 EOF
     ]
