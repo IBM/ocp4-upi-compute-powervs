@@ -207,7 +207,7 @@ resource "null_resource" "manage_packages" {
   # Dev Note: transient connection errors to centos may occur, and the || provides resilient reruns of the command
   provisioner "remote-exec" {
     inline = [
-<<EOF
+      <<EOF
 sudo yum install -y wget jq git net-tools vim python3 tar \
   || sleep 60s 
   && sudo yum install -y wget jq git net-tools vim python3 tar
