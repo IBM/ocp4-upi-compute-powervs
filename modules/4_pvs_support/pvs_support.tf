@@ -244,9 +244,11 @@ EOF
   }
 }
 
-locals {
-  hostPrefix = split("/", "${var.powervs_machine_cidr}")[1]
-}
+#locals {
+  # Dev Note: considered `split("/", "${var.powervs_machine_cidr}")[1]` however, it needs to be smaller than the mask.
+  # ref: https://www.ibm.com/docs/en/zcxrhos/1.1.0?topic=parameters-network-configuration
+  #hostPrefix = 30
+#}
 
 resource "null_resource" "alter_network_cluster_config" {
   depends_on = [null_resource.keep_imagepruner_on_vpc]
@@ -260,15 +262,16 @@ resource "null_resource" "alter_network_cluster_config" {
   }
 
   # Dev Note: adds the network so the OVN-KUBE settings are correct for a second network, and the LB doesn't end up in a loop.
+  # original logic was `jq '.spec.clusterNetwork += [{"cidr": "${var.powervs_machine_cidr}", "hostPrefix": ${local.hostPrefix}}]'`
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 dnf install -y jq
 echo "CIDRs are:"
 oc get Network.config.openshift.io cluster -ojson | jq -r '.spec.clusterNetwork[].cidr'
-[[ "$(oc get Network.config.openshift.io cluster -ojson | jq -r '.spec.clusterNetwork[].cidr')" != "${var.powervs_machine_cidr}" ]] \
+[[ "$(oc get Network.config.openshift.io cluster -ojson | jq -r '.spec.clusterNetwork[].cidr')" != "192.168.0.0/16" ]] \
   && oc get Network.config.openshift.io cluster -o json \
-  | jq '.spec.clusterNetwork += [{"cidr": "${var.powervs_machine_cidr}", "hostPrefix": ${local.hostPrefix}}]' \
+  | jq '.spec.clusterNetwork += [{"cidr": "192.168.0.0/16", "hostPrefix": 24}]' \
   | oc apply -f -
 EOF
     ]
