@@ -16,7 +16,7 @@ NAME_PREFIX="${3}"
 
 for IDX in $(seq 0 ${COUNT})
 do
-    echo "Removing the Worker: $IDX"
+    echo "Removing the Worker: ${NAME_PREFIX}-worker-${IDX}"
     export HTTPS_PROXY="http://${PROXY_SERVER}:3128"
-    oc delete node/${NAME_PREFIX}-worker-${IDX}
+    oc delete node ${NAME_PREFIX}-worker-${IDX} || true
 done
