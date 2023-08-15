@@ -245,9 +245,9 @@ EOF
 }
 
 #locals {
-  # Dev Note: considered `split("/", "${var.powervs_machine_cidr}")[1]` however, it needs to be smaller than the mask.
-  # ref: https://www.ibm.com/docs/en/zcxrhos/1.1.0?topic=parameters-network-configuration
-  #hostPrefix = 30
+# Dev Note: considered `split("/", "${var.powervs_machine_cidr}")[1]` however, it needs to be smaller than the mask.
+# ref: https://www.ibm.com/docs/en/zcxrhos/1.1.0?topic=parameters-network-configuration
+#hostPrefix = 30
 #}
 
 resource "null_resource" "alter_network_cluster_config" {
