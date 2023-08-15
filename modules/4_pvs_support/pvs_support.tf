@@ -250,7 +250,35 @@ EOF
 #hostPrefix = 30
 #}
 
-resource "null_resource" "alter_network_cluster_config" {
+# resource "null_resource" "alter_network_cluster_config" {
+#   depends_on = [null_resource.keep_imagepruner_on_vpc]
+#   connection {
+#     type        = "ssh"
+#     user        = var.rhel_username
+#     host        = var.bastion_public_ip
+#     private_key = file(var.private_key_file)
+#     agent       = var.ssh_agent
+#     timeout     = "${var.connection_timeout}m"
+#   }
+
+#   # Dev Note: adds the network so the OVN-KUBE settings are correct for a second network, and the LB doesn't end up in a loop.
+#   # original logic was `jq '.spec.clusterNetwork += [{"cidr": "${var.powervs_machine_cidr}", "hostPrefix": ${local.hostPrefix}}]'`
+#   provisioner "remote-exec" {
+#     inline = [<<EOF
+# export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
+# dnf install -y jq
+# echo "CIDRs are:"
+# oc get Network.config.openshift.io cluster -ojson | jq -r '.spec.clusterNetwork[].cidr'
+# [[ "$(oc get Network.config.openshift.io cluster -ojson | jq -r '.spec.clusterNetwork[].cidr')" != "192.168.0.0/16" ]] \
+#   && oc get Network.config.openshift.io cluster -o json \
+#   | jq '.spec.clusterNetwork += [{"cidr": "192.168.0.0/16", "hostPrefix": 24}]' \
+#   | oc apply -f -
+# EOF
+#     ]
+#   }
+# }
+
+resource "null_resource" "set_routing_via_host" {
   depends_on = [null_resource.keep_imagepruner_on_vpc]
   connection {
     type        = "ssh"
@@ -261,18 +289,11 @@ resource "null_resource" "alter_network_cluster_config" {
     timeout     = "${var.connection_timeout}m"
   }
 
-  # Dev Note: adds the network so the OVN-KUBE settings are correct for a second network, and the LB doesn't end up in a loop.
-  # original logic was `jq '.spec.clusterNetwork += [{"cidr": "${var.powervs_machine_cidr}", "hostPrefix": ${local.hostPrefix}}]'`
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
-dnf install -y jq
-echo "CIDRs are:"
-oc get Network.config.openshift.io cluster -ojson | jq -r '.spec.clusterNetwork[].cidr'
-[[ "$(oc get Network.config.openshift.io cluster -ojson | jq -r '.spec.clusterNetwork[].cidr')" != "192.168.0.0/16" ]] \
-  && oc get Network.config.openshift.io cluster -o json \
-  | jq '.spec.clusterNetwork += [{"cidr": "192.168.0.0/16", "hostPrefix": 24}]' \
-  | oc apply -f -
+oc patch network.operator/cluster --type merge -p \
+  '{"spec":{"defaultNetwork":{"ovnKubernetesConfig":{"gatewayConfig":{"routingViaHost":true}}}}}'
 EOF
     ]
   }
