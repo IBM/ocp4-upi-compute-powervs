@@ -84,7 +84,7 @@ resource "null_resource" "destroy_worker" {
     on_failure = continue
     inline = [<<EOF
 cd ${self.triggers.ansible_post_path}
-bash destroy-workers.sh "${self.triggers.count}" "${self.triggers.vpc_support_server_ip}" "${self.triggers.name_prefix}"
+bash files/destroy-workers.sh "${self.triggers.count}" "${self.triggers.vpc_support_server_ip}" "${self.triggers.name_prefix}"
 EOF
     ]
   }
@@ -104,7 +104,7 @@ resource "null_resource" "debug_taints" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.nfs_server}:3128"
 oc get nodes -owide
-oc get nodes -l 'kubernetes.io/arch=ppc64le' -o yaml | yq -r '.items[].spec'
+oc get nodes -l 'kubernetes.io/arch=ppc64le' -o json | jq -r '.items[].spec'
 EOF
     ]
   }
