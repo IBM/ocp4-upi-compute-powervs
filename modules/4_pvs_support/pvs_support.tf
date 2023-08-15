@@ -278,6 +278,8 @@ EOF
 #   }
 # }
 
+# ovnkube between vpc/powervs requires routingViaHost for the LBs to work properly
+# ref: https://community.ibm.com/community/user/powerdeveloper/blogs/mick-tarsel/2023/01/26/routingviahost-with-ovnkuberenetes
 resource "null_resource" "set_routing_via_host" {
   depends_on = [null_resource.keep_imagepruner_on_vpc]
   connection {
