@@ -75,7 +75,6 @@ module "pvs_prepare" {
   ansible_repo_name                  = var.ansible_repo_name
   bastion                            = var.bastion
   bastion_health_status              = var.bastion_health_status
-  cloud_conn_name                    = var.cloud_conn_name
   cluster_domain                     = var.cluster_domain
   cluster_id                         = local.cluster_id
   connection_timeout                 = var.connection_timeout
@@ -90,7 +89,6 @@ module "pvs_prepare" {
   processor_type                     = var.processor_type
   powervs_dns_forwarders             = var.powervs_dns_forwarders == "" ? [] : [for dns in split(";", var.powervs_dns_forwarders) : trimspace(dns)]
   public_key                         = var.public_key
-  powervs_network_name               = var.powervs_network_name
   rhcos_image_name                   = var.rhcos_image_name
   rhcos_import_image                 = var.rhcos_import_image
   rhcos_import_image_filename        = var.rhcos_import_image_filename
@@ -115,7 +113,6 @@ module "transit_gateway" {
   depends_on = [module.pvs_prepare]
   source     = "./modules/3_transit_gateway"
 
-  cloud_conn_name    = var.cloud_conn_name
   cluster_id         = local.cluster_id
   vpc_name           = var.vpc_name
   vpc_crn            = module.vpc_support.vpc_crn

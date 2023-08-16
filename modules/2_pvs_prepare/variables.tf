@@ -7,7 +7,6 @@ variable "cluster_id" {}
 variable "ansible_repo_name" {}
 variable "bastion" {}
 variable "bastion_health_status" {}
-variable "cloud_conn_name" {}
 variable "cluster_domain" {}
 variable "connection_timeout" {}
 variable "enable_snat" {}
@@ -21,7 +20,6 @@ variable "processor_type" {}
 variable "powervs_dns_forwarders" {}
 variable "public_key" {}
 variable "public_key_file" {}
-variable "powervs_network_name" {}
 variable "rhcos_image_name" {}
 variable "rhcos_import_image" {}
 variable "rhcos_import_image_filename" {}

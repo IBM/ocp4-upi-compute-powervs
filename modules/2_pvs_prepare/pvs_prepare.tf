@@ -39,14 +39,10 @@ module "network" {
 
   powervs_service_instance_id = var.powervs_service_instance_id
   name_prefix                 = var.name_prefix
-  powervs_dns_forwarders      = var.powervs_dns_forwarders
-  powervs_network_name        = var.powervs_network_name
   powervs_machine_cidr        = var.powervs_machine_cidr
   vpc_support_server_ip       = var.vpc_support_server_ip
   enable_snat                 = var.enable_snat
   cluster_id                  = var.cluster_id
-  cloud_conn_name             = var.cloud_conn_name
-  #vpc_crn                     = var.vpc_crn
 }
 
 module "bastion" {

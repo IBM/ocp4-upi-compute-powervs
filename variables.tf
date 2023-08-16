@@ -251,12 +251,6 @@ variable "powervs_machine_cidr" {
   default     = "192.168.200.0/24"
 }
 
-variable "powervs_network_name" {
-  type        = string
-  description = "PowerVS DHCP Network name"
-  default     = ""
-}
-
 ################################################################
 ### OpenShift variables
 ################################################################
@@ -393,12 +387,6 @@ variable "public_key_name" {
 variable "powervs_dns_forwarders" {
   type    = string
   default = "8.8.8.8;8.8.4.4"
-}
-
-variable "cloud_conn_name" {
-  type        = string
-  description = "The Cloud Connection Name that already exists"
-  default     = ""
 }
 
 variable "node_labels" {

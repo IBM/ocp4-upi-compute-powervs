@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-variable "cloud_conn_name" {}
 variable "cluster_id" {}
 variable "vpc_name" {}
 variable "vpc_crn" {}
