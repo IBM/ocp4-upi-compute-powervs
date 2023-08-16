@@ -47,6 +47,13 @@ There are some important points to mention:
 1. The Power Bastion node uses a https proxy to forward requests to the Cluster's internal api load balancer. This setting is configured in /etc/environment on the Power Bastion.
 2. NFS is used as the storage provider across nodes.
 
+## Running Automation from another IBMCloud VPC
+
+To run the code, you'll need to set the MTU for your machine: 
+
+```
+ip link set eth0 mtu 1400
+```
 
 ## Contributing
 
