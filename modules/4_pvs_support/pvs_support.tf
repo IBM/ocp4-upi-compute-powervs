@@ -316,3 +316,25 @@ EOF
     ]
   }
 }
+
+resource "null_resource" "latest_ignition" {
+  depends_on = [null_resource.keep_imagepruner_on_vpc]
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = var.bastion_public_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+ifup env3
+echo 'Running ocp4-upi-compute-powervs playbook for ignition...'
+cd ocp4-upi-compute-powervs/support
+ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support.log ansible-playbook -e @vars/vars.yaml tasks/ignition.yml --become
+EOF
+    ]
+  }
+}

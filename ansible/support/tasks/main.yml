@@ -51,9 +51,6 @@
       state: started
       enabled: yes
 
-  - name: Disable fcontext
-    shell: "semanage fcontext -a -t httpd_sys_rw_content_t /var/www/html/ignition/worker.ign || true"
-
   - name: Open up firewall ports
     firewalld:
       permanent: yes
@@ -126,39 +123,3 @@
           name: "httpd"
           state: restarted
           daemon_reload: yes
-
-  - name: Download the ignition file to http server
-    block:
-    - name: Downloading the ignition file
-      get_url:
-        url: "{{ openshift_machine_config_url }}"
-        dest: /var/www/html/ignition/worker.ign
-        validate_certs: false
-        headers:
-          "Accept": "application/vnd.coreos.ignition+json;version=3.2.0"
-      ignore_errors: true
-
-    - name: Downloading the ignition file using a https_proxy
-      get_url:
-        url: "{{ openshift_machine_config_url }}"
-        dest: /var/www/html/ignition/worker.ign
-        validate_certs: false
-        headers:
-          "Accept": "application/vnd.coreos.ignition+json;version=3.2.0"
-      ignore_errors: true
-      environment:
-        https_proxy: http://{{ vpc_support_server_ip }}:3128
-
-    - name: Verify the ignition file exists
-      ansible.builtin.shell: stat /var/www/html/ignition/worker.ign
-
-    - name: Make ignition file readable through the www dir
-      ansible.builtin.file:
-        path: /var/www
-        owner: apache
-        group: apache
-        recurse: true 
-        mode: u+rwx,g-rx,o-rx
-
-  - name: Best effort SELinux repair - Apache
-    shell: "restorecon -vR /var/www/html/ignition || true"
