@@ -30,15 +30,16 @@ resource "ibm_pi_cloud_connection" "new_cloud_connection" {
   # Dev Note: Preference for Transit Gateway.
 }
 
-# Dev Note: injects a delay the network destroy.
+# Dev Note: injects a delay the network create/destroy.
 # Othweriwse, this message comes up: One or more ports have an IP allocation from this subnet.
-resource "time_sleep" "wait_2m_dhcp" {
+resource "time_sleep" "wait_dhcp" {
   depends_on       = [ibm_pi_cloud_connection.new_cloud_connection]
+  create_duration  = "120s"
   destroy_duration = "120s"
 }
 
 resource "ibm_pi_dhcp" "new_dhcp_service" {
-  depends_on             = [time_sleep.wait_2m_dhcp]
+  depends_on             = [time_sleep.wait_dhcp]
   pi_cloud_instance_id   = var.powervs_service_instance_id
   pi_cloud_connection_id = ibm_pi_cloud_connection.new_cloud_connection[0].id
   pi_cidr                = var.powervs_machine_cidr
