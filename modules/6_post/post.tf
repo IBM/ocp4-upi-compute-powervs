@@ -90,7 +90,9 @@ EOF
   }
 }
 
-resource "null_resource" "debug_taints" {
+# Dev Note: Normal Cloud Providers remove this taint, we have to manually remove it.
+# ref: https://github.com/openshift/kubernetes/blob/master/staging/src/k8s.io/cloud-provider/api/well_known_taints.go#L20
+resource "null_resource" "debug_and_remove_taints" {
   depends_on = [null_resource.destroy_worker]
   connection {
     type        = "ssh"
@@ -105,6 +107,8 @@ resource "null_resource" "debug_taints" {
 export HTTPS_PROXY="http://${var.nfs_server}:3128"
 oc get nodes -owide
 oc get nodes -l 'kubernetes.io/arch=ppc64le' -o json | jq -r '.items[].spec'
+cd ${local.ansible_post_path}
+bash files/remove-worker-taints.sh "${var.nfs_server}" "${var.name_prefix}" "${var.worker["count"]}"
 EOF
     ]
   }
