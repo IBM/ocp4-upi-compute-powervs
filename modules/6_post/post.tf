@@ -30,36 +30,9 @@ resource "null_resource" "post_setup" {
   }
 }
 
-#command to run ansible playbook on Bastion
-resource "null_resource" "post_ansible" {
+# Dev Note: only on destroy - remove the workers, and leave it at the top after post_setup
+resource "null_resource" "remove_workers" {
   depends_on = [null_resource.post_setup]
-  connection {
-    type        = "ssh"
-    user        = "root"
-    private_key = file(var.private_key_file)
-    host        = var.bastion_public_ip[0]
-    agent       = var.ssh_agent
-  }
-
-  #create ansible_post_vars.json file on bastion (with desired variables to be passed to Ansible from Terraform)
-  provisioner "file" {
-    content     = templatefile("${path.module}/templates/ansible_post_vars.json.tpl", local.ansible_vars)
-    destination = "${local.ansible_post_path}/ansible_post_vars.json"
-  }
-
-  #command to run ansible playbook on Bastion
-  provisioner "remote-exec" {
-    inline = [
-      "echo Running ansible-playbook for Post Activities",
-      "cd ${local.ansible_post_path}",
-      "ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-post.log ansible-playbook tasks/main.yml --extra-vars @ansible_post_vars.json"
-    ]
-  }
-}
-
-# Dev Note: only on destroy - remove the worker
-resource "null_resource" "destroy_worker" {
-  depends_on = [null_resource.post_ansible]
 
   triggers = {
     count                 = var.worker["count"]
@@ -90,10 +63,37 @@ EOF
   }
 }
 
+#command to run ansible playbook on Bastion
+resource "null_resource" "post_ansible" {
+  depends_on = [null_resource.remove_workers]
+  connection {
+    type        = "ssh"
+    user        = "root"
+    private_key = file(var.private_key_file)
+    host        = var.bastion_public_ip[0]
+    agent       = var.ssh_agent
+  }
+
+  #create ansible_post_vars.json file on bastion (with desired variables to be passed to Ansible from Terraform)
+  provisioner "file" {
+    content     = templatefile("${path.module}/templates/ansible_post_vars.json.tpl", local.ansible_vars)
+    destination = "${local.ansible_post_path}/ansible_post_vars.json"
+  }
+
+  #command to run ansible playbook on Bastion
+  provisioner "remote-exec" {
+    inline = [
+      "echo Running ansible-playbook for Post Activities",
+      "cd ${local.ansible_post_path}",
+      "ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-post.log ansible-playbook tasks/main.yml --extra-vars @ansible_post_vars.json"
+    ]
+  }
+}
+
 # Dev Note: Normal Cloud Providers remove this taint, we have to manually remove it.
 # ref: https://github.com/openshift/kubernetes/blob/master/staging/src/k8s.io/cloud-provider/api/well_known_taints.go#L20
 resource "null_resource" "debug_and_remove_taints" {
-  depends_on = [null_resource.destroy_worker]
+  depends_on = [null_resource.post_ansible]
   connection {
     type        = "ssh"
     user        = "root"
