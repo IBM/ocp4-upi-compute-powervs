@@ -122,7 +122,7 @@ EOF
 }
 
 resource "null_resource" "config_csi" {
-  depends_on = [null_resource.config_login]
+  depends_on = [null_resource.config_login, null_resource.config]
   connection {
     type        = "ssh"
     user        = var.rhel_username
