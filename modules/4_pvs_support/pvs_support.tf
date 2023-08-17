@@ -265,7 +265,7 @@ EOF
 }
 
 resource "null_resource" "wait_on_mcp" {
-  depends_on = [time_sleep.set_routing_via_host]
+  depends_on = [null_resource.set_routing_via_host]
   connection {
     type        = "ssh"
     user        = var.rhel_username
