@@ -54,3 +54,10 @@ resource "ibm_pi_dhcp" "new_dhcp_service" {
   # the pi_dhcp_name param will be prefixed by the DHCP ID when created, so keep it short here:
   pi_dhcp_name = var.cluster_id
 }
+
+# Dev Note: injects a delay the dhcp_service/destroy.
+# Othweriwse, this message comes up: Error: failed to perform Delete DHCP Operation for dhcp id
+resource "time_sleep" "wait_dhcp_service_destroy" {
+  depends_on       = [ibm_pi_dhcp.new_dhcp_service]
+  destroy_duration = "120s"
+}
