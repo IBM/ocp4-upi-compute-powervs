@@ -47,6 +47,7 @@ resource "null_resource" "kubeconfig" {
 }
 
 resource "null_resource" "config" {
+  depends_on = [null_resource.kubeconfig]
   connection {
     type        = "ssh"
     user        = var.rhel_username
@@ -97,10 +98,31 @@ EOF
   }
 }
 
-# Two different paths to update the namespace.
-resource "null_resource" "config_non" {
+# Dev Note: login
+resource "null_resource" "config_login" {
   count      = fileexists(var.kubeconfig_file) ? 0 : 1
-  depends_on = [null_resource.config, null_resource.kubeconfig]
+  depends_on = [null_resource.config]
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = var.bastion_public_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
+oc login \
+  "${var.openshift_api_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
+EOF
+    ]
+  }
+}
+
+resource "null_resource" "config_csi" {
+  depends_on = [null_resource.config_login]
   connection {
     type        = "ssh"
     user        = var.rhel_username
@@ -116,29 +138,6 @@ resource "null_resource" "config_non" {
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
-oc login \
-  "${var.openshift_api_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
-oc annotate ns openshift-cluster-csi-drivers \
-  scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
-EOF
-    ]
-  }
-}
-
-resource "null_resource" "config_kube" {
-  count      = fileexists(var.kubeconfig_file) ? 1 : 0
-  depends_on = [null_resource.config, null_resource.kubeconfig]
-  connection {
-    type        = "ssh"
-    user        = var.rhel_username
-    host        = var.bastion_public_ip
-    private_key = file(var.private_key_file)
-    agent       = var.ssh_agent
-    timeout     = "${var.connection_timeout}m"
-  }
-  provisioner "remote-exec" {
-    inline = [<<EOF
-export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc annotate --kubeconfig /root/.kube/config ns openshift-cluster-csi-drivers \
   scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
 EOF
@@ -147,7 +146,7 @@ EOF
 }
 
 resource "null_resource" "adjust_mtu" {
-  depends_on = [null_resource.config_kube, null_resource.config_non]
+  depends_on = [null_resource.config_csi]
   connection {
     type        = "ssh"
     user        = var.rhel_username
@@ -166,60 +165,8 @@ EOF
   }
 }
 
-# The MTU change may take a few minutes
-resource "time_sleep" "wait_2_minutes" {
-  depends_on      = [null_resource.adjust_mtu]
-  create_duration = "2m"
-}
-
-resource "null_resource" "wait_on_mcp" {
-  depends_on = [time_sleep.wait_2_minutes]
-  connection {
-    type        = "ssh"
-    user        = var.rhel_username
-    host        = var.bastion_public_ip
-    private_key = file(var.private_key_file)
-    agent       = var.ssh_agent
-    timeout     = "${var.connection_timeout}m"
-  }
-
-  # Dev Note: added hardening to the MTU wait, we wait for the condition and then fail
-  provisioner "remote-exec" {
-    inline = [<<EOF
-export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
-oc wait mcp/master --for condition=updated --timeout=30m || true
-oc wait mcp/worker --for condition=updated --timeout=30m || true
-
-echo "-diagnostics-"
-oc get network cluster -o yaml | grep -i mtu
-oc get mcp
-
-echo 'verifying worker mc'
-while ! oc get mc 00-worker -o yaml | grep MTU=9000
-do
-  echo "waiting on worker"
-  sleep 60
-done
-oc wait mcp/worker --for condition=updated --timeout=30m || true
-
-echo 'verifying master mc'
-while ! oc get mc 00-master -o yaml | grep MTU=9000
-do
-  echo "waiting on master"
-  sleep 60
-done
-oc wait mcp/master --for condition=updated --timeout=30m || true
-
-echo '-checking mtu-'
-[[ "$( oc get network cluster -o yaml | grep clusterNetworkMTU | awk '{print $NF}')" == "9000" ]] || false
-echo "success on wait on mtu change"
-EOF
-    ]
-  }
-}
-
 resource "null_resource" "keep_dns_on_vpc" {
-  depends_on = [null_resource.wait_on_mcp]
+  depends_on = [null_resource.adjust_mtu]
   connection {
     type        = "ssh"
     user        = var.rhel_username
@@ -317,8 +264,55 @@ EOF
   }
 }
 
+resource "null_resource" "wait_on_mcp" {
+  depends_on = [time_sleep.set_routing_via_host]
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = var.bastion_public_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
+
+  # Dev Note: added hardening to the MTU wait, we wait for the condition and then fail
+  provisioner "remote-exec" {
+    inline = [<<EOF
+export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
+oc wait mcp/master --for condition=updated --timeout=30m || true
+oc wait mcp/worker --for condition=updated --timeout=30m || true
+
+echo "-diagnostics-"
+oc get network cluster -o yaml | grep -i mtu
+oc get mcp
+
+echo 'verifying worker mc'
+while ! oc get mc 00-worker -o yaml | grep MTU=9000
+do
+  echo "waiting on worker"
+  sleep 60
+done
+oc wait mcp/worker --for condition=updated --timeout=30m || true
+
+echo 'verifying master mc'
+while ! oc get mc 00-master -o yaml | grep MTU=9000
+do
+  echo "waiting on master"
+  sleep 60
+done
+oc wait mcp/master --for condition=updated --timeout=30m || true
+
+echo '-checking mtu-'
+[[ "$( oc get network cluster -o yaml | grep clusterNetworkMTU | awk '{print $NF}')" == "9000" ]] || false
+echo "success on wait on mtu change"
+EOF
+    ]
+  }
+}
+
+# Dev Note: do this as the last step so we get a good worker ignition file downloaded.
 resource "null_resource" "latest_ignition" {
-  depends_on = [null_resource.keep_imagepruner_on_vpc]
+  depends_on = [null_resource.wait_on_mcp]
   connection {
     type        = "ssh"
     user        = var.rhel_username
