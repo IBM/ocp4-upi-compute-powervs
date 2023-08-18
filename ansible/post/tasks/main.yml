@@ -20,27 +20,22 @@
     become: yes
 
   - name: Get CSRs
-    shell: "oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name'"
+    shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name'"
     register: csr_list
 
-  - name: Get Worker Nodes count (with ppc64le architecture)
-    shell: "oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | wc -l"
-    register: ppc_nodes_count
-
-  - name: Print PPC Node count and CSRs
+  - name: Print Pending CSRs
     debug:
-      msg: "PPC Worker Node count Before Approving CSR is : {{ ppc_nodes_count.stdout }}, Pending CSR List is : {{ csr_list.stdout }}"
+      msg: "Pending CSR List is : {{ csr_list.stdout }}"
 
   # Run approve command till we have all ppc workers ready. 'xargs -r ' is used to ignore empty stdin.
   - name: Approve Worker CSRs
-    # Approve CSR till you don't get PPC worker node with ready status for defined time
+    # Approve CSR till you don't get PPC worker node/s with ready status for defined time
     shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name' | xargs -r oc adm certificate approve && oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | grep -w Ready | wc -l"
     register: ready_count_result
-    #until: lookup('pipe','oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | grep -w Ready | wc -l') > "0"
-    until: "ready_count_result.stdout.find('0') == -1"
-    retries: 120
+    until: ready_count_result.stdout.find(ppc_worker_count) != -1
+    retries: 50
     delay: 30
-    when: csr_list.stdout != "" or ppc_nodes_count.stdout == "0"
+    when: ppc_worker_count|int > 0
 
   - name: Ensure able to fetch project list
     shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get projects"

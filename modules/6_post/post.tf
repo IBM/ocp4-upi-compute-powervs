@@ -6,11 +6,12 @@
 locals {
   ansible_post_path = "/root/ocp4-upi-compute-powervs/post"
   ansible_vars = {
-    region      = var.powervs_region
-    zone        = var.powervs_zone
-    system_type = var.system_type
-    nfs_server  = var.nfs_server
-    nfs_path    = var.nfs_path
+    region           = var.powervs_region
+    zone             = var.powervs_zone
+    system_type      = var.system_type
+    nfs_server       = var.nfs_server
+    nfs_path         = var.nfs_path
+    ppc_worker_count = var.worker["count"]
   }
 }
 

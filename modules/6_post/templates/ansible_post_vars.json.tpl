@@ -11,6 +11,8 @@ node_labels: {
   "node.kubernetes.io/instance-type": "${system_type}"
 }
 
+ppc_worker_count: "${ppc_worker_count}"
+
 # NFS Storage variables
 nfs_server: "${nfs_server}"
 nfs_path: "${nfs_path}"
