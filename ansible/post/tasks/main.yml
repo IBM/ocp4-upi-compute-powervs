@@ -27,15 +27,27 @@
     debug:
       msg: "Pending CSR List is : {{ csr_list.stdout }}"
 
-  # Run approve command till we have all ppc workers ready. 'xargs -r ' is used to ignore empty stdin.
+  # Run approve CSR command till CSR list is empty.
   - name: Approve Worker CSRs
-    # Approve CSR till you don't get PPC worker node/s with ready status for defined time
+    shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && for i in `oc get csr | grep -i pending | awk '{ print $1 }'`; do oc adm certificate approve $i; done && oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name'"
+    register: csr_list
+    until: csr_list.stdout == ""
+    retries: 5
+    delay: 40
+    when: powervs_worker_count|int > 0
+
+  - name: Wait for 20 seconds before checking Ready state for Powervs worker node/s
+    pause:
+      seconds: 20
+
+  # Run approve command again and wait till we have all powervs worker/s with Ready status. 'xargs -r ' is used to ignore empty stdin.
+  - name: Check Ready state for Powervs Worker Node
     shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name' | xargs -r oc adm certificate approve && oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | grep -w Ready | wc -l"
     register: ready_count_result
-    until: ready_count_result.stdout.find(ppc_worker_count) != -1
+    until: ready_count_result.stdout.find(powervs_worker_count) != -1
     retries: 50
     delay: 30
-    when: ppc_worker_count|int > 0
+    when: powervs_worker_count|int > 0
 
   - name: Ensure able to fetch project list
     shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get projects"
