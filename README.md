@@ -55,6 +55,16 @@ To run the code, you'll need to set the MTU for your machine:
 ip link set eth0 mtu 1400
 ```
 
+### Getting the IPs of Power Workers
+
+To get the IPs of the Power Workers. 
+
+```
+❯ oc get nodes -l 'kubernetes.io/arch=ppc64le' -owide
+NAME                STATUS   ROLES    AGE   VERSION           INTERNAL-IP      EXTERNAL-IP   OS-IMAGE                                                       KERNEL-VERSION                  CONTAINER-RUNTIME
+mac-d263-worker-0   Ready    worker   40h   v1.27.4+4e87926   192.168.200.10   <none>        Red Hat Enterprise Linux CoreOS 414.92.202308151250-0 (Plow)   5.14.0-284.25.1.el9_2.ppc64le   cri-o://1.27.1-6.rhaos4.14.gitc2c9f36.el9
+```
+
 ## Contributing
 
 If you have any questions or issues you can create a new [issue here][issues].
