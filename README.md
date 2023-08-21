@@ -38,7 +38,7 @@ Note: The PowerVS and IBMCloud VPC regions must be compatible.
 ❯ terraform destroy -var-file=var.tfvars
 ```
 
-Note, the `destroy` command leaves the Node resource in place, and destroys the virtual server. You must delete the Node manually.
+Note, the `destroy` command removes the Node resource, removes the NFS deployment, and destroys the virtual servers. Please backup your NFS Server first - it is destroyed.
 
 ## Cluster Details
 
