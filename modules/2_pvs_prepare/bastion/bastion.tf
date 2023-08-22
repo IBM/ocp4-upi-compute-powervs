@@ -25,9 +25,15 @@ resource "ibm_pi_instance" "bastion" {
   }
 }
 
+# The PowerVS instance may take a few minutes to start (per the IPI work)
+resource "time_sleep" "wait_3_minutes" {
+  depends_on      = [ibm_pi_instance.bastion]
+  create_duration = "3m"
+}
+
 data "ibm_pi_instance_ip" "bastion_public_ip" {
   count      = 1
-  depends_on = [ibm_pi_instance.bastion]
+  depends_on = [time_sleep.wait_3_minutes]
 
   pi_instance_name     = ibm_pi_instance.bastion[count.index].pi_instance_name
   pi_network_name      = var.bastion_public_network_name
