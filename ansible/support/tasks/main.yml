@@ -126,7 +126,7 @@
 
   - name: Wait for quick to become open on the vpc support machine
     ansible.builtin.wait_for:
-      host: {{ vpc_support_server_ip }}
+      host: "{{ vpc_support_server_ip }}"
       port: 3128
       delay: 30
       timeout: 600
