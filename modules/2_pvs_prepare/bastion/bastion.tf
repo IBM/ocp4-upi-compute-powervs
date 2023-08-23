@@ -174,11 +174,13 @@ resource "null_resource" "enable_repos" {
     timeout     = "${var.connection_timeout}m"
   }
 
+  # The timeout is a guard against flakes in the dns lookup for mirrolist.centos.org and dl.fedoraproject.org
   provisioner "remote-exec" {
     inline = [<<EOF
 # Additional repo for installing ansible package
 if ( [[ -z "${var.rhel_subscription_username}" ]] || [[ "${var.rhel_subscription_username}" == "<subscription-id>" ]] ) && [[ -z "${var.rhel_subscription_org}" ]]
 then
+  timeout 120 bash -c -- 'until nslookup mirrorlist.centos.org; do sleep 30; printf ".";done'
   sudo yum install -y epel-release
 else
   os_ver=$(cat /etc/os-release | egrep "^VERSION_ID=" | awk -F'"' '{print $2}')
@@ -189,6 +191,7 @@ else
       sudo subscription-manager repos --enable ${var.ansible_repo_name}
     fi
   else
+    timeout 120 bash -c -- 'until nslookup dl.fedoraproject.org; do sleep 30; printf ".";done'
     sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
   fi
 fi
