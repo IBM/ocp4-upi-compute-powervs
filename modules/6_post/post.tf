@@ -13,6 +13,9 @@ locals {
     nfs_path             = var.nfs_path
     powervs_worker_count = var.worker["count"]
   }
+
+  nfs_namespace  = "nfs-provisioner"
+  nfs_deployment = "nfs-client-provisioner"
 }
 
 resource "null_resource" "post_setup" {
@@ -114,3 +117,37 @@ EOF
     ]
   }
 }
+
+# Dev Note: only on destroy - remove the the deployment for nfs storage, and leave after post_ansible
+resource "null_resource" "remove_nfs_deployment" {
+  depends_on = [null_resource.post_ansible]
+
+  triggers = {
+    vpc_support_server_ip = "${var.nfs_server}"
+    private_key           = file(var.private_key_file)
+    host                  = var.bastion_public_ip[0]
+    agent                 = var.ssh_agent
+    nfs_namespace         = local.nfs_namespace
+    nfs_deployment        = local.nfs_deployment
+    ansible_post_path     = local.ansible_post_path
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "root"
+    private_key = self.triggers.private_key
+    host        = self.triggers.host
+    agent       = self.triggers.agent
+  }
+
+  provisioner "remote-exec" {
+    when       = destroy
+    on_failure = continue
+    inline = [<<EOF
+cd ${self.triggers.ansible_post_path}
+bash files/destroy-nfs-deployment.sh "${self.triggers.nfs_deployment}" "${self.triggers.vpc_support_server_ip}" "${self.triggers.nfs_namespace}"
+EOF
+    ]
+  }
+}
+
