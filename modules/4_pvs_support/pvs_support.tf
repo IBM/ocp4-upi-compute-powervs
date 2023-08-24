@@ -292,14 +292,6 @@ do
 done
 oc wait mcp/worker --for condition=updated --timeout=30m || true
 
-echo 'verifying master mc'
-while ! oc get mc 00-master -o yaml | grep MTU=9000
-do
-  echo "waiting on master"
-  sleep 60
-done
-oc wait mcp/master --for condition=updated --timeout=30m || true
-
 echo '-checking mtu-'
 [[ "$( oc get network cluster -o yaml | grep clusterNetworkMTU | awk '{print $NF}')" == "9000" ]] || false
 echo "success on wait on mtu change"
