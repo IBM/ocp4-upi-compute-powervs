@@ -279,8 +279,6 @@ resource "null_resource" "wait_on_mcp" {
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
-oc wait mcp/master --for condition=updated --timeout=30m || true
-oc wait mcp/worker --for condition=updated --timeout=30m || true
 
 echo "-diagnostics-"
 oc get network cluster -o yaml | grep -i mtu
