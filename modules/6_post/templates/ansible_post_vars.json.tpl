@@ -8,7 +8,8 @@ node_labels: {
   "failure-domain.beta.kubernetes.io/region": "${region}",
   "failure-domain.beta.kubernetes.io/zone": "${zone}",
   "vpc-block-csi-driver-labels": "false",
-  "node.kubernetes.io/instance-type": "${system_type}"
+  "node.kubernetes.io/instance-type": "${system_type}",
+  "beta.kubernetes.io/instance-type": "${system_type}"
 }
 
 powervs_worker_count: "${powervs_worker_count}"
