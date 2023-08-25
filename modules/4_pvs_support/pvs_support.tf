@@ -290,7 +290,7 @@ do
   echo "waiting on worker"
   sleep 60
 done
-oc wait mcp/worker --for condition=updated --timeout=30m || true
+oc wait mcp/worker --for condition=updated --timeout=5m || true
 
 echo '-checking mtu-'
 [[ "$( oc get network cluster -o yaml | grep clusterNetworkMTU | awk '{print $NF}')" == "9000" ]] || false
