@@ -285,12 +285,18 @@ oc get network cluster -o yaml | grep -i mtu
 oc get mcp
 
 echo 'verifying worker mc'
-while ! oc get mc 00-worker -o yaml | grep MTU=9000
+start_counter=0
+timeout_counter=10
+mtu_output=`oc get mc 00-worker -o yaml | grep MTU=9000`
+# While loop waits for MTU=9000 till timeout has not reached 
+while [[ ( $mtu_output == "" ) && ( $start_counter -lt $timeout_counter ) ]];
 do
   echo "waiting on worker"
-  sleep 60
+  sleep 30
+  mtu_output=`oc get mc 00-worker -o yaml | grep MTU=9000`
+  start_counter=`expr $start_counter + 1`
 done
-oc wait mcp/worker --for condition=updated --timeout=5m || true
+#oc wait mcp/worker --for condition=updated --timeout=5m || true
 
 echo '-checking mtu-'
 [[ "$( oc get network cluster -o yaml | grep clusterNetworkMTU | awk '{print $NF}')" == "9000" ]] || false
