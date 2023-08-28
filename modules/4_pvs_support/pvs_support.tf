@@ -155,11 +155,13 @@ resource "null_resource" "adjust_mtu" {
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"
   }
+
+  # The mtu.network.to was originally targetting 9000, and has been moved to 1350 based on the VPC/IBM Cloud configurations.
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc patch Network.operator.openshift.io cluster --type=merge --patch \
-  '{"spec": { "migration": { "mtu": { "network": { "from": 1400, "to": 9000 } , "machine": { "to" : 9100} } } } }'
+  '{"spec": { "migration": { "mtu": { "network": { "from": 1400, "to": 1350 } , "machine": { "to" : 9100} } } } }'
 EOF
     ]
   }

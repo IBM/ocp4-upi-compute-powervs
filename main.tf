@@ -30,7 +30,7 @@ locals {
   node_prefix = var.use_zone_info_for_names ? "${var.powervs_zone}-" : ""
 }
 
-### Prepares the VPC Support Machine
+### Checks VPC compatibility
 module "checks" {
   providers = {
     ibm = ibm.vpc
