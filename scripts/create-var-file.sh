@@ -85,6 +85,7 @@ else
     # To get the CRN...
     # POWERVS_CRN=$(ibmcloud resource service-instances --output json | jq -r '.[] | select(.guid == "'${POWERVS_SERVICE_INSTANCE_ID}'").id')
     # ibmcloud pi st "${POWERVS_CRN}"
+    # remapped osa21 osa to tok
     POWERVS_ZONE=$(${IBMCLOUD} resource service-instances --output json | jq -r '.[] | select(.guid == "'${POWERVS_SERVICE_INSTANCE_ID}'").region_id')
     POWERVS_REGION=$(
         case "$POWERVS_ZONE" in
@@ -102,7 +103,7 @@ else
             ("syd04") echo "syd" ;;
             ("syd05") echo "syd" ;;
             ("tok04") echo "tok" ;;
-            ("osa21") echo "osa" ;;
+            ("osa21") echo "tok" ;;
             (*) echo "$POWERVS_ZONE" ;;
         esac)
     echo "REGION: ${POWERVS_REGION}"
@@ -181,6 +182,7 @@ system_type    = "e980"
 bastion_health_status = "WARNING"
 bastion               = { memory = "16", processors = "1", "count" = 1 }
 worker                = { memory = "16", processors = "1", "count" = ${EXPECTED_NODES} }
+override_region_check=true
 EOFXEOF
 }
 
