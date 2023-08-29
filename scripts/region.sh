@@ -7,13 +7,14 @@
 
 # Maps or overrides the regions
 
-# jp-osa: osa21 is remapped to tok04
+# v2: reverted the mapping for jp-osa to osa21
+# v1: jp-osa: osa21 is remapped to tok04
 
 REGION="$1"
 OVERRIDE="$2"
 
 case "$REGION" in
-  ("jp-osa") echo "tok04" ;;
+  ("jp-osa") echo "osa21" ;;
   ("eu-gb") echo "lon05" ;;
   ("ca-tor") echo "mon01" ;;
   ("br-sao") echo "sao01" ;;
