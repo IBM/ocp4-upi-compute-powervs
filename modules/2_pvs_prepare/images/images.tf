@@ -42,6 +42,7 @@ locals {
     dal     = "us-south",
     sao     = "br-sao",
     us-east = "us-east"
+    mon     = "ca-tor"
   }
   # If not Empty, then we switch to using the override region
   rhcos_import_bucket_region = var.rhcos_import_image_region_override != "" ? "${var.rhcos_import_image_region_override}" : lookup(local.powervs_vpc_region_map, var.powervs_region, "au-syd")
