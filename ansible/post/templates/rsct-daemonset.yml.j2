@@ -7,9 +7,15 @@ spec:
   selector:
     matchLabels:
       app: "{{ rmc_name }}"
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 10%
   template:
     metadata:
       creationTimestamp: null
+      annotation: 
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
       labels:
         app: "{{ rmc_name }}"
     spec:
@@ -35,8 +41,6 @@ spec:
             requests:
               cpu: 100m
               memory: 500Mi
-            limits:
-              memory: 4Gi
           volumeMounts:
             - name: lib-modules
               mountPath: /lib/modules
@@ -45,6 +49,7 @@ spec:
             privileged: true
             runAsUser: 0
       serviceAccount: "{{ rmc_name }}"
+      priorityClassName: system-node-critical
       volumes:
         - name: lib-modules
           hostPath:
