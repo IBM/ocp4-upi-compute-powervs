@@ -14,8 +14,6 @@ spec:
   template:
     metadata:
       creationTimestamp: null
-      annotation: 
-        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
       labels:
         app: "{{ rmc_name }}"
     spec:
