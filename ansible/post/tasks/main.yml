@@ -56,14 +56,14 @@
     retries: 20
     delay: 30
 
-  - name: Create openshift-powervm-rmc project
+  - name: Create powervm-rmc project
     when: projects_list.stdout.find(project_name) == -1
     kubernetes.core.k8s:
       state: present
       proxy: "http://{{ nfs_server }}:3128"
       definition: "{{ lookup('template', '../templates/rmc-ns.yml.j2')}}"
 
-  - name: Create openshift-powervm-rmc serviceaccount
+  - name: Create powervm-rmc serviceaccount
     kubernetes.core.k8s:
       state: present
       proxy: "http://{{ nfs_server }}:3128"
