@@ -152,3 +152,24 @@ EOF
   }
 }
 
+# Dev Note: For CICD, we're spinning until we get a good setup.
+resource "null_resource" "cicd_hold_while_updating" {
+  depends_on = [null_resource.remove_nfs_deployment]
+  count = var.cicd ? 1 : 0
+  connection {
+    type        = "ssh"
+    user        = "root"
+    private_key = file(var.private_key_file)
+    host        = var.bastion_public_ip[0]
+    agent       = var.ssh_agent
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+export HTTPS_PROXY="http://${var.nfs_server}:3128"
+cd ${self.triggers.ansible_post_path}
+bash files/cicd_hold_while_updating.sh "${var.nfs_server}" "${var.name_prefix}" "${var.worker["count"]}"
+EOF
+    ]
+  }
+}
