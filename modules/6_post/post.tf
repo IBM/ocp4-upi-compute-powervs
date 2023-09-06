@@ -12,6 +12,7 @@ locals {
     nfs_server           = var.nfs_server
     nfs_path             = var.nfs_path
     powervs_worker_count = var.worker["count"]
+    cicd                 = var.cicd
   }
 
   nfs_namespace  = "nfs-provisioner"

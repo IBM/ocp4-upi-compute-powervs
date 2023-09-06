@@ -485,3 +485,13 @@ variable "vpc_supp_public_ip" {
   description = "Set to true to create a public ip for the PowerVS (vpc) support machine"
   default     = false
 }
+
+################################################################
+# Overrides the CICD
+################################################################
+
+variable "cicd" {
+  type        = bool
+  description = "Flips on additional checks used by cicd"
+  default     = false
+}

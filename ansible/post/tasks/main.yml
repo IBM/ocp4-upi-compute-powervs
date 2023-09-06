@@ -106,3 +106,7 @@
     import_tasks: nfs_provisioner.yaml
     when: nfs_server != "none"
 
+  - name: Cleanup events in openshift-etcd for cicd
+    when: cicd != "none"
+    shell: |
+      export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc delete events --all=true -n openshift-etcd

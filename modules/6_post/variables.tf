@@ -17,3 +17,4 @@ variable "nfs_server" {}
 variable "nfs_path" {}
 variable "name_prefix" {}
 variable "worker" {}
+variable "cicd" {}

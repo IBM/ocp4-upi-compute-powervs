@@ -175,4 +175,5 @@ module "post" {
   nfs_path          = var.nfs_path
   name_prefix       = local.name_prefix
   worker            = var.worker
+  cicd              = var.cicd
 }
