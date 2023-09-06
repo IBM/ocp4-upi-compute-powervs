@@ -75,6 +75,34 @@ ibmcloud pi images
 ibmcloud pi image-create CentOS-Stream-8 --json
 echo "Import image status is: $?"
 
-
 # This CRN is useful when manually destroying.
 echo "PowerVS Service CRN: ${CRN}"
+
+# 6. Create Cloud Connection
+# 7. Attach Cloud Connection
+ibmcloud pi connection-create ${WORKSPACE_NAME}-conn --transit-enabled \
+    --global-routing --speed 1000
+
+# 8. Create DHCP Network
+POWERVS_SERVICE_INSTANCE_ID=$(echo "${CRN}" | sed 's|:| |g' | awk '{print $NF}')
+bin/pvsadm dhcpserver create --instance-id ${POWERVS_SERVICE_INSTANCE_ID} \
+    --cidr '192.168.200.0/24' \
+    --dns-server 9.9.9.9 \
+    --name mac-dhcp-${REGION} \
+    --snat true \
+    --cloud-connection-id $(ibmcloud pi cons 2>&1  | grep rdr-mac- | awk '{print $1}')
+
+# 9. Create Transit Gateway
+ibmcloud tg gateway-create \
+    --name ${WORKSPACE_NAME}-tg \
+    --location ${REGION} \
+    --routing global \
+    --resource-group-id $(ibmcloud resource groups 2>&1 | grep ${RESOURCE_GROUP} | awk '{print $2}')
+
+# 10. Attach Transit Gateway
+DL_ID=$(ibmcloud dl gateways | grep ${WORKSPACE_NAME} | awk '{print $1}')
+DL_CRN=$(ibmcloud dl gateway ${DL_ID} --output json | jq -r .crn)
+ibmcloud tg connection-create \
+    --name ${WORKSPACE_NAME}-conn \
+    --network-id ${DL_CRN} \
+    --network-type directlink
