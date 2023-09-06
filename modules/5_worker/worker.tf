@@ -34,18 +34,3 @@ resource "ibm_pi_instance" "worker" {
         name : base64encode("${var.name_prefix}-worker-${count.index}"),
   }))
 }
-
-# The PowerVS instance may take a few minutes to start (per the IPI work)
-resource "time_sleep" "wait_3_minutes" {
-  depends_on      = [ibm_pi_instance.worker]
-  create_duration = "3m"
-}
-
-data "ibm_pi_instance_ip" "worker" {
-  count      = 1
-  depends_on = [time_sleep.wait_3_minutes]
-
-  pi_instance_name     = ibm_pi_instance.worker[count.index].pi_instance_name
-  pi_network_name      = var.powervs_dhcp_network_name
-  pi_cloud_instance_id = var.powervs_service_instance_id
-}

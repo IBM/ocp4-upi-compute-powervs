@@ -35,6 +35,28 @@ resource "null_resource" "post_setup" {
   }
 }
 
+# Dev Note: For CICD, we're spinning until we get the CSRs.
+resource "null_resource" "wait_for_power_nodes" {
+  depends_on = [null_resource.post_setup]
+  count      = var.cicd ? 1 : 0
+  connection {
+    type        = "ssh"
+    user        = "root"
+    private_key = file(var.private_key_file)
+    host        = var.bastion_public_ip[0]
+    agent       = var.ssh_agent
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+export HTTPS_PROXY="http://${var.nfs_server}:3128"
+cd ${self.triggers.ansible_post_path}
+bash files/wait_on_power_nodes.sh "${var.nfs_server}" "${var.worker["count"]}"
+EOF
+    ]
+  }
+}
+
 # Dev Note: only on destroy - remove the workers, and leave it at the top after post_setup
 resource "null_resource" "remove_workers" {
   depends_on = [null_resource.post_setup]
@@ -111,7 +133,7 @@ resource "null_resource" "debug_and_remove_taints" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.nfs_server}:3128"
 oc get nodes -owide
-oc get nodes -l 'kubernetes.io/arch=ppc64le' -o json | jq -r '.items[].spec'
+oc get nodes -l 'kubernetes.io/arch=ppc64le' -o json | jq -r '.items[]'
 cd ${local.ansible_post_path}
 bash files/remove-worker-taints.sh "${var.nfs_server}" "${var.name_prefix}" "${var.worker["count"]}"
 EOF
@@ -155,7 +177,7 @@ EOF
 # Dev Note: For CICD, we're spinning until we get a good setup.
 resource "null_resource" "cicd_hold_while_updating" {
   depends_on = [null_resource.remove_nfs_deployment]
-  count = var.cicd ? 1 : 0
+  count      = var.cicd ? 1 : 0
   connection {
     type        = "ssh"
     user        = "root"
@@ -168,7 +190,7 @@ resource "null_resource" "cicd_hold_while_updating" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.nfs_server}:3128"
 cd ${self.triggers.ansible_post_path}
-bash files/cicd_hold_while_updating.sh "${var.nfs_server}" "${var.name_prefix}" "${var.worker["count"]}"
+bash files/cicd_hold_while_updating.sh "${var.nfs_server}"
 EOF
     ]
   }
