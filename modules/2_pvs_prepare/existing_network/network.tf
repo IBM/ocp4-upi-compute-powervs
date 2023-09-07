@@ -20,7 +20,7 @@ data "ibm_pi_dhcps" "dhcps" {
 
 data "ibm_pi_dhcp" "dhcp" {
   pi_cloud_instance_id = var.powervs_service_instance_id
-  pi_dhcp_id = data.ibm_pi_dhcps.dhcps.servers[0].dhcp_id
+  pi_dhcp_id           = data.ibm_pi_dhcps.dhcps.servers[0].dhcp_id
 }
 
 locals {
