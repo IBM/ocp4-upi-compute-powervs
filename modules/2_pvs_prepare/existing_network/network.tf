@@ -18,6 +18,15 @@ data "ibm_pi_dhcps" "dhcps" {
   pi_cloud_instance_id = var.powervs_service_instance_id
 }
 
+data "ibm_pi_dhcp" "dhcp" {
+  pi_cloud_instance_id = var.powervs_service_instance_id
+  pi_dhcp_id = data.ibm_pi_dhcps.dhcps.servers[0].dhcp_id
+}
+
 locals {
-  server = [for server in data.ibm_pi_dhcps.dhcps.servers : server if server.network_name == "${var.override_network_name}"]
+  # Dev Note: in the future, we can use a count on line 22, and
+  # process through the tuple to find the right dhcp server
+  # making the assumption there is only one per workspace.
+  # #[for server in data.ibm_pi_dhcps.dhcps.servers : server if server.network_name == "${var.override_network_name}"]
+  server = data.ibm_pi_dhcp.dhcp
 }

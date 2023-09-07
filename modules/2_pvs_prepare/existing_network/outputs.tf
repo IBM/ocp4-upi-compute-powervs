@@ -16,13 +16,13 @@ output "bastion_public_network_cidr" {
 }
 
 output "powervs_dhcp_network_id" {
-  value = local.server[0].network_id
+  value = local.server.network_id
 }
 
 output "powervs_dhcp_network_name" {
-  value = local.server[0].network_name
+  value = local.server.network_name
 }
 
 output "powervs_dhcp_service" {
-  value = local.server[0]
+  value = local.server
 }
