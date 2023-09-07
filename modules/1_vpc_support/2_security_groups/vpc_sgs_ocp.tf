@@ -7,7 +7,7 @@
 
 # Loads the VPC Security Groups so we can find the existing ids
 data "ibm_is_security_groups" "sgs" {
-  vpc_id = data.ibm_is_vpc.vpc.id
+  vpc_id = var.vpc
 }
 
 locals {

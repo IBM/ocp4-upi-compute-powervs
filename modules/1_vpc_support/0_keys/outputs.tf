@@ -4,17 +4,9 @@
 ################################################################
 
 output "vpc_check_key" {
-  value = module.keys.vpc_check_key
+  value = local.check_key
 }
 
-output "vpc_support_server_ip" {
-  value = module.vsi.vpc_support_server_ip
-}
-
-output "vpc_crn" {
-  value = data.ibm_is_vpc.vpc.crn
-}
-
-output "transit_gateway_id" {
-  value = module.transit_gateway[0].new_tg
+output "key_id" {
+  value = local.key_id
 }

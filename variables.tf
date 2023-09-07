@@ -487,7 +487,7 @@ variable "vpc_supp_public_ip" {
 }
 
 ################################################################
-# Overrides the CICD
+# Supports the CICD features
 ################################################################
 
 variable "cicd" {
@@ -495,3 +495,22 @@ variable "cicd" {
   description = "Flips on additional checks used by cicd"
   default     = false
 }
+
+################################################################
+# Overrides the dhcp network, transit gateway creation from a 
+# PowerVS perspective.
+################################################################
+
+
+variable "override_transit_gateway_name" {
+  type        = string
+  description = "uses an existing transit gateway"
+  default     = false
+}
+
+variable "override_network_name" {
+  type        = string
+  description = "overrides network creation for a specific dhcp network"
+  default     = false
+}
+

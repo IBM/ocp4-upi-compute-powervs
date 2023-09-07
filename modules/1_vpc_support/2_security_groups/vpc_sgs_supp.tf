@@ -3,6 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
+# Loads the Security Groups so we can avoid duplication
+data "ibm_is_security_groups" "supp_vm_sgs" {
+  vpc_id = var.vpc
+}
+
 locals {
   sgs = [for x in data.ibm_is_security_groups.supp_vm_sgs.security_groups : x.id if x.name == "${var.vpc_name}-supp-sg"]
 }
@@ -10,8 +15,8 @@ locals {
 resource "ibm_is_security_group" "supp_vm_sg" {
   count          = local.sgs == [] ? 1 : 0
   name           = "${var.vpc_name}-supp-sg"
-  vpc            = data.ibm_is_vpc.vpc.id
-  resource_group = data.ibm_is_vpc.vpc.resource_group
+  vpc            = var.vpc
+  resource_group = var.resource_group
 }
 
 # allow all outgoing network traffic

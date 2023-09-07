@@ -54,14 +54,15 @@ module "vpc_support" {
   depends_on = [module.checks]
   source     = "./modules/1_vpc_support"
 
-  vpc_name             = var.vpc_name
-  vpc_region           = var.vpc_region
-  vpc_zone             = var.vpc_zone
-  public_key           = var.public_key
-  public_key_file      = var.public_key_file
-  openshift_api_url    = var.openshift_api_url
-  powervs_machine_cidr = var.powervs_machine_cidr
-  vpc_supp_public_ip   = var.vpc_supp_public_ip
+  vpc_name                      = var.vpc_name
+  vpc_region                    = var.vpc_region
+  vpc_zone                      = var.vpc_zone
+  public_key                    = var.public_key
+  public_key_file               = var.public_key_file
+  openshift_api_url             = var.openshift_api_url
+  powervs_machine_cidr          = var.powervs_machine_cidr
+  vpc_supp_public_ip            = var.vpc_supp_public_ip
+  override_transit_gateway_name = var.override_transit_gateway_name
 }
 
 ### Prepares the PowerVS workspace for Day-2 Workers

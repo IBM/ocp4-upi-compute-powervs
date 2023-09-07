@@ -3,18 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-output "vpc_check_key" {
-  value = module.keys.vpc_check_key
-}
-
 output "vpc_support_server_ip" {
-  value = module.vsi.vpc_support_server_ip
-}
-
-output "vpc_crn" {
-  value = data.ibm_is_vpc.vpc.crn
-}
-
-output "transit_gateway_id" {
-  value = module.transit_gateway[0].new_tg
+  value = ibm_is_instance.supp_vm_vsi[0].primary_network_interface[0].primary_ip.0.address
 }

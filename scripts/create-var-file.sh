@@ -151,6 +151,8 @@ then
     RHEL_IMAGE_NAME="CentOS-Stream-8"
 fi
 
+OVERRIDE_PREFIX=$(${IBMCLOUD} pi sl 2>&1 | grep $POWERVS_SERVICE_INSTANCE_ID | awk '{print $NF}')
+
 # creates the var file
 cat << EOFXEOF > data/var.tfvars
 ibmcloud_api_key = "${IC_API_KEY}"
@@ -182,6 +184,9 @@ bastion_health_status = "WARNING"
 bastion               = { memory = "16", processors = "1", "count" = 1 }
 worker                = { memory = "16", processors = "1", "count" = ${EXPECTED_NODES} }
 override_region_check=true
+
+override_network_name=DHCPSERVERmac-dhcp-${VPC_REGION}_Private
+override_transit_gateway_name=${OVERRIDE_PREFIX}-tg
 EOFXEOF
 }
 
