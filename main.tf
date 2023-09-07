@@ -114,10 +114,11 @@ module "transit_gateway" {
   depends_on = [module.pvs_prepare]
   source     = "./modules/3_transit_gateway"
 
-  cluster_id         = local.cluster_id
-  vpc_name           = var.vpc_name
-  vpc_crn            = module.vpc_support.vpc_crn
-  transit_gateway_id = module.vpc_support.transit_gateway_id
+  cluster_id                    = local.cluster_id
+  vpc_name                      = var.vpc_name
+  vpc_crn                       = module.vpc_support.vpc_crn
+  transit_gateway_id            = module.vpc_support.transit_gateway_id
+  override_transit_gateway_name = var.override_transit_gateway_name
 }
 
 module "support" {

@@ -3,8 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-variable "cluster_id" {}
-variable "vpc_name" {}
-variable "vpc_crn" {}
-variable "transit_gateway_id" {}
-variable "override_transit_gateway_name" {}
+output "mac_vpc_subnets" {
+  value = data.ibm_is_subnets.vpc_subnets.subnets[*].ipv4_cidr_block
+}

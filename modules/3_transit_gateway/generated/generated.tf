@@ -13,8 +13,3 @@ resource "ibm_tg_connection" "powervs_ibm_tg_connection" {
   name         = "${var.vpc_name}-pvs-conn"
   network_id   = data.ibm_dl_gateway.pvs_dl.crn
 }
-
-# Ref: https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/data-sources/tg_gateway
-data "ibm_tg_gateway" "mac_tg_gw" {
-  name = "${var.vpc_name}-tg"
-}

@@ -3,8 +3,13 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-variable "cluster_id" {}
-variable "vpc_name" {}
-variable "vpc_crn" {}
-variable "transit_gateway_id" {}
-variable "override_transit_gateway_name" {}
+terraform {
+  required_providers {
+    ibm = {
+      source                = "IBM-Cloud/ibm"
+      version               = "~> 1.56.2"
+      configuration_aliases = [ibm]
+    }
+  }
+  required_version = ">= 1.5.0"
+}
