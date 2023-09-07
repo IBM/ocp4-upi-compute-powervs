@@ -501,7 +501,6 @@ variable "cicd" {
 # PowerVS perspective.
 ################################################################
 
-
 variable "override_transit_gateway_name" {
   type        = string
   description = "uses an existing transit gateway"
@@ -513,4 +512,3 @@ variable "override_network_name" {
   description = "overrides network creation for a specific dhcp network"
   default     = false
 }
-

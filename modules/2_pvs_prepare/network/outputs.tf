@@ -15,6 +15,7 @@ output "bastion_public_network_cidr" {
   value = ibm_pi_network.bastion_public_network.pi_cidr
 }
 
+# Conditionally create the following, otherwise read from data.
 output "powervs_dhcp_network_id" {
   value = ibm_pi_dhcp.new_dhcp_service.network_id
 }
