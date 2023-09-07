@@ -4,5 +4,5 @@
 ################################################################
 
 output "new_tg" {
-  value = ibm_tg_connection.vpc_tg_connection.id
+  value = ibm_tg_gateway.mac_tg_gw.id
 }

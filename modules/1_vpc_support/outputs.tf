@@ -16,5 +16,5 @@ output "vpc_crn" {
 }
 
 output "transit_gateway_id" {
-  value = module.transit_gateway[0].new_tg
+  value = var.override_transit_gateway_name == "" ? module.transit_gateway[0].new_tg : module.existing_gateway[0].existing_tg
 }
