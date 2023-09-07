@@ -31,7 +31,20 @@ module "keys" {
   public_key_file             = var.public_key_file
 }
 
+module "existing_network" {
+  count = var.override_network_name == "" ? 0 : 1
+  providers = {
+    ibm = ibm
+  }
+  source = "./existing_network"
+
+  powervs_service_instance_id = var.powervs_service_instance_id
+  name_prefix                 = var.name_prefix
+  override_network_name       = var.override_network_name
+}
+
 module "network" {
+  count = var.override_network_name == "" ? 1 : 0
   providers = {
     ibm = ibm
   }
@@ -61,11 +74,11 @@ module "bastion" {
   bastion_image_id                = module.images.bastion_image_id
   bastion_storage_pool            = module.images.bastion_storage_pool
   key_name                        = module.keys.pvs_pubkey_name
-  bastion_public_network_id       = module.network.bastion_public_network_id
-  bastion_public_network_name     = module.network.bastion_public_network_name
-  bastion_public_network_cidr     = module.network.bastion_public_network_cidr
-  powervs_dhcp_network_id         = module.network.powervs_dhcp_network_id
-  powervs_dhcp_network_name       = module.network.powervs_dhcp_network_name
+  bastion_public_network_id       = var.override_network_name != "" ? module.existing_network[0].bastion_public_network_id : module.network[0].bastion_public_network_id
+  bastion_public_network_name     = var.override_network_name != "" ? module.existing_network[0].bastion_public_network_name : module.network[0].bastion_public_network_name
+  bastion_public_network_cidr     = var.override_network_name != "" ? module.existing_network[0].bastion_public_network_cidr : module.network[0].bastion_public_network_cidr
+  powervs_dhcp_network_id         = var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_network_id : module.network[0].powervs_dhcp_network_id
+  powervs_dhcp_network_name       = var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_network_name : module.network[0].powervs_dhcp_network_name
   powervs_dhcp_network_cidr       = var.powervs_machine_cidr
   private_key_file                = var.private_key_file
   public_key                      = module.keys.pvs_pubkey_name
@@ -80,5 +93,5 @@ module "bastion" {
   rhel_subscription_username      = var.rhel_subscription_username
   rhel_subscription_password      = var.rhel_subscription_password
   rhel_subscription_activationkey = var.rhel_subscription_activationkey
-  dhcp_service                    = module.network.powervs_dhcp_service
+  dhcp_service                    = var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_service : module.network[0].powervs_dhcp_service
 }

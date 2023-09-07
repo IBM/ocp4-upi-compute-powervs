@@ -105,6 +105,7 @@ module "pvs_prepare" {
   ssh_agent                          = var.ssh_agent
   system_type                        = var.system_type
   vpc_support_server_ip              = module.vpc_support.vpc_support_server_ip
+  override_network_name              = var.override_network_name
 }
 
 module "transit_gateway" {

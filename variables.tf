@@ -504,11 +504,11 @@ variable "cicd" {
 variable "override_transit_gateway_name" {
   type        = string
   description = "uses an existing transit gateway"
-  default     = false
+  default     = ""
 }
 
 variable "override_network_name" {
   type        = string
   description = "overrides network creation for a specific dhcp network"
-  default     = false
+  default     = ""
 }
