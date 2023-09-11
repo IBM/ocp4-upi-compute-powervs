@@ -168,7 +168,7 @@ EOF
 }
 
 resource "null_resource" "keep_dns_on_vpc" {
-  count      = var.keep_dns
+  count      = var.keep_dns ? 1 : 0
   depends_on = [null_resource.adjust_mtu]
   connection {
     type        = "ssh"
