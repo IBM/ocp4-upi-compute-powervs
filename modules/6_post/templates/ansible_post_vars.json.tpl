@@ -18,3 +18,4 @@ powervs_worker_count: "${powervs_worker_count}"
 nfs_server: "${nfs_server}"
 nfs_path: "${nfs_path}"
 
+cicd: "${cicd}"
