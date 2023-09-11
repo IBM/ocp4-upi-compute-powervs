@@ -228,6 +228,8 @@ resource "ibm_is_security_group_rule" "kube_api_lb_sg_https_out" {
 # TCP (IN) 	10250 	192.168.200.0/24
 # Dev Note: originally used 32767 and it's too low. Changed to 65000
 
+# Dev Note: UDP (IN) 4500 192.168.200.0/24
+
 locals {
   openshift_net_sg_rule_exists_hashes = [for x in local.openshift_net_sg[0].rules : format("%s/%s/%s/%s/%s", x.protocol, x.direction, x.port_min, x.port_max, coalesce(x.remote[0].cidr_block, "EMPTY"))]
 }
@@ -295,5 +297,16 @@ resource "ibm_is_security_group_rule" "openshift_net_sg_10250_out" {
   tcp {
     port_min = 10250
     port_max = 10250
+  }
+}
+
+resource "ibm_is_security_group_rule" "openshift_net_sg_4500" {
+  count     = contains(local.openshift_net_sg_rule_exists_hashes, format("%s%s", "udp/inbound/4500/4500/", var.powervs_machine_cidr)) ? 0 : 1
+  group     = local.openshift_net_sg[0].id
+  direction = "inbound"
+  remote    = var.powervs_machine_cidr
+  udp {
+    port_min = 4500
+    port_max = 4500
   }
 }
