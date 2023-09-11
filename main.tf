@@ -179,4 +179,7 @@ module "post" {
   name_prefix       = local.name_prefix
   worker            = var.worker
   cicd              = var.cicd
+  openshift_api_url = var.openshift_api_url
+  openshift_user    = var.openshift_user
+  openshift_pass    = var.openshift_pass
 }

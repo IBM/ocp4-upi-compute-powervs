@@ -69,6 +69,9 @@ resource "null_resource" "remove_workers" {
     host                  = var.bastion_public_ip[0]
     agent                 = var.ssh_agent
     ansible_post_path     = local.ansible_post_path
+    openshift_api_url     = var.openshift_api_url
+    openshift_user        = var.openshift_user
+    openshift_pass        = var.openshift_pass
   }
 
   connection {
@@ -83,6 +86,10 @@ resource "null_resource" "remove_workers" {
     when       = destroy
     on_failure = continue
     inline = [<<EOF
+export HTTPS_PROXY="http://${self.triggers.vpc_support_server_ip}:3128"
+oc login \
+  "${self.triggers.openshift_api_url}" -u "${self.triggers.openshift_user}" -p "${self.triggers.openshift_pass}" --insecure-skip-tls-verify=true
+
 cd ${self.triggers.ansible_post_path}
 bash files/destroy-workers.sh "${self.triggers.count}" "${self.triggers.vpc_support_server_ip}" "${self.triggers.name_prefix}"
 EOF
@@ -153,6 +160,9 @@ resource "null_resource" "remove_nfs_deployment" {
     nfs_namespace         = local.nfs_namespace
     nfs_deployment        = local.nfs_deployment
     ansible_post_path     = local.ansible_post_path
+    openshift_api_url     = var.openshift_api_url
+    openshift_user        = var.openshift_user
+    openshift_pass        = var.openshift_pass
   }
 
   connection {
@@ -167,6 +177,10 @@ resource "null_resource" "remove_nfs_deployment" {
     when       = destroy
     on_failure = continue
     inline = [<<EOF
+export HTTPS_PROXY="http://${self.triggers.vpc_support_server_ip}:3128"
+oc login \
+  "${self.triggers.openshift_api_url}" -u "${self.triggers.openshift_user}" -p "${self.triggers.openshift_pass}" --insecure-skip-tls-verify=true
+
 cd ${self.triggers.ansible_post_path}
 bash files/destroy-nfs-deployment.sh "${self.triggers.nfs_deployment}" "${self.triggers.vpc_support_server_ip}" "${self.triggers.nfs_namespace}"
 EOF

@@ -18,3 +18,7 @@ variable "nfs_path" {}
 variable "name_prefix" {}
 variable "worker" {}
 variable "cicd" {}
+
+variable "openshift_api_url" {}
+variable "openshift_user" {}
+variable "openshift_pass" {}
