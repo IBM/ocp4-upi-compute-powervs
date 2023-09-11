@@ -496,6 +496,12 @@ variable "cicd" {
   default     = false
 }
 
+variable "keep_dns" {
+  type        = bool
+  description = "Moves the dns pods to the Intel nodes"
+  default     = false
+}
+
 ################################################################
 # Overrides the dhcp network, transit gateway creation from a 
 # PowerVS perspective.

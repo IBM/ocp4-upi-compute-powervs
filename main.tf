@@ -142,6 +142,7 @@ module "support" {
   kubeconfig_file          = var.kubeconfig_file
   cidrs                    = module.transit_gateway.mac_vpc_subnets
   powervs_machine_cidr     = var.powervs_machine_cidr
+  keep_dns                 = var.keep_dns
 }
 
 module "worker" {

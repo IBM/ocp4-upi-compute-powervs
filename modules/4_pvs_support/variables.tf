@@ -16,3 +16,4 @@ variable "openshift_pass" {}
 variable "kubeconfig_file" {}
 variable "cidrs" {}
 variable "powervs_machine_cidr" {}
+variable "keep_dns" {}
