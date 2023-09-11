@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-output "bastion_private_ip" {
+output "bastion_private_mac" {
   depends_on = [module.bastion]
-  value      = module.bastion.bastion_private_ip
+  value      = module.bastion.bastion_private_mac
 }
 
 output "bastion_public_ip" {

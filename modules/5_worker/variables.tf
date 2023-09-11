@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-variable "ignition_ip" {}
+variable "ignition_mac" {}
 variable "key_name" {}
 variable "name_prefix" {}
 variable "powervs_service_instance_id" {}

@@ -248,16 +248,3 @@ EOF
     ]
   }
 }
-
-### Grab the Bastion Data
-data "ibm_pi_dhcp" "dhcp_server" {
-  depends_on           = [null_resource.manage_packages, ibm_pi_instance.bastion]
-  pi_cloud_instance_id = var.powervs_service_instance_id
-  pi_dhcp_id           = var.dhcp_service.dhcp_id
-}
-
-locals {
-  # Dev Note: Leases should return the IP, however, they are returning empty in some data centers and existing workspaces.
-  tmp_bastion_private_ip = [for lease in data.ibm_pi_dhcp.dhcp_server.leases : lease if lease.instance_mac == ibm_pi_instance.bastion[0].pi_network[1].mac_address]
-  bastion_private_ip     = length(local.tmp_bastion_private_ip) != 0 ? local.tmp_bastion_private_ip : data.ibm_pi_instance_ip.bastion_public_ip.*.ip
-}

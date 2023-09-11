@@ -36,12 +36,12 @@
     delay: 40
     when: powervs_worker_count|int > 0
 
-  - name: Wait for 20 seconds before checking Ready state for Powervs worker node/s
+  - name: Wait for 20 seconds before checking Ready state for PowerVS worker node/s
     pause:
       seconds: 20
 
   # Run approve command again and wait till we have all powervs worker/s with Ready status. 'xargs -r ' is used to ignore empty stdin.
-  - name: Check Ready state for Powervs Worker Node
+  - name: Check Ready state for PowerVS Worker Node
     shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name' | xargs -r oc adm certificate approve && oc get nodes -l kubernetes.io/arch=ppc64le | grep -w worker | grep -w Ready | wc -l"
     register: ready_count_result
     until: ready_count_result.stdout.find(powervs_worker_count) != -1

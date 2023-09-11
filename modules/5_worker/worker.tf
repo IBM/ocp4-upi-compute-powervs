@@ -3,6 +3,17 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
+### Grab the Bastion Data
+data "ibm_pi_dhcp" "dhcp_server" {
+  pi_cloud_instance_id = var.powervs_service_instance_id
+  pi_dhcp_id           = var.powervs_dhcp_network_id
+}
+
+locals {
+  # Dev Note: Leases should return the IP, however, they are returning empty in some data centers and existing workspaces.
+  bastion_private_ip = [for lease in data.ibm_pi_dhcp.dhcp_server.leases : lease if lease.instance_mac == var.ignition_mac]
+}
+
 # Modeled off the OpenShift Installer work for IPI PowerVS
 # https://github.com/openshift/installer/blob/master/data/data/powervs/bootstrap/vm/main.tf#L41
 # https://github.com/openshift/installer/blob/master/data/data/powervs/cluster/master/vm/main.tf
@@ -30,7 +41,7 @@ resource "ibm_pi_instance" "worker" {
     templatefile(
       "${path.cwd}/modules/5_worker/templates/worker.ign",
       {
-        ignition_ip : var.ignition_ip,
+        ignition_ip : local.bastion_private_ip,
         name : base64encode("${var.name_prefix}-worker-${count.index}"),
   }))
 }
