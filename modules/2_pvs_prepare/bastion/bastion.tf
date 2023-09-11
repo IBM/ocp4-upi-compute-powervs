@@ -180,7 +180,7 @@ resource "null_resource" "enable_repos" {
 # Additional repo for installing ansible package
 if ( [[ -z "${var.rhel_subscription_username}" ]] || [[ "${var.rhel_subscription_username}" == "<subscription-id>" ]] ) && [[ -z "${var.rhel_subscription_org}" ]]
 then
-  timeout 300 bash -c -- 'until dig mirrorlist.centos.org; do sleep 30; printf ".";done'
+  timeout 300 bash -c -- 'until ping -c 1 mirrorlist.centos.org; do sleep 30; printf ".";done'
   sudo yum install -y epel-release
 else
   os_ver=$(cat /etc/os-release | egrep "^VERSION_ID=" | awk -F'"' '{print $2}')
@@ -191,7 +191,7 @@ else
       sudo subscription-manager repos --enable ${var.ansible_repo_name}
     fi
   else
-    timeout 300 bash -c -- 'until dig dl.fedoraproject.org; do sleep 30; printf ".";done'
+    timeout 300 bash -c -- 'until ping -c 1 dl.fedoraproject.org; do sleep 30; printf ".";done'
     sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
   fi
 fi
@@ -257,7 +257,6 @@ data "ibm_pi_dhcp" "dhcp_server" {
 }
 
 locals {
-
   # Dev Note: Leases should return the IP, however, they are returning empty in some data centers and existing workspaces.
   tmp_bastion_private_ip = [for lease in data.ibm_pi_dhcp.dhcp_server.leases : lease if lease.instance_mac == ibm_pi_instance.bastion[0].pi_network[1].mac_address]
   bastion_private_ip     = length(local.tmp_bastion_private_ip) != 0 ? local.tmp_bastion_private_ip : data.ibm_pi_instance_ip.bastion_public_ip.*.ip
