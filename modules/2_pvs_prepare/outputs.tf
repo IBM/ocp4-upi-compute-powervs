@@ -32,3 +32,7 @@ output "rhcos_image_id" {
   depends_on = [module.images]
   value      = module.images.rhcos_image_id
 }
+
+output "powervs_dhcp_service" {
+  value = var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_service : module.network[0].powervs_dhcp_service
+}

@@ -161,7 +161,8 @@ module "worker" {
   rhcos_image_id              = module.pvs_prepare.rhcos_image_id
   system_type                 = var.system_type
   worker                      = var.worker
-  ignition_mac                = module.pvs_prepare.bastion_private_mac[0]
+  ignition_mac                = module.pvs_prepare.bastion_private_mac
+  powervs_dhcp_service        = module.pvs_prepare.powervs_dhcp_service
   # Eventually, this should be a bit more dynamic and include MachineConfigPool
 }
 
