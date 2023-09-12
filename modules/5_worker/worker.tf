@@ -20,6 +20,8 @@ locals {
 resource "ibm_pi_instance" "worker" {
   count = var.worker["count"]
 
+  depends_on = [data.ibm_pi_dhcp.dhcp_server]
+
   pi_cloud_instance_id = var.powervs_service_instance_id
   pi_instance_name     = "${var.name_prefix}-worker-${count.index}"
 
@@ -41,7 +43,7 @@ resource "ibm_pi_instance" "worker" {
     templatefile(
       "${path.cwd}/modules/5_worker/templates/worker.ign",
       {
-        ignition_ip : local.bastion_private_ip,
+        ignition_ip : "${local.bastion_private_ip}",
         name : base64encode("${var.name_prefix}-worker-${count.index}"),
   }))
 }

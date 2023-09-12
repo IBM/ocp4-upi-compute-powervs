@@ -20,9 +20,11 @@ resource "ibm_pi_instance" "bastion" {
   pi_network {
     network_id = var.bastion_public_network_id
   }
-  pi_network {
-    network_id = var.powervs_dhcp_network_id
-  }
+
+  # Dev Note: this dhcp network ip does not register with the dhcp server.
+  # pi_network {
+  #   network_id = var.powervs_dhcp_network_id
+  # }
 }
 
 # The PowerVS instance may take a few minutes to start (per the IPI work)
@@ -40,9 +42,19 @@ data "ibm_pi_instance_ip" "bastion_public_ip" {
   pi_cloud_instance_id = var.powervs_service_instance_id
 }
 
+resource "ibm_pi_network_port_attach" "bastion_dhcp_net" {
+  depends_on                  = [ibm_pi_instance.bastion]
+  pi_cloud_instance_id        = var.powervs_service_instance_id
+  pi_instance_id              = ibm_pi_instance.bastion.instance_id
+  pi_network_name             = var.powervs_dhcp_network_name
+  pi_network_port_description = "dhcp network port"
+}
+
 #### Configure the Bastion
 resource "null_resource" "bastion_init" {
   count = 1
+
+  depends_on = [ibm_pi_network_port_attach.bastion_dhcp_net]
 
   connection {
     type        = "ssh"
