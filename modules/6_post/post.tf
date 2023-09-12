@@ -99,7 +99,7 @@ EOF
 
 #command to run ansible playbook on Bastion
 resource "null_resource" "post_ansible" {
-  depends_on = [null_resource.remove_workers]
+  depends_on = [null_resource.remove_workers, null_resource.post_setup]
   connection {
     type        = "ssh"
     user        = "root"

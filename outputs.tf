@@ -28,3 +28,7 @@ output "bastion_private_ip" {
 output "bastion_public_ip" {
   value = join(", ", module.pvs_prepare.bastion_public_ip)
 }
+
+output "bastion_private_ip_mac" {
+  value = module.pvs_prepare.bastion_private_mac
+}

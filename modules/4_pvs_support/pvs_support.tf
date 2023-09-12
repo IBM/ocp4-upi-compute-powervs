@@ -204,7 +204,7 @@ EOF
 }
 
 resource "null_resource" "keep_imagepruner_on_vpc" {
-  depends_on = [null_resource.keep_dns_on_vpc]
+  depends_on = [null_resource.keep_dns_on_vpc, null_resource.adjust_mtu]
   connection {
     type        = "ssh"
     user        = var.rhel_username

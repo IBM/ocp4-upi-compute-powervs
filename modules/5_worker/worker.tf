@@ -9,9 +9,15 @@ data "ibm_pi_dhcp" "dhcp_server" {
   pi_dhcp_id           = var.powervs_dhcp_service.dhcp_id
 }
 
+data "ibm_pi_instance" "bastion_instance" {
+  depends_on = [ data.ibm_pi_dhcp.dhcp_server ]
+  pi_instance_name     = var.powervs_bastion_name
+  pi_cloud_instance_id = var.powervs_service_instance_id
+}
+
 locals {
   # Dev Note: Leases should return the IP, however, they are returning empty in some data centers and existing workspaces.
-  bastion_private_ip = [for lease in data.ibm_pi_dhcp.dhcp_server.leases : lease if lease.instance_mac == var.ignition_mac]
+  bastion_private_ip = [for lease in data.ibm_pi_dhcp.dhcp_server.leases : lease if lease.instance_mac == data.ibm_pi_instance.bastion_instance.networks[0].macaddress]
 }
 
 # Modeled off the OpenShift Installer work for IPI PowerVS
