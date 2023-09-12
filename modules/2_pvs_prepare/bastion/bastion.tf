@@ -249,10 +249,17 @@ EOF
   }
 
   # Dev Note: rsct status is reported back to the PowerVS.
+  # systemctl status srcmstr --no-pager
+  # systemctl restart srcmstr
+  # systemctl status ctrmc --no-pager
+  # systemctl restart ctrmc
+  # lssrc -s ctrmc
+  # /opt/rsct/bin/rmcdomainstatus -s ctrmc
+  # lssrc -a
   provisioner "remote-exec" {
     inline = [<<EOF
-systemctl status srcmstr --no-pager
-systemctl restart srcmstr
+lssrc -a
+rmcdomainstatus -s ctrmc -a IP > /var/log/rsct.status && [ -s /var/log/rsct.status ]
 EOF
     ]
   }
@@ -268,7 +275,6 @@ resource "ibm_pi_network_port_attach" "bastion_dhcp_net" {
 
 resource "null_resource" "bastion_fix_up_networks" {
   count = 1
-
   depends_on = [ibm_pi_network_port_attach.bastion_dhcp_net]
 
   connection {
@@ -293,14 +299,15 @@ resource "null_resource" "bastion_fix_up_networks" {
   provisioner "remote-exec" {
     inline = [<<EOF
 # turn off rx and set mtu to var.private_network_mtu for all interfaces to improve network performance
-cidrs=("${var.bastion_public_network_cidr}" "${var.powervs_dhcp_network_cidr}")
-for cidr in "$${cidrs[@]}"; do
+for cidr in "$${cidrs[@]}"
+do
   envs=($(ip r | grep "$cidr dev" | awk '{print $3}'))
-  for env in "$${envs[@]}"; do
-    con_name=$(sudo nmcli -t -f NAME connection show | grep $env)
-    sudo nmcli connection modify "$con_name" ethtool.feature-rx off
-    sudo nmcli connection modify "$con_name" ethernet.mtu ${var.private_network_mtu}
-    sudo nmcli connection up "$con_name"
+  for env in "$${envs[@]}"
+  do
+    dev_name=$(sudo nmcli -t -f DEVICE connection show | grep $env)
+    sudo nmcli device modify "$dev_name" ethtool.feature-rx off
+    sudo nmcli device modify "$dev_name" ethernet.mtu ${var.private_network_mtu}
+    sudo nmcli device up "$dev_name"
   done
 done
 EOF
