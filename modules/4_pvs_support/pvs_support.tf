@@ -21,7 +21,7 @@ locals {
     gateway    = cidrhost(var.powervs_machine_cidr, 1)
   }
 
- cidr_str = split("/", var.powervs_machine_cidr)[0]
+  cidr_str = split("/", var.powervs_machine_cidr)[0]
 }
 
 resource "null_resource" "kubeconfig" {

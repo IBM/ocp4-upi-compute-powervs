@@ -273,12 +273,12 @@ resource "ibm_pi_network_port_attach" "bastion_dhcp_net" {
   pi_network_port_description = "dhcp network port"
 }
 
-locals { 
+locals {
   cidr = split("/", var.powervs_dhcp_network_cidr)[0]
 }
 
 resource "null_resource" "bastion_fix_up_networks" {
-  count = 1
+  count      = 1
   depends_on = [ibm_pi_network_port_attach.bastion_dhcp_net]
 
   connection {
