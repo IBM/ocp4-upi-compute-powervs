@@ -42,19 +42,10 @@ data "ibm_pi_instance_ip" "bastion_public_ip" {
   pi_cloud_instance_id = var.powervs_service_instance_id
 }
 
-resource "ibm_pi_network_port_attach" "bastion_dhcp_net" {
-  depends_on                  = [ibm_pi_instance.bastion]
-  pi_cloud_instance_id        = var.powervs_service_instance_id
-  pi_instance_id              = ibm_pi_instance.bastion.instance_id
-  pi_network_name             = var.powervs_dhcp_network_name
-  pi_network_port_description = "dhcp network port"
-}
-
-#### Configure the Bastion
-resource "null_resource" "bastion_init" {
+resource "null_resource" "bastion_nop" {
   count = 1
 
-  depends_on = [ibm_pi_network_port_attach.bastion_dhcp_net]
+  depends_on = [data.ibm_pi_instance_ip.bastion_public_ip]
 
   connection {
     type        = "ssh"
@@ -69,17 +60,35 @@ resource "null_resource" "bastion_init" {
       "whoami"
     ]
   }
+}
+
+#### Configure the Bastion
+resource "null_resource" "bastion_init" {
+  count = 1
+
+  depends_on = [null_resource.bastion_nop]
+
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
+
   provisioner "file" {
     content     = file(var.private_key_file)
     destination = ".ssh/id_rsa"
   }
+
   provisioner "file" {
     content     = var.public_key
     destination = ".ssh/id_rsa.pub"
   }
+
   provisioner "remote-exec" {
     inline = [<<EOF
-
 sudo chmod 600 .ssh/id_rsa*
 sudo sed -i.bak -e 's/^ - set_hostname/# - set_hostname/' -e 's/^ - update_hostname/# - update_hostname/' /etc/cloud/cloud.cfg
 sudo hostnamectl set-hostname --static ${lower(var.name_prefix)}-bastion-${count.index}.${var.cluster_domain}
@@ -89,18 +98,6 @@ echo 'vm.max_map_count = 262144' | sudo tee --append /etc/sysctl.conf > /dev/nul
 
 # Set SMT to user specified value; Should not fail for invalid values.
 sudo ppc64_cpu --smt=${var.rhel_smt} | true
-
-# turn off rx and set mtu to var.private_network_mtu for all interfaces to improve network performance
-cidrs=("${var.bastion_public_network_cidr}" "${var.powervs_dhcp_network_cidr}")
-for cidr in "$${cidrs[@]}"; do
-  envs=($(ip r | grep "$cidr dev" | awk '{print $3}'))
-  for env in "$${envs[@]}"; do
-    con_name=$(sudo nmcli -t -f NAME connection show | grep $env)
-    sudo nmcli connection modify "$con_name" ethtool.feature-rx off
-    sudo nmcli connection modify "$con_name" ethernet.mtu ${var.private_network_mtu}
-    sudo nmcli connection up "$con_name"
-  done
-done
 EOF
     ]
   }
@@ -235,15 +232,6 @@ sudo yum install -y wget jq git net-tools vim python3 tar \
 EOF
     ]
   }
-  provisioner "remote-exec" {
-    inline = [
-      "sudo systemctl unmask NetworkManager",
-      "sudo systemctl start NetworkManager",
-      "for i in $(nmcli device | grep unmanaged | awk '{print $1}'); do echo NM_CONTROLLED=yes | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-$i; done",
-      "sudo systemctl restart NetworkManager",
-      "sudo systemctl enable NetworkManager"
-    ]
-  }
 
   provisioner "remote-exec" {
     inline = [
@@ -257,6 +245,65 @@ EOF
   provisioner "remote-exec" {
     inline = [
       "sudo yum remove cloud-init --noautoremove -y",
+    ]
+  }
+
+  # Dev Note: rsct status is reported back to the PowerVS.
+  provisioner "remote-exec" {
+    inline = [<<EOF
+systemctl status srcmstr --no-pager
+systemctl restart srcmstr
+EOF
+    ]
+  }
+}
+
+resource "ibm_pi_network_port_attach" "bastion_dhcp_net" {
+  depends_on                  = [null_resource.manage_packages]
+  pi_cloud_instance_id        = var.powervs_service_instance_id
+  pi_instance_id              = ibm_pi_instance.bastion[0].instance_id
+  pi_network_name             = var.powervs_dhcp_network_name
+  pi_network_port_description = "dhcp network port"
+}
+
+resource "null_resource" "bastion_fix_up_networks" {
+  count = 1
+
+  depends_on = [ibm_pi_network_port_attach.bastion_dhcp_net]
+
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo systemctl unmask NetworkManager",
+      "sudo systemctl start NetworkManager",
+      "for i in $(nmcli device | grep unmanaged | awk '{print $1}'); do echo NM_CONTROLLED=yes | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-$i; done",
+      "sudo systemctl restart NetworkManager",
+      "sudo systemctl enable NetworkManager"
+    ]
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+# turn off rx and set mtu to var.private_network_mtu for all interfaces to improve network performance
+cidrs=("${var.bastion_public_network_cidr}" "${var.powervs_dhcp_network_cidr}")
+for cidr in "$${cidrs[@]}"; do
+  envs=($(ip r | grep "$cidr dev" | awk '{print $3}'))
+  for env in "$${envs[@]}"; do
+    con_name=$(sudo nmcli -t -f NAME connection show | grep $env)
+    sudo nmcli connection modify "$con_name" ethtool.feature-rx off
+    sudo nmcli connection modify "$con_name" ethernet.mtu ${var.private_network_mtu}
+    sudo nmcli connection up "$con_name"
+  done
+done
+EOF
     ]
   }
 }
