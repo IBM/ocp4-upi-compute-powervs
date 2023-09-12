@@ -20,6 +20,8 @@ locals {
     cidrs_ipv4 = var.cidrs
     gateway    = cidrhost(var.powervs_machine_cidr, 1)
   }
+
+ cidr_str = split("/", var.powervs_machine_cidr)[0]
 }
 
 resource "null_resource" "kubeconfig" {
@@ -87,8 +89,20 @@ resource "null_resource" "config" {
     destination = "/etc/sysconfig/network-scripts/route-env3"
   }
 
+  # Dev Note: need to move the route script to the right location
   provisioner "remote-exec" {
     inline = [<<EOF
+cidrs=("${local.cidr_str}")
+for cidr in "$${cidrs[@]}"
+do
+  envs=($(ip r | grep "$cidr dev" | awk '{print $3}'))
+  for env in "$${envs[@]}"
+  do
+    dev_name=$(sudo nmcli -t -f DEVICE connection show | grep $env)
+    mv /etc/sysconfig/network-scripts/route-env3 /etc/sysconfig/network-scripts/route-$${dev_name}
+  done
+done
+
 ifup env3
 echo 'Running ocp4-upi-compute-powervs playbook...'
 cd ocp4-upi-compute-powervs/support
@@ -204,7 +218,7 @@ resource "null_resource" "keep_imagepruner_on_vpc" {
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
-oc patch imagepruner/cluster -p '{ "spec" : {"nodeSelector": {"kubernetes.io/arch" : "amd64"}}}' --type merge
+oc patch imagepruner/cluster -p '{ "spec" : {"nodeSelector": {"kubernetes.io/arch" : "amd64"}}}' --type merge -v=1
 EOF
     ]
   }

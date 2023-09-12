@@ -273,6 +273,10 @@ resource "ibm_pi_network_port_attach" "bastion_dhcp_net" {
   pi_network_port_description = "dhcp network port"
 }
 
+locals { 
+  cidr = split("/", var.powervs_dhcp_network_cidr)[0]
+}
+
 resource "null_resource" "bastion_fix_up_networks" {
   count = 1
   depends_on = [ibm_pi_network_port_attach.bastion_dhcp_net]
@@ -299,6 +303,7 @@ resource "null_resource" "bastion_fix_up_networks" {
   provisioner "remote-exec" {
     inline = [<<EOF
 # turn off rx and set mtu to var.private_network_mtu for all interfaces to improve network performance
+cidrs=("${var.bastion_public_network_cidr}" "${local.cidr}")
 for cidr in "$${cidrs[@]}"
 do
   envs=($(ip r | grep "$cidr dev" | awk '{print $3}'))
