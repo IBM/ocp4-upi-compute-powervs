@@ -4,6 +4,7 @@
 ################################################################
 
 variable "ignition_mac" {}
+variable "ignition_ip" {}
 variable "key_name" {}
 variable "name_prefix" {}
 variable "powervs_service_instance_id" {}
@@ -14,6 +15,10 @@ variable "powervs_bastion_name" {}
 variable "processor_type" {}
 variable "rhcos_image_id" {}
 variable "system_type" {}
+
+variable "private_key_file" {}
+variable "ssh_agent" {}
+variable "bastion_public_ip" {}
 
 variable "worker" {
   type = object({ count = number, memory = string, processors = string })

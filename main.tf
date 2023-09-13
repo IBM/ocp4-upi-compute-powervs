@@ -163,8 +163,13 @@ module "worker" {
   system_type                 = var.system_type
   worker                      = var.worker
   ignition_mac                = module.pvs_prepare.bastion_private_mac
+  ignition_ip                 = module.worker.bastion_private_ip
   powervs_dhcp_service        = module.pvs_prepare.powervs_dhcp_service
   # Eventually, this should be a bit more dynamic and include MachineConfigPool
+
+  private_key_file         = var.private_key_file
+  ssh_agent                = var.ssh_agent
+  bastion_public_ip        = module.pvs_prepare.bastion_public_ip[0]
 }
 
 module "post" {
