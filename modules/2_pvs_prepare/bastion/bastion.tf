@@ -37,7 +37,7 @@ data "ibm_pi_instance_ip" "bastion_public_ip" {
 }
 
 resource "null_resource" "bastion_nop" {
-  count = 1
+  count      = 1
   depends_on = [data.ibm_pi_instance_ip.bastion_public_ip]
 
   connection {

@@ -13,5 +13,5 @@ output "bastion_public_ip" {
 }
 
 output "powervs_bastion_name" {
-  value      = ibm_pi_instance.bastion[0].pi_instance_name
+  value = ibm_pi_instance.bastion[0].pi_instance_name
 }

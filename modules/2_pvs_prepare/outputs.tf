@@ -38,5 +38,5 @@ output "powervs_dhcp_service" {
 }
 
 output "powervs_bastion_name" {
-  value      = module.bastion.powervs_bastion_name
+  value = module.bastion.powervs_bastion_name
 }
