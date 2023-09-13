@@ -52,7 +52,7 @@
   - name: Ensure able to fetch project list
     shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get projects"
     register: projects_list
-    until: projects_list.stdout.find("default") != -1
+    until: projects_list.stdout.find("openshift-kube-apiserver") != -1
     retries: 20
     delay: 30
 
@@ -74,10 +74,10 @@
           name: "{{ rmc_name }}"
           namespace: "{{ project_name }}"
 
-  - name: Add privileged scc to openshift-powervm-rmc serviceaccount
+  - name: Add privileged scc to powervm-rmc serviceaccount
     shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc adm policy add-scc-to-user -z {{ rmc_name }} privileged -n {{ project_name }}"
 
-  - name: Deploy openshift-powervm-rmc DaemonSet
+  - name: Deploy powervm-rmc DaemonSet
     kubernetes.core.k8s:
       state: present
       proxy: "http://{{ nfs_server }}:3128"
