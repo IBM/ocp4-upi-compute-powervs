@@ -3,7 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
+# Dev Note: nop is a s
 resource "null_resource" "nop" {
+  triggers = {
+    bastion_private_ip_mac = var.ignition_mac
+  }
+
   connection {
     type        = "ssh"
     user        = "root"
@@ -14,7 +19,14 @@ resource "null_resource" "nop" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-echo "NOP"
+echo "Waiting on DHCP Lease to be registered"
+sleep 15
+echo "Done waiting on DHCP Lease to be registered"
+echo ""
+echo "IP Information"
+ip a
+
+echo "Looking for mac: ${var.ignition_mac}"
 EOF
     ]
   }
@@ -36,7 +48,7 @@ data "ibm_pi_instance" "bastion_instance" {
 locals {
   # Dev Note: Leases should return the IP, however, they are returning empty in some data centers and existing workspaces.
   bastion_private_ip = [for lease in data.ibm_pi_dhcp.refresh_dhcp_server.leases : lease if lease.instance_mac == data.ibm_pi_instance.bastion_instance.networks[0].macaddress]
-  ignition_ip        = length(local.bastion_private_ip) == 0 ? var.ignition_ip : local.bastion_private_ip
+  ignition_ip        = length(var.ignition_ip) > 0 ? var.ignition_ip[0].instance_ip : local.bastion_private_ip[0].instance_ip
 }
 
 # Modeled off the OpenShift Installer work for IPI PowerVS
@@ -45,7 +57,7 @@ locals {
 resource "ibm_pi_instance" "worker" {
   count = var.worker["count"]
 
-  depends_on = [data.ibm_pi_dhcp.refresh_dhcp_server]
+  depends_on = [data.ibm_pi_dhcp.refresh_dhcp_server, null_resource.nop]
 
   pi_cloud_instance_id = var.powervs_service_instance_id
   pi_instance_name     = "${var.name_prefix}-worker-${count.index}"
