@@ -242,17 +242,15 @@ EOF
   }
 
   # Dev Note: rsct status is reported back to the PowerVS.
-  # systemctl status srcmstr --no-pager
-  # systemctl restart srcmstr
-  # systemctl status ctrmc --no-pager
-  # systemctl restart ctrmc
-  # lssrc -s ctrmc
-  # /opt/rsct/bin/rmcdomainstatus -s ctrmc
-  # lssrc -a
+  # see https://github.com/canonical/cloud-init/blob/349ca1e10e70d305d018102d7ee08e7826220e43/cloudinit/config/cc_reset_rmc.py#L130
   provisioner "remote-exec" {
     inline = [<<EOF
+/opt/rsct/install/bin/rmcctrl -z
+/opt/rsct/install/bin/recfgct
+cat /etc/ct_node_id
 lssrc -a
 rmcdomainstatus -s ctrmc -a IP > /var/log/rsct.status && [ -s /var/log/rsct.status ]
+
 EOF
     ]
   }
