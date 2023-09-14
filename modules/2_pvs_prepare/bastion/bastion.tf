@@ -250,7 +250,7 @@ EOF
 cat /etc/ct_node_id
 lssrc -a
 rmcdomainstatus -s ctrmc -a IP > /var/log/rsct.status && [ -s /var/log/rsct.status ]
-
+cat /etc/ct_node_id
 EOF
     ]
   }
