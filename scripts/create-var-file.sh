@@ -180,7 +180,7 @@ rhcos_import_image_region_override = "us-east"
 
 processor_type = "shared"
 system_type    = "e980"
-bastion_health_status = "WARNING"
+bastion_health_status = "OK"
 bastion               = { memory = "16", processors = "1", "count" = 1 }
 worker                = { memory = "16", processors = "1", "count" = ${EXPECTED_NODES} }
 override_region_check=true
