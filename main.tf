@@ -63,6 +63,7 @@ module "vpc_support" {
   powervs_machine_cidr          = var.powervs_machine_cidr
   vpc_supp_public_ip            = var.vpc_supp_public_ip
   override_transit_gateway_name = var.override_transit_gateway_name
+  mac_tags                      = var.mac_tags
 }
 
 ### Prepares the PowerVS workspace for Day-2 Workers

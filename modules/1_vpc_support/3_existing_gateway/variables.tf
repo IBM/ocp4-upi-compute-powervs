@@ -6,3 +6,4 @@
 variable "override_transit_gateway_name" {}
 variable "resource_crn" {}
 variable "vpc_name" {}
+variable "mac_tags" {}

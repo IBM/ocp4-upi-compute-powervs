@@ -61,3 +61,4 @@ variable "vpc_supp_public_ip" {
 
 variable "powervs_machine_cidr" {}
 variable "override_transit_gateway_name" {}
+variable "mac_tags" {}

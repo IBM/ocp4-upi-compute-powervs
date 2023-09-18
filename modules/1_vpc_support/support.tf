@@ -61,6 +61,7 @@ module "existing_gateway" {
   override_transit_gateway_name = var.override_transit_gateway_name
   resource_crn                  = data.ibm_is_vpc.vpc.resource_crn
   vpc_name                      = var.vpc_name
+  mac_tags                      = var.mac_tags
 }
 
 module "transit_gateway" {
@@ -75,6 +76,7 @@ module "transit_gateway" {
   vpc_name       = var.vpc_name
   vpc_region     = var.vpc_region
   resource_group = data.ibm_is_vpc.vpc.resource_group
+  mac_tags       = var.mac_tags
 }
 
 module "vsi" {

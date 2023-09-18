@@ -496,6 +496,12 @@ variable "cicd" {
   default     = false
 }
 
+variable "mac_tags" {
+  type        = list(string)
+  description = "Tags to mac resources"
+  default     = []
+}
+
 variable "keep_dns" {
   type        = bool
   description = "Moves the dns pods to the Intel nodes"

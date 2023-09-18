@@ -21,3 +21,8 @@ resource "ibm_tg_connection" "vpc_tg_connection" {
   name         = "${var.vpc_name}-vpc-conn"
   network_id   = var.resource_crn
 }
+
+resource "ibm_resource_tag" "tag" {
+  resource_id = ibm_tg_gateway.mac_tg_gw.crn
+  tags        = var.mac_tags
+}
