@@ -22,7 +22,7 @@ output "vpc_check_key" {
 }
 
 output "bastion_private_interface" {
-  value = module.worker.bastion_private_ip
+  value       = module.worker.bastion_private_ip
   description = "The interface mac and ip details"
 }
 
