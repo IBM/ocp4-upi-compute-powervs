@@ -524,3 +524,9 @@ variable "override_network_name" {
   description = "overrides network creation for a specific dhcp network"
   default     = ""
 }
+
+variable "use_fixed_network" {
+  type        = bool
+  description = "Switches to using a PowerVS `vlan` instead of `dhcp-vlan`"
+  default     = false
+}

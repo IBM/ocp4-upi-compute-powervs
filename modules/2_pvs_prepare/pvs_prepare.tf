@@ -32,7 +32,7 @@ module "keys" {
 }
 
 module "existing_network" {
-  count = var.override_network_name == "" ? 0 : 1
+  count = var.override_network_name == "" && !var.use_fixed_network ? 0 : 1
   providers = {
     ibm = ibm
   }
@@ -44,7 +44,7 @@ module "existing_network" {
 }
 
 module "network" {
-  count = var.override_network_name == "" ? 1 : 0
+  count = var.override_network_name == "" && !var.use_fixed_network ? 1 : 0
   providers = {
     ibm = ibm
   }
@@ -56,6 +56,20 @@ module "network" {
   vpc_support_server_ip       = var.vpc_support_server_ip
   enable_snat                 = var.enable_snat
   cluster_id                  = var.cluster_id
+}
+
+module "fixed_network" {
+  count = var.use_fixed_network ? 1 : 0
+  providers = {
+    ibm = ibm
+  }
+  source = "./fixed_network"
+
+  powervs_service_instance_id = var.powervs_service_instance_id
+  cluster_id                  = var.cluster_id
+  name_prefix                 = var.name_prefix
+  powervs_machine_cidr        = var.powervs_machine_cidr
+  vpc_support_server_ip       = var.vpc_support_server_ip
 }
 
 module "bastion" {
