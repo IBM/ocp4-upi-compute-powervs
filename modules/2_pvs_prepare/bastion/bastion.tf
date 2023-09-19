@@ -35,7 +35,7 @@ resource "time_sleep" "wait_bastion" {
 
 resource "ibm_pi_instance_action" "restart_bastion" {
   depends_on       = [time_sleep.wait_bastion]
-  pi_cloud_instance_id  = var.bastion_public_network_name
+  pi_cloud_instance_id  = var.powervs_service_instance_id
   pi_instance_id        = ibm_pi_instance.bastion[0].instance_id
   pi_action             = "hard-reboot"
 }
