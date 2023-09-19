@@ -255,21 +255,21 @@ EOF
   }
 }
 
-resource "ibm_pi_network_port_attach" "bastion_dhcp_net" {
+resource "ibm_pi_network_port_attach" "bastion_priv_net" {
   depends_on                  = [null_resource.manage_packages]
   pi_cloud_instance_id        = var.powervs_service_instance_id
   pi_instance_id              = ibm_pi_instance.bastion[0].instance_id
-  pi_network_name             = var.powervs_dhcp_network_name
-  pi_network_port_description = "dhcp network port"
+  pi_network_name             = var.powervs_network_name
+  pi_network_port_description = "private network port"
 }
 
 locals {
-  cidr = split("/", var.powervs_dhcp_network_cidr)[0]
+  cidr = split("/", var.powervs_network_cidr)[0]
 }
 
 resource "null_resource" "bastion_fix_up_networks" {
   count      = 1
-  depends_on = [ibm_pi_network_port_attach.bastion_dhcp_net]
+  depends_on = [ibm_pi_network_port_attach.bastion_priv_net]
 
   connection {
     type        = "ssh"

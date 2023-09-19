@@ -76,7 +76,7 @@ module "bastion" {
   providers = {
     ibm = ibm
   }
-  depends_on = [module.images, module.keys, module.network]
+  depends_on = [module.images, module.keys, module.network, module.existing_network, module.fixed_network]
   source     = "./bastion"
 
   powervs_service_instance_id     = var.powervs_service_instance_id
@@ -88,12 +88,12 @@ module "bastion" {
   bastion_image_id                = module.images.bastion_image_id
   bastion_storage_pool            = module.images.bastion_storage_pool
   key_name                        = module.keys.pvs_pubkey_name
-  bastion_public_network_id       = var.override_network_name != "" ? module.existing_network[0].bastion_public_network_id : module.network[0].bastion_public_network_id
-  bastion_public_network_name     = var.override_network_name != "" ? module.existing_network[0].bastion_public_network_name : module.network[0].bastion_public_network_name
-  bastion_public_network_cidr     = var.override_network_name != "" ? module.existing_network[0].bastion_public_network_cidr : module.network[0].bastion_public_network_cidr
-  powervs_dhcp_network_id         = var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_network_id : module.network[0].powervs_dhcp_network_id
-  powervs_dhcp_network_name       = var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_network_name : module.network[0].powervs_dhcp_network_name
-  powervs_dhcp_network_cidr       = var.powervs_machine_cidr
+  bastion_public_network_id       = var.use_fixed_network ? module.fixed_network[0].bastion_public_network_name : var.override_network_name != "" ? module.existing_network[0].bastion_public_network_id : module.network[0].bastion_public_network_id
+  bastion_public_network_name     = var.use_fixed_network ? module.fixed_network[0].bastion_public_network_cidr : var.override_network_name != "" ? module.existing_network[0].bastion_public_network_name : module.network[0].bastion_public_network_name
+  bastion_public_network_cidr     = var.use_fixed_network ? module.fixed_network[0].bastion_public_network_cidr : var.override_network_name != "" ? module.existing_network[0].bastion_public_network_cidr : module.network[0].bastion_public_network_cidr
+  powervs_network_id         = var.use_fixed_network ? module.fixed_network[0].powervs_network_id : var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_network_id : module.network[0].powervs_dhcp_network_id
+  powervs_network_name       = var.use_fixed_network ? module.fixed_network[0].powervs_network_name : var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_network_name : module.network[0].powervs_dhcp_network_name
+  powervs_network_cidr       = var.powervs_machine_cidr
   private_key_file                = var.private_key_file
   public_key                      = module.keys.pvs_pubkey_name
   ssh_agent                       = var.ssh_agent
@@ -107,5 +107,4 @@ module "bastion" {
   rhel_subscription_username      = var.rhel_subscription_username
   rhel_subscription_password      = var.rhel_subscription_password
   rhel_subscription_activationkey = var.rhel_subscription_activationkey
-  dhcp_service                    = var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_service : module.network[0].powervs_dhcp_service
 }

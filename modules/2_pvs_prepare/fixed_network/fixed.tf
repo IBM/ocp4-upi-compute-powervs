@@ -25,7 +25,7 @@ resource "ibm_pi_network" "fixed_network" {
   pi_network_name      = "${var.name_prefix}-${var.cluster_id}-priv-net"
   pi_network_type      = "vlan"
   pi_cidr              = var.powervs_machine_cidr
-  pi_dns               = var.vpc_support_server_ip
+  pi_dns               = [var.vpc_support_server_ip]
   pi_network_jumbo     = true
   # Dev Note: take the pi_gateway default
 }

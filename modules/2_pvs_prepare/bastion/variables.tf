@@ -28,7 +28,6 @@ variable "bastion_storage_pool" {}
 variable "bastion_public_network_id" {}
 variable "bastion_public_network_name" {}
 variable "bastion_public_network_cidr" {}
-variable "powervs_dhcp_network_id" {}
-variable "powervs_dhcp_network_name" {}
-variable "powervs_dhcp_network_cidr" {}
-variable "dhcp_service" {}
+variable "powervs_network_id" {}
+variable "powervs_network_name" {}
+variable "powervs_network_cidr" {}

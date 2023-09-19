@@ -4,7 +4,7 @@
 ################################################################
 
 output "bastion_private_mac" {
-  value = ibm_pi_network_port_attach.bastion_dhcp_net.macaddress
+  value = ibm_pi_network_port_attach.bastion_priv_net.macaddress
 }
 
 output "bastion_public_ip" {
