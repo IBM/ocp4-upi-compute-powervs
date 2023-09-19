@@ -32,7 +32,7 @@ module "keys" {
 }
 
 module "existing_network" {
-  count = var.override_network_name == "" && !var.use_fixed_network ? 0 : 1
+  count = var.override_network_name == "" ? 0 : var.use_fixed_network ? 0 : 1
   providers = {
     ibm = ibm
   }
