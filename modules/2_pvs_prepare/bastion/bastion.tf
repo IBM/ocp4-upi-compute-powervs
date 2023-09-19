@@ -27,6 +27,19 @@ resource "ibm_pi_instance" "bastion" {
   # }
 }
 
+# Dev Note: injects a delay before a hard-reboot
+resource "time_sleep" "wait_bastion" {
+  depends_on       = [ibm_pi_instance.bastion]
+  create_duration  = "120s"
+}
+
+resource "ibm_pi_instance_action" "restart_bastion" {
+  depends_on       = [time_sleep.wait_bastion]
+  pi_cloud_instance_id  = var.bastion_public_network_name
+  pi_instance_id        = ibm_pi_instance.bastion[0].instance_id
+  pi_action             = "hard-reboot"
+}
+
 data "ibm_pi_instance_ip" "bastion_public_ip" {
   count      = var.use_fixed_network ? 0 : 1
   depends_on = [ibm_pi_instance.bastion]
@@ -42,7 +55,7 @@ locals {
 
 resource "null_resource" "bastion_nop" {
   count      = 1
-  depends_on = [data.ibm_pi_instance_ip.bastion_public_ip]
+  depends_on = [data.ibm_pi_instance_ip.bastion_public_ip, time_sleep.wait_bastion, ibm_pi_instance_action.restart_bastion]
 
   connection {
     type        = "ssh"
@@ -278,7 +291,7 @@ resource "null_resource" "bastion_fix_up_networks" {
   connection {
     type        = "ssh"
     user        = var.rhel_username
-    host        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
+    host        = local.ext_ip
     private_key = file(var.private_key_file)
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"
