@@ -40,7 +40,7 @@ resource "time_sleep" "wait_cc" {
 
 # Attaches it back to the network
 resource "ibm_pi_cloud_connection_network_attach" "add_cc_to_priv_net" {
-  depends_on       = [ibm_pi_cloud_connection.new_cloud_connection, time_sleep.wait_cc]
+  depends_on             = [ibm_pi_cloud_connection.new_cloud_connection, time_sleep.wait_cc]
   pi_cloud_instance_id   = var.powervs_service_instance_id
   pi_cloud_connection_id = ibm_pi_cloud_connection.new_cloud_connection.cloud_connection_id
   pi_network_id          = ibm_pi_network.fixed_network.network_id

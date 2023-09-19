@@ -91,9 +91,9 @@ module "bastion" {
   bastion_public_network_id       = var.use_fixed_network ? module.fixed_network[0].bastion_public_network_name : var.override_network_name != "" ? module.existing_network[0].bastion_public_network_id : module.network[0].bastion_public_network_id
   bastion_public_network_name     = var.use_fixed_network ? module.fixed_network[0].bastion_public_network_cidr : var.override_network_name != "" ? module.existing_network[0].bastion_public_network_name : module.network[0].bastion_public_network_name
   bastion_public_network_cidr     = var.use_fixed_network ? module.fixed_network[0].bastion_public_network_cidr : var.override_network_name != "" ? module.existing_network[0].bastion_public_network_cidr : module.network[0].bastion_public_network_cidr
-  powervs_network_id         = var.use_fixed_network ? module.fixed_network[0].powervs_network_id : var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_network_id : module.network[0].powervs_dhcp_network_id
-  powervs_network_name       = var.use_fixed_network ? module.fixed_network[0].powervs_network_name : var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_network_name : module.network[0].powervs_dhcp_network_name
-  powervs_network_cidr       = var.powervs_machine_cidr
+  powervs_network_id              = var.use_fixed_network ? module.fixed_network[0].powervs_network_id : var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_network_id : module.network[0].powervs_dhcp_network_id
+  powervs_network_name            = var.use_fixed_network ? module.fixed_network[0].powervs_network_name : var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_network_name : module.network[0].powervs_dhcp_network_name
+  powervs_network_cidr            = var.powervs_machine_cidr
   private_key_file                = var.private_key_file
   public_key                      = module.keys.pvs_pubkey_name
   ssh_agent                       = var.ssh_agent
