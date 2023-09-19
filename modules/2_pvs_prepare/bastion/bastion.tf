@@ -28,12 +28,16 @@ resource "ibm_pi_instance" "bastion" {
 }
 
 data "ibm_pi_instance_ip" "bastion_public_ip" {
-  count      = 1
+  count      = var.use_fixed_network ? 0 : 1
   depends_on = [ibm_pi_instance.bastion]
 
   pi_instance_name     = ibm_pi_instance.bastion[count.index].pi_instance_name
   pi_network_name      = var.bastion_public_network_name
   pi_cloud_instance_id = var.powervs_service_instance_id
+}
+
+locals {
+  ext_ip = var.use_fixed_network ? ibm_pi_instance.bastion[0].pi_network[0].external_ip : data.ibm_pi_instance_ip.bastion_public_ip[0].external_ip
 }
 
 resource "null_resource" "bastion_nop" {
@@ -43,7 +47,7 @@ resource "null_resource" "bastion_nop" {
   connection {
     type        = "ssh"
     user        = var.rhel_username
-    host        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
+    host        = local.ext_ip
     private_key = file(var.private_key_file)
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"
@@ -64,7 +68,7 @@ resource "null_resource" "bastion_init" {
   connection {
     type        = "ssh"
     user        = var.rhel_username
-    host        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
+    host        = local.ext_ip
     private_key = file(var.private_key_file)
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"
@@ -100,7 +104,7 @@ resource "null_resource" "bastion_register" {
   count      = (var.rhel_subscription_username == "" || var.rhel_subscription_username == "<subscription-id>") && var.rhel_subscription_org == "" ? 0 : 1
   depends_on = [null_resource.bastion_init]
   triggers = {
-    external_ip        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
+    external_ip        = local.ext_ip
     rhel_username      = var.rhel_username
     private_key        = file(var.private_key_file)
     ssh_agent          = var.ssh_agent
@@ -170,7 +174,7 @@ resource "null_resource" "enable_repos" {
   connection {
     type        = "ssh"
     user        = var.rhel_username
-    host        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
+    host        = local.ext_ip
     private_key = file(var.private_key_file)
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"
@@ -209,7 +213,7 @@ resource "null_resource" "manage_packages" {
   connection {
     type        = "ssh"
     user        = var.rhel_username
-    host        = data.ibm_pi_instance_ip.bastion_public_ip[count.index].external_ip
+    host        = local.ext_ip
     private_key = file(var.private_key_file)
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"

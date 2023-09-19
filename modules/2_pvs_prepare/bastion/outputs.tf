@@ -9,7 +9,7 @@ output "bastion_private_mac" {
 
 output "bastion_public_ip" {
   depends_on = [null_resource.manage_packages]
-  value      = data.ibm_pi_instance_ip.bastion_public_ip.*.external_ip
+  value      = [local.ext_ip]
 }
 
 output "powervs_bastion_name" {
