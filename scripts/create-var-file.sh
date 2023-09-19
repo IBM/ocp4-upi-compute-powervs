@@ -189,6 +189,7 @@ mac_tags = [ "mac-cicd" ]
 
 #override_network_name="DHCPSERVERmac-dhcp-${VPC_REGION}_Private"
 #override_transit_gateway_name="${OVERRIDE_PREFIX}-tg"
+use_fixed_network=true
 EOFXEOF
 }
 
