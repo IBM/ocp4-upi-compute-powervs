@@ -29,15 +29,15 @@ resource "ibm_pi_instance" "bastion" {
 
 # Dev Note: injects a delay before a hard-reboot
 resource "time_sleep" "wait_bastion" {
-  depends_on       = [ibm_pi_instance.bastion]
-  create_duration  = "120s"
+  depends_on      = [ibm_pi_instance.bastion]
+  create_duration = "120s"
 }
 
 resource "ibm_pi_instance_action" "restart_bastion" {
-  depends_on       = [time_sleep.wait_bastion]
-  pi_cloud_instance_id  = var.powervs_service_instance_id
-  pi_instance_id        = ibm_pi_instance.bastion[0].instance_id
-  pi_action             = "hard-reboot"
+  depends_on           = [time_sleep.wait_bastion]
+  pi_cloud_instance_id = var.powervs_service_instance_id
+  pi_instance_id       = ibm_pi_instance.bastion[0].instance_id
+  pi_action            = "hard-reboot"
 }
 
 data "ibm_pi_instance_ip" "bastion_public_ip" {
