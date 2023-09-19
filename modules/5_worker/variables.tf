@@ -15,7 +15,7 @@ variable "powervs_bastion_name" {}
 variable "processor_type" {}
 variable "rhcos_image_id" {}
 variable "system_type" {}
-
+variable "use_fixed_network" {}
 variable "private_key_file" {}
 variable "ssh_agent" {}
 variable "bastion_public_ip" {}

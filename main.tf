@@ -172,6 +172,7 @@ module "worker" {
   private_key_file  = var.private_key_file
   ssh_agent         = var.ssh_agent
   bastion_public_ip = module.pvs_prepare.bastion_public_ip[0]
+  use_fixed_network = var.use_fixed_network
 }
 
 module "post" {
