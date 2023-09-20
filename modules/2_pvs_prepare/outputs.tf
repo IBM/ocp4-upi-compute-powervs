@@ -34,7 +34,7 @@ output "rhcos_image_id" {
 }
 
 output "powervs_dhcp_service" {
-  value = var.use_fixed_network ? {} : var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_service : module.network[0].powervs_dhcp_service
+  value = var.use_fixed_network ? "" : var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_service.dhcp_id : module.network[0].powervs_dhcp_service.dhcp_id
 }
 
 output "powervs_bastion_name" {

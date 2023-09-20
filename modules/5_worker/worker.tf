@@ -37,7 +37,7 @@ data "ibm_pi_dhcp" "refresh_dhcp_server" {
   count                = var.use_fixed_network ? 0 : 1
   depends_on           = [null_resource.nop]
   pi_cloud_instance_id = var.powervs_service_instance_id
-  pi_dhcp_id           = var.powervs_dhcp_service.dhcp_id
+  pi_dhcp_id           = var.powervs_dhcp_service
 }
 
 data "ibm_pi_instance" "bastion_instance" {
