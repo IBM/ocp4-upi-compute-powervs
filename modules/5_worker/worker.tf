@@ -80,7 +80,9 @@ resource "ibm_pi_instance" "worker" {
   pi_key_pair_name = var.key_name
   pi_health_status = "WARNING"
 
-  # docs/development.md describes the worker.ign file
+  ### DEV NOTE to fully support FIXED NETWORK
+  # need a different worker.ign with static ip setting a kernel arg using ignition following this pattern:
+  # ip={{ item.ipaddr }}::{{ static_ip.gateway }}:{{ static_ip.netmask }}:{{ infraID.stdout }}-{{ item.name }}:ens192:off:{{ coredns_vm.ipaddr }}
   pi_user_data = base64encode(
     templatefile(
       "${path.cwd}/modules/5_worker/templates/worker.ign",

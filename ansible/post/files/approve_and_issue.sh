@@ -50,13 +50,13 @@ do
   while [ "$LOCAL_WORKER_SCAN" -lt "$POWER_COUNT" ]
   do
     # username: system:node:mac-674e-worker-0
-    CSR_NAME=$(oc get csr -o json | jq -r '.items[] | select (.spec.username == "'system:node:${POWER_PREFIX}-worker-${ISSUED_WORKERS}'")' | jq -r '.metadata.name')
-    if [ -n "${CSR_NAME}" ]
-    then
+    for CSR_NAME in $(oc get csr -o json | jq -r '.items[] | select (.spec.username == "'system:node:${POWER_PREFIX}-worker-${ISSUED_WORKERS}'")' | jq -r '.metadata.name')
+    do
       # Dev note: will approve more than one matching csr
-      echo "Approving: system:node:${POWER_PREFIX}-worker-${ISSUED_WORKERS}"
+      echo "Approving: ${CSR_NAME} system:node:${POWER_PREFIX}-worker-${ISSUED_WORKERS}"
       echo "${CSR_NAME}" | xargs -r oc adm certificate approve
     fi
+    LOCAL_WORKER_SCAN=$(($LOCAL_WORKER_SCAN + 1))
   done
 
   if [ "${IDX}" -eq "240" ]

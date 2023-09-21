@@ -272,6 +272,20 @@ EOF
   }
 }
 
+### DEV NOTE to fully support FIXED NETWORK
+# 1. Grab the MAC Address for the Bastion Private INterace
+# 2. Search for the right connection 
+# 3. Modify the Settings 
+# nmcli con mod 'Wired connection 1' ipv4.addresses 192.168.200.104/24
+# nmcli con mod 'Wired connection 1' ipv4.gateway 192.168.200.1
+# nmcli con mod 'Wired connection 1' ipv4.dns "10.245.1.19"
+# nmcli con mod 'Wired connection 1' ipv4.method manual
+# nmcli con mod 'Wired connection 1' connection.autoconnect yes
+# ** set mtu
+# nmcli connection up 'Wired connection 1'
+# 4. Add route 
+# ip route add 10.245.1.0/24 via 192.168.200.1 dev env9
+
 resource "ibm_pi_network_port_attach" "bastion_priv_net" {
   depends_on                  = [null_resource.manage_packages]
   pi_cloud_instance_id        = var.powervs_service_instance_id

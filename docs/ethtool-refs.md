@@ -1,9 +1,4 @@
-## Development
-
-
-### the worker.ign file
-
-#### Use of ethtool dispatcher script
+## Use of ethtool dispatcher script
 
 The worker ignition file sets the ethtool settings to disable offloading.
 
