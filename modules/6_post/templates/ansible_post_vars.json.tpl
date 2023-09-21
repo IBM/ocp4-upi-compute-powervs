@@ -12,7 +12,8 @@ node_labels: {
   "beta.kubernetes.io/instance-type": "${system_type}"
 }
 
-powervs_worker_count: "${powervs_worker_count}"
+power_worker_count: "${power_worker_count}"
+power_prefix: "${power_prefix}"
 
 # NFS Storage variables
 nfs_server: "${nfs_server}"

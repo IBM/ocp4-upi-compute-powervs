@@ -6,13 +6,14 @@
 locals {
   ansible_post_path = "/root/ocp4-upi-compute-powervs/post"
   ansible_vars = {
-    region               = var.powervs_region
-    zone                 = var.powervs_zone
-    system_type          = var.system_type
-    nfs_server           = var.nfs_server
-    nfs_path             = var.nfs_path
-    powervs_worker_count = var.worker["count"]
-    cicd                 = var.cicd
+    region             = var.powervs_region
+    zone               = var.powervs_zone
+    system_type        = var.system_type
+    nfs_server         = var.nfs_server
+    nfs_path           = var.nfs_path
+    power_worker_count = var.worker["count"]
+    power_prefix       = var.name_prefix
+    cicd               = var.cicd
   }
 
   nfs_namespace  = "nfs-provisioner"
@@ -32,28 +33,6 @@ resource "null_resource" "post_setup" {
   provisioner "file" {
     source      = "ansible/post"
     destination = "${local.ansible_post_path}/"
-  }
-}
-
-# Dev Note: For CICD, we're spinning until we get the CSRs.
-resource "null_resource" "wait_for_power_nodes" {
-  depends_on = [null_resource.post_setup]
-  count      = var.cicd ? 1 : 0
-  connection {
-    type        = "ssh"
-    user        = "root"
-    private_key = file(var.private_key_file)
-    host        = var.bastion_public_ip[0]
-    agent       = var.ssh_agent
-  }
-
-  provisioner "remote-exec" {
-    inline = [<<EOF
-export HTTPS_PROXY="http://${var.nfs_server}:3128"
-cd ${self.triggers.ansible_post_path}
-bash files/wait_on_power_nodes.sh "${var.nfs_server}" "${var.worker["count"]}"
-EOF
-    ]
   }
 }
 
