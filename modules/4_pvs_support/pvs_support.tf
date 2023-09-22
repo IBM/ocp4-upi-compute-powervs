@@ -9,7 +9,7 @@ locals {
     rhel_username = var.rhel_username
   }
 
-  worker_hosts = flatten([for k, v in var.worker["count"] :
+  worker_hosts = flatten([for k, v in range(var.worker["count"]) :
     [
       for t in range(v) : cidrhost(var.powervs_machine_cidr, 2) + k
     ]
