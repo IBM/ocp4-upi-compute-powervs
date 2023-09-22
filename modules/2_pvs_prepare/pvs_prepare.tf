@@ -108,4 +108,5 @@ module "bastion" {
   rhel_subscription_password      = var.rhel_subscription_password
   rhel_subscription_activationkey = var.rhel_subscription_activationkey
   use_fixed_network               = var.use_fixed_network
+  vpc_support_server_ip           = var.vpc_support_server_ip
 }

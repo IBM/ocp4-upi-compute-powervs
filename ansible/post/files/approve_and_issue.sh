@@ -55,7 +55,7 @@ do
       # Dev note: will approve more than one matching csr
       echo "Approving: ${CSR_NAME} system:node:${POWER_PREFIX}-worker-${ISSUED_WORKERS}"
       echo "${CSR_NAME}" | xargs -r oc adm certificate approve
-    fi
+    done
     LOCAL_WORKER_SCAN=$(($LOCAL_WORKER_SCAN + 1))
   done
 
