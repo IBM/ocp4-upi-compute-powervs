@@ -312,19 +312,24 @@ resource "null_resource" "bastion_fix_up_networks" {
     timeout     = "${var.connection_timeout}m"
   }
 
+  # Identifies the networks, and picks the iface that is on the private networkfor_each
+  # The macaddress is used to identify the private interface and setup with a static ip.
   provisioner "remote-exec" {
     inline = [<<EOF
     DEV_NAME=$(find /sys/class/net -mindepth 1 -maxdepth 1 ! -name lo -printf "%P " -execdir cat {}/address \; | \
       grep ${ibm_pi_network_port_attach.bastion_priv_net.macaddress} | awk '{print $1}')
 
-    nmcli dev mod $${DEV_NAME} ipv4.addresses ${var.powervs_network_cidr} \
-      ipv4.gateway ${local.gw} \
-      ipv4.dns "${var.vpc_support_server_ip}" \
-      ipv4.method manual \
-      connection.autoconnect yes \
-      802-3-ethernet.mtu 9000
+    if [[ "${var.use_fixed_network}" == "true" ]]
+    then
+      nmcli dev mod $${DEV_NAME} ipv4.addresses ${var.powervs_network_cidr} \
+        ipv4.gateway ${local.gw} \
+        ipv4.dns "${var.vpc_support_server_ip}" \
+        ipv4.method manual \
+        connection.autoconnect yes \
+        802-3-ethernet.mtu 9000
 
-    nmcli dev $${DEV_NAME}
+      nmcli dev $${DEV_NAME}
+    fi
 EOF
     ]
   }
