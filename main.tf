@@ -145,6 +145,8 @@ module "support" {
   cidrs                    = module.transit_gateway.mac_vpc_subnets
   powervs_machine_cidr     = var.powervs_machine_cidr
   keep_dns                 = var.keep_dns
+  worker                   = var.worker
+  use_fixed_network        = var.use_fixed_network
 }
 
 module "worker" {

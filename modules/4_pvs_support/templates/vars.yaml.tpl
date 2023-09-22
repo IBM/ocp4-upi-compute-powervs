@@ -21,3 +21,5 @@ ports:
 - 50825/tcp
 - 53248/tcp
 ssh_gen_key: false
+use_fixed_network: ${use_fixed_network}
+power_worker_count: ${power_worker_count}

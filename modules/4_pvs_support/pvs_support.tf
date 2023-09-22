@@ -9,11 +9,21 @@ locals {
     rhel_username = var.rhel_username
   }
 
+  worker_hosts = flatten([for k, v in var.worker["count"] :
+    [
+      for t in range(v) : cidrhost(var.powervs_machine_cidr, 2) + k
+    ]
+  ])
+
   # you must use the api-int url so the bastion routes over the correct interface.
   helpernode_vars = {
     client_tarball               = var.openshift_client_tarball
     openshift_machine_config_url = replace(replace(var.openshift_api_url, ":6443", ""), "://api.", "://api-int.")
     vpc_support_server_ip        = var.vpc_support_server_ip
+    use_fixed_network            = var.use_fixed_network
+    power_worker_count           = var.worker["count"]
+    start_host                   = join(",", local.worker_hosts)
+    gateway                      = cidrhost(var.powervs_machine_cidr, 1)
   }
 
   cidrs = {
@@ -109,6 +119,16 @@ ifup $${act_dev_name}
 echo 'Running ocp4-upi-compute-powervs playbook...'
 cd ocp4-upi-compute-powervs/support
 ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support.log ansible-playbook -e @vars/vars.yaml tasks/main.yml --become
+EOF
+    ]
+  }
+
+  # Dev Note: setup the dhcp server for the workers
+  provisioner "remote-exec" {
+    inline = [<<EOF
+echo 'Running ocp4-upi-compute-powervs playbook...'
+cd ocp4-upi-compute-powervs/support
+ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support-dhcp.log ansible-playbook -e @vars/vars.yaml tasks/dhcp.yml --become
 EOF
     ]
   }
