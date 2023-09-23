@@ -11,7 +11,7 @@ locals {
 
   worker_hosts = flatten([for k, v in range(var.worker["count"]) :
     [
-      for t in range(v) : cidrhost(var.powervs_machine_cidr, 2) + k
+      for t in range(v) : cidrhost(var.powervs_machine_cidr, 2 + k)
     ]
   ])
 

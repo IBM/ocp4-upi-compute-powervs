@@ -15,7 +15,8 @@ resource "ibm_pi_instance" "bastion" {
   pi_key_pair_name     = var.key_name
   pi_sys_type          = var.system_type
   pi_health_status     = var.bastion_health_status
-  pi_storage_pool      = var.bastion_storage_pool
+  pi_storage_type      = "tier1"
+  #pi_storage_pool      = var.bastion_storage_pool
 
   pi_network {
     network_id = var.bastion_public_network_id
@@ -38,6 +39,7 @@ resource "ibm_pi_instance_action" "restart_bastion" {
   pi_cloud_instance_id = var.powervs_service_instance_id
   pi_instance_id       = ibm_pi_instance.bastion[0].instance_id
   pi_action            = "hard-reboot"
+  pi_health_status     = "WARNING"
 }
 
 data "ibm_pi_instance_ip" "bastion_public_ip" {
@@ -265,8 +267,12 @@ EOF
   provisioner "remote-exec" {
     inline = [<<EOF
 lssrc -a
-rmcdomainstatus -s ctrmc -a IP > /var/log/rsct.status && [ -s /var/log/rsct.status ]
+#rmcdomainstatus -s ctrmc -a IP > /var/log/rsct.status && [ -s /var/log/rsct.status ]
+systemctl enable srcmstr && systemctl enable ctrmc
+systemctl start srcmstr && systemctl start ctrmc
 echo "RSCT NODE_ID = $(head -n 1 /etc/ct_node_id)"
+sleep 60s
+echo "proceeding to next step..."
 EOF
     ]
   }
@@ -316,11 +322,11 @@ resource "null_resource" "bastion_fix_up_networks" {
   # The macaddress is used to identify the private interface and setup with a static ip.
   provisioner "remote-exec" {
     inline = [<<EOF
-    DEV_NAME=$(find /sys/class/net -mindepth 1 -maxdepth 1 ! -name lo -printf "%P " -execdir cat {}/address \; | \
-      grep ${ibm_pi_network_port_attach.bastion_priv_net.macaddress} | awk '{print $1}')
-
     if [[ "${var.use_fixed_network}" == "true" ]]
     then
+      DEV_NAME=$(find /sys/class/net -mindepth 1 -maxdepth 1 ! -name lo ! -name '*bond*' -printf "%P " -execdir cat {}/address \; | \
+        grep ${ibm_pi_network_port_attach.bastion_priv_net.macaddress} | awk '{print $1}')
+
       nmcli dev mod $${DEV_NAME} ipv4.addresses ${var.powervs_network_cidr} \
         ipv4.gateway ${local.gw} \
         ipv4.dns "${var.vpc_support_server_ip}" \
