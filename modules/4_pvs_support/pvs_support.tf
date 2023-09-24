@@ -128,7 +128,7 @@ EOF
     inline = [<<EOF
 echo 'Running ocp4-upi-compute-powervs playbook...'
 cd ocp4-upi-compute-powervs/support
-ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support-dhcp.log ansible-playbook -e @vars/vars.yaml tasks/dhcp.yml --become
+ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support-dhcp.log ansible-playbook -e @vars/vars.yaml tasks/dhcp.yml --become || true
 EOF
     ]
   }
