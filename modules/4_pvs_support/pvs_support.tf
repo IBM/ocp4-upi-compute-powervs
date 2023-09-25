@@ -196,8 +196,13 @@ resource "null_resource" "adjust_mtu" {
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
+if [ "$(oc get Network.config cluster -o jsonpath='{.status.networkType}')"  == "OpenShiftSDN" ]
+then
+oc patch Network.operator.openshift.io cluster --type=merge --patch   '{"spec": { "migration": { "mtu": { "machine": { "to" : 9100} } } } }'
+else
 oc patch Network.operator.openshift.io cluster --type=merge --patch \
   '{"spec": { "migration": { "mtu": { "network": { "from": 1400, "to": 1350 } , "machine": { "to" : 9100} } } } }'
+fi
 EOF
     ]
   }
@@ -296,8 +301,11 @@ resource "null_resource" "set_routing_via_host" {
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
+if [ "$(oc get Network.config cluster -o jsonpath='{.status.networkType}')" == "OVNKubernetes" ]
+then
 oc patch network.operator/cluster --type merge -p \
   '{"spec":{"defaultNetwork":{"ovnKubernetesConfig":{"gatewayConfig":{"routingViaHost":true}}}}}'
+fi
 EOF
     ]
   }
