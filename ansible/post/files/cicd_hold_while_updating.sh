@@ -13,25 +13,25 @@ oc get nodes -o jsonpath='{range .items[*]}{.metadata.name}{","}{.status.conditi
 echo "Cluster Operator is: "
 oc get co
 
-IDX=0
-while [ "$IDX" -lt "121" ]
-do
-    export HTTPS_PROXY="http://${PROXY_SERVER}:3128"
-    echo "Check Cluster Operators: ${IDX}"
-    FAL_COUNT=$(oc get co -o jsonpath='{range .items[*]}{.metadata.name}{","}{.status.conditions[?(@.type=="Available")].status}{"\n"}{end}' | grep False | wc -l)
-    if [ "${FAL_COUNT}" -eq "0" ]
-    then
-      break
-    fi
+echo "$(date -u --rfc-3339=seconds) - Waiting for clusteroperators to complete"
+export HTTPS_PROXY="http://${PROXY_SERVER}:3128"
 
-    if [ "${IDX}" -eq "120" ]
-    then
-      echo "Exceeded the wait time for cluster operators - >120 minutes"
-      exit 3
-    fi
+oc wait clusteroperator.config.openshift.io \
+    --for=condition=Available=True \
+    --for=condition=Progressing=False \
+    --for=condition=Degraded=False \
+    --timeout=120m \
+    --all
 
-    oc get co -o yaml
-    echo "waiting for the cluster operators to return to operation"
-    sleep 60
-    IDX=$(($IDX + 1))
-done
+echo "Final Worker Status is: "
+oc get nodes -o jsonpath='{range .items[*]}{.metadata.name}{","}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}'
+
+echo "Cluster Operator is: "
+oc get co
+
+FAL_COUNT=$(oc get co -o jsonpath='{range .items[*]}{.metadata.name}{","}{.status.conditions[?(@.type=="Available")].status}{"\n"}{end}' | grep False | wc -l)
+if [ "${FAL_COUNT}" == "0" ]
+then
+  echo "Cluster Operators are not ready after 120 minutes"
+  exit 1
+fi
