@@ -24,7 +24,7 @@
       chmod +x ../files/approve_and_issue.sh
       ../files/approve_and_issue.sh {{ nfs_server }} {{ power_worker_count }} {{ power_prefix }}
 
-  - name: Ensure able to fetch project list
+  - name: Fetch the list of projects
     shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get projects"
     register: projects_list
     until: projects_list.stdout.find("openshift-kube-apiserver") != -1
@@ -33,10 +33,9 @@
 
   - name: Create powervm-rmc project
     when: projects_list.stdout.find(project_name) == -1
-    kubernetes.core.k8s:
-      state: present
-      proxy: "http://{{ nfs_server }}:3128"
-      definition: "{{ lookup('template', '../templates/rmc-ns.yml.j2')}}"
+    shell: |
+      export HTTPS_PROXY=http://{{ nfs_server }}:3128
+      echo {{ lookup('template', '../templates/rmc-ns.yml.j2')}} | oc apply -f -
 
   - name: Create powervm-rmc serviceaccount
     kubernetes.core.k8s:
