@@ -31,19 +31,11 @@
     retries: 20
     delay: 30
 
-  - name: Template a file 
-    ansible.builtin.template:
-      src: ../templates/rmc-ns.yml.j2
-      dest: rmc-ns.yml
-      owner: root
-      group: root
-      mode: '0644'
-
   - name: Create powervm-rmc project
     when: projects_list.stdout.find(project_name) == -1
     shell: |
       export HTTPS_PROXY=http://{{ nfs_server }}:3128
-      oc apply -f rmc-ns.yml
+      oc apply -f ../files/rmc-ns.yml
 
   - name: Create powervm-rmc serviceaccount
     kubernetes.core.k8s:
