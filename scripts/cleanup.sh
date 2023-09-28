@@ -7,6 +7,7 @@
 
 # Facilitates the cleanup
 # usage: vpc_name service_instance_id api_key region
+# it does not delete the VPC or PowerVS workspace
 
 # Cleans up the failed prior jobs
 function cleanup_mac() {
