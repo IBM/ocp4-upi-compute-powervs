@@ -83,11 +83,21 @@ do
 
   if [ -z "${STOP_SEARCH}" ]
   then
-    IDX=1000
+    # Checks if the nodes are READY
+    INTER_COUNT=$(oc get nodes -owide | grep ppc64le | grep Ready | wc -l)
+    if [ "${INTER_COUNT}" == "${POWER_COUNT}" ]
+    then
+      IDX=1000
+      echo "Nodes are ready"
+    else
+      echo "Nodes are NOT ready"
+      oc get nodes -owide
+      oc get csr
+    fi
   else 
     # 30 second sleep
     echo "waiting for the csrs"
     sleep 30
-    IDX=$(($IDX + 1))
   fi
+  IDX=$(($IDX + 1))
 done
