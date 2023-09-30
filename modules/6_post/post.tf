@@ -178,7 +178,7 @@ EOF
 
 # Dev Note: For CICD, we're spinning until we get a good setup.
 resource "null_resource" "cicd_hold_while_updating" {
-  depends_on = [null_resource.remove_nfs_deployment]
+  depends_on = [null_resource.remove_nfs_deployment, null_resource.debug_and_remove_taints]
   count      = var.cicd ? 1 : 0
   connection {
     type        = "ssh"
