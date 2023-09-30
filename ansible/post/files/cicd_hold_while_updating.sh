@@ -20,8 +20,10 @@ oc wait clusteroperator.config.openshift.io \
     --for=condition=Available=True \
     --for=condition=Progressing=False \
     --for=condition=Degraded=False \
-    --timeout=30m \
+    --timeout=15m \
     --all
+
+oc get co
 
 echo "Final Worker Status is: "
 oc get nodes -o jsonpath='{range .items[*]}{.metadata.name}{","}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}'
