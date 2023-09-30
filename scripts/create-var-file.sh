@@ -30,6 +30,8 @@ then
     EXPECTED_NODES=1
 fi
 
+CLEAN_VERSION="${3}"
+
 IBMCLOUD=ibmcloud
 if [[ $(type -t ic) == function ]]
 then
