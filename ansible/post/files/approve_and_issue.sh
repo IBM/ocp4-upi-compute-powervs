@@ -101,3 +101,12 @@ do
   fi
   IDX=$(($IDX + 1))
 done
+
+READY_COUNT=$(oc get nodes -l kubernetes.io/arch=ppc64le | grep Ready | wc -l)
+while [ "$NODE_COUNT" -ne "$POWER_COUNT" ]
+do
+  oc get csr | grep 'kubernetes.io/kubelet-serving' \
+    | grep 'Pending' | awk '{print $1}' \
+    | xargs -r oc adm certificate approve
+  sleep 30
+done
