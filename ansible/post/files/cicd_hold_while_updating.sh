@@ -20,7 +20,7 @@ oc wait clusteroperator.config.openshift.io \
     --for=condition=Available=True \
     --for=condition=Progressing=False \
     --for=condition=Degraded=False \
-    --timeout=120m \
+    --timeout=30m \
     --all
 
 echo "Final Worker Status is: "
