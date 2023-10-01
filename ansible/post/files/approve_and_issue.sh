@@ -84,7 +84,7 @@ do
   if [ -z "${STOP_SEARCH}" ]
   then
     # Checks if the nodes are READY
-    INTER_COUNT=$(oc get nodes -owide | grep ppc64le | grep Ready | wc -l)
+    INTER_COUNT=$(oc get nodes -owide | grep ppc64le | grep -v NotReady | grep Ready | wc -l)
     if [ "${INTER_COUNT}" == "${POWER_COUNT}" ]
     then
       IDX=1000
