@@ -317,7 +317,7 @@ echo 'verifying worker mc'
 start_counter=0
 timeout_counter=10
 mtu_output=`oc get mc 00-worker -o yaml | grep TARGET_MTU=9100`
-echo "(DEBUG) MTU FOUND?: ${mtu_output}"
+echo "(DEBUG) MTU FOUND?: $${mtu_output}"
 # While loop waits for TARGET_MTU=9100 till timeout has not reached 
 while [[ "$(oc get network cluster -o yaml | grep 'to: 9100' | awk '{print $NF}')" != "9100" ]]
 do
