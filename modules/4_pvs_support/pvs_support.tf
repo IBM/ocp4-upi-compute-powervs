@@ -325,6 +325,16 @@ do
   sleep 30
 done
 
+RENDERED_CONFIG=$(oc get mcp/worker -o json | jq -r '.spec.configuration.name')
+CHECK_CONFIG=$(oc get mc $${RENDERED_CONFIG} -ojson 2>&1 | grep TARGET_MTU=9100)
+while [ -z "$${CHECK_CONFIG}" ]
+do
+  echo "waiting on worker"
+  sleep 30
+  RENDERED_CONFIG=$(oc get mcp/worker -o json | jq -r '.spec.configuration.name')
+  CHECK_CONFIG=$(oc get mc $${RENDERED_CONFIG} -ojson 2>&1 | grep TARGET_MTU=9100)
+done
+
 # Waiting on output
 oc wait mcp/worker \
   --for condition=updated \
