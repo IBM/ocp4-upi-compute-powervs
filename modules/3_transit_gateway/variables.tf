@@ -8,3 +8,4 @@ variable "vpc_name" {}
 variable "vpc_crn" {}
 variable "transit_gateway_id" {}
 variable "override_transit_gateway_name" {}
+variable "powervs_crn" {}

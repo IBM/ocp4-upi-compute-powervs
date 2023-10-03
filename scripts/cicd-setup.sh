@@ -89,8 +89,7 @@ bin/pvsadm dhcpserver create --instance-id ${POWERVS_SERVICE_INSTANCE_ID} \
     --cidr '192.168.200.0/24' \
     --dns-server 9.9.9.9 \
     --name mac-dhcp-${REGION} \
-    --snat true \
-    --cloud-connection-id $(ibmcloud pi cons 2>&1  | grep rdr-mac- | awk '{print $1}')
+    --snat true
 
 # 9. Create Transit Gateway
 ibmcloud tg gateway-create \

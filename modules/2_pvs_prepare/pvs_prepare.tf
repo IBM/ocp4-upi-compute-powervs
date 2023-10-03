@@ -110,3 +110,7 @@ module "bastion" {
   use_fixed_network               = var.use_fixed_network
   vpc_support_server_ip           = var.vpc_support_server_ip
 }
+
+data "ibm_pi_cloud_instance" "pvs_cloud_instance" {
+  pi_cloud_instance_id = var.powervs_service_instance_id
+}

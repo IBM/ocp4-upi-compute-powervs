@@ -84,6 +84,7 @@ module "pvs_prepare" {
   powervs_machine_cidr               = var.powervs_machine_cidr
   name_prefix                        = local.name_prefix
   powervs_region                     = module.checks.powervs_region
+  powervs_zone                       = module.checks.powervs_zone
   powervs_service_instance_id        = var.powervs_service_instance_id
   private_key_file                   = var.private_key_file
   public_key_file                    = var.public_key_file
@@ -122,6 +123,7 @@ module "transit_gateway" {
   vpc_crn                       = module.vpc_support.vpc_crn
   transit_gateway_id            = module.vpc_support.transit_gateway_id
   override_transit_gateway_name = var.override_transit_gateway_name
+  powervs_crn       = module.pvs_prepare.powervs_crn
 }
 
 module "support" {

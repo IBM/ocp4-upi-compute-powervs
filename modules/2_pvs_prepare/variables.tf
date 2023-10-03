@@ -13,6 +13,7 @@ variable "enable_snat" {}
 variable "powervs_machine_cidr" {}
 variable "name_prefix" {}
 variable "powervs_region" {}
+variable "powervs_zone" {}
 variable "powervs_service_instance_id" {}
 variable "private_key_file" {}
 variable "private_network_mtu" {}

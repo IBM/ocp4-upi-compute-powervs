@@ -10,9 +10,10 @@ module "generated" {
   }
   source = "./generated"
 
-  cluster_id         = var.cluster_id
-  transit_gateway_id = var.transit_gateway_id
-  vpc_name           = var.vpc_name
+  cluster_id              = var.cluster_id
+  transit_gateway_id      = var.transit_gateway_id
+  vpc_name                = var.vpc_name
+  powervs_crn = var.powervs_crn
 }
 
 module "subnets" {

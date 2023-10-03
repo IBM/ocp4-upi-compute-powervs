@@ -53,14 +53,6 @@ function cleanup_mac() {
     done
     sleep 60
 
-    echo "Deleting the Cloud Connections"
-    for CC_INSTANCE_ID in $(ibmcloud pi cons --json | jq -r '.cloudConnections[] | select(.name | contains("mac-cloud-conn")).cloudConnectionID')
-    do
-      echo "Deleting Cloud Connection Instance ${CC_INSTANCE_ID}"
-      ibmcloud pi cond "${CC_INSTANCE_ID}"
-      sleep 60
-    done
-
     echo "Deleting the Images"
     for IMAGE_ID in $(ibmcloud pi imgs --json | jq -r '.images[].imageID')
     do
