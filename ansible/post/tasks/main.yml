@@ -19,11 +19,6 @@
       line: "HTTPS_PROXY=http://{{ nfs_server }}:3128"
     become: yes
 
-  - name: Approve and Issue CSRs for Power Workers only
-    shell: |
-      chmod +x ../files/approve_and_issue.sh
-      ../files/approve_and_issue.sh {{ nfs_server }} {{ power_worker_count }} {{ power_prefix }}
-
   - name: Fetch the list of projects
     shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get projects"
     register: projects_list
@@ -35,7 +30,7 @@
     when: projects_list.stdout.find(project_name) == -1
     shell: |
       export HTTPS_PROXY=http://{{ nfs_server }}:3128
-      echo {{ lookup('template', '../templates/rmc-ns.yml.j2')}} | oc apply -f -
+      oc apply -f ../files/rmc-ns.yml
 
   - name: Create powervm-rmc serviceaccount
     kubernetes.core.k8s:

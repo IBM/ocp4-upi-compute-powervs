@@ -83,11 +83,30 @@ do
 
   if [ -z "${STOP_SEARCH}" ]
   then
-    IDX=1000
+    # Checks if the nodes are READY
+    INTER_COUNT=$(oc get nodes -owide | grep ppc64le | grep -v NotReady | grep Ready | wc -l)
+    if [ "${INTER_COUNT}" == "${POWER_COUNT}" ]
+    then
+      IDX=1000
+      echo "Nodes are ready"
+    else
+      echo "Nodes are NOT ready"
+      oc get nodes -owide
+      oc get csr
+    fi
   else 
     # 30 second sleep
     echo "waiting for the csrs"
     sleep 30
-    IDX=$(($IDX + 1))
   fi
+  IDX=$(($IDX + 1))
+done
+
+READY_COUNT=$(oc get nodes -l kubernetes.io/arch=ppc64le | grep Ready | wc -l)
+while [ "$NODE_COUNT" -ne "$POWER_COUNT" ]
+do
+  oc get csr | grep 'kubernetes.io/kubelet-serving' \
+    | grep 'Pending' | awk '{print $1}' \
+    | xargs -r oc adm certificate approve
+  sleep 30
 done

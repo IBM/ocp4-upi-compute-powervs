@@ -93,6 +93,15 @@ resource "null_resource" "post_ansible" {
     destination = "${local.ansible_post_path}/ansible_post_vars.json"
   }
 
+  provisioner "remote-exec" {
+    inline = [<<EOF
+cd ${local.ansible_post_path}
+chmod +x files/approve_and_issue.sh
+bash files/approve_and_issue.sh ${var.nfs_server} ${var.worker["count"]} ${var.name_prefix}
+EOF
+    ]
+  }
+
   #command to run ansible playbook on Bastion
   provisioner "remote-exec" {
     inline = [
@@ -169,7 +178,7 @@ EOF
 
 # Dev Note: For CICD, we're spinning until we get a good setup.
 resource "null_resource" "cicd_hold_while_updating" {
-  depends_on = [null_resource.remove_nfs_deployment]
+  depends_on = [null_resource.remove_nfs_deployment, null_resource.debug_and_remove_taints]
   count      = var.cicd ? 1 : 0
   connection {
     type        = "ssh"
@@ -182,7 +191,7 @@ resource "null_resource" "cicd_hold_while_updating" {
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.nfs_server}:3128"
-cd ${self.triggers.ansible_post_path}
+cd ${local.ansible_post_path}
 bash files/cicd_hold_while_updating.sh "${var.nfs_server}"
 EOF
     ]

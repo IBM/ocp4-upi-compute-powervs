@@ -30,6 +30,8 @@ then
     EXPECTED_NODES=1
 fi
 
+CLEAN_VERSION="${3}"
+
 IBMCLOUD=ibmcloud
 if [[ $(type -t ic) == function ]]
 then
@@ -185,7 +187,7 @@ bastion               = { memory = "16", processors = "1", "count" = 1 }
 worker                = { memory = "16", processors = "1", "count" = ${EXPECTED_NODES} }
 override_region_check=true
 
-mac_tags = [ "mac-cicd" ]
+mac_tags = [ "mac-cicd-${CLEAN_VERSION}" ]
 
 #override_network_name="DHCPSERVERmac-dhcp-${VPC_REGION}_Private"
 #override_transit_gateway_name="${OVERRIDE_PREFIX}-tg"

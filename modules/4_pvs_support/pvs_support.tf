@@ -102,28 +102,18 @@ resource "null_resource" "config" {
   # Dev Note: need to move the route script to the right location
   provisioner "remote-exec" {
     inline = [<<EOF
-act_dev_name=""
-cidrs=("${local.cidr_str}")
-for cidr in "$${cidrs[@]}"
-do
-  envs=($(ip r | grep "$cidr dev" | awk '{print $3}'))
-  for env in "$${envs[@]}"
-  do
-    dev_name=$(sudo nmcli -t -f DEVICE connection show | grep $env)
-    mv /etc/sysconfig/network-scripts/route-env3 /etc/sysconfig/network-scripts/route-$${dev_name}
-    act_dev_name=$${dev_name}
-  done
-done
-
-ifup $${act_dev_name}
-echo 'Running ocp4-upi-compute-powervs playbook...'
 cd ocp4-upi-compute-powervs/support
+chmod +x files/setup_route.sh
+files/setup_route.sh "${local.cidr_str}"
+
+echo 'Running ocp4-upi-compute-powervs playbook...'
 ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support.log ansible-playbook -e @vars/vars.yaml tasks/main.yml --become
 EOF
     ]
   }
 
   # Dev Note: setup the dhcp server for the workers
+  # Currently this is a NOP
   provisioner "remote-exec" {
     inline = [<<EOF
 echo 'Running ocp4-upi-compute-powervs playbook...'
@@ -312,7 +302,7 @@ EOF
 }
 
 resource "null_resource" "wait_on_mcp" {
-  depends_on = [null_resource.set_routing_via_host]
+  depends_on = [null_resource.set_routing_via_host, null_resource.adjust_mtu]
   connection {
     type        = "ssh"
     user        = var.rhel_username
@@ -335,18 +325,32 @@ echo 'verifying worker mc'
 start_counter=0
 timeout_counter=10
 mtu_output=`oc get mc 00-worker -o yaml | grep TARGET_MTU=9100`
+echo "(DEBUG) MTU FOUND?: $${mtu_output}"
 # While loop waits for TARGET_MTU=9100 till timeout has not reached 
-while [[ ( $mtu_output == "" ) && ( $start_counter -lt $timeout_counter ) ]];
+while [[ "$(oc get network cluster -o yaml | grep 'to: 9100' | awk '{print $NF}')" != "9100" ]]
 do
   echo "waiting on worker"
   sleep 30
-  mtu_output=`oc get mc 00-worker -o yaml | grep TARGET_MTU=9100`
-  start_counter=`expr $start_counter + 1`
 done
-#oc wait mcp/worker --for condition=updated --timeout=5m || true
+
+RENDERED_CONFIG=$(oc get mcp/worker -o json | jq -r '.spec.configuration.name')
+CHECK_CONFIG=$(oc get mc $${RENDERED_CONFIG} -ojson 2>&1 | grep TARGET_MTU=9100)
+while [ -z "$${CHECK_CONFIG}" ]
+do
+  echo "waiting on worker"
+  sleep 30
+  RENDERED_CONFIG=$(oc get mcp/worker -o json | jq -r '.spec.configuration.name')
+  CHECK_CONFIG=$(oc get mc $${RENDERED_CONFIG} -ojson 2>&1 | grep TARGET_MTU=9100)
+done
+
+# Waiting on output
+oc wait mcp/worker \
+  --for condition=updated \
+  --timeout=5m || true
 
 echo '-checking mtu-'
-[[ "$( oc get network cluster -o yaml | grep 'to: 9100' | awk '{print $NF}')" == "9100" ]] || false
+oc get network cluster -o yaml | grep 'to: 9100' | awk '{print $NF}'
+[[ "$(oc get network cluster -o yaml | grep 'to: 9100' | awk '{print $NF}')" == "9100" ]] || false
 echo "success on wait on mtu change"
 EOF
     ]

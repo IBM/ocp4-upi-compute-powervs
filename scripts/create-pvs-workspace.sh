@@ -35,4 +35,5 @@ SERVICE_NAME=power-iaas
 SERVICE_PLAN_NAME=power-virtual-server-group
 
 ${IBMCLOUD} resource service-instance-create "${WORKSPACE_NAME}" \
-    "${SERVICE_NAME}" "${SERVICE_PLAN_NAME}" "${REGION}" -g "${RESOURCE_GROUP}"
+    "${SERVICE_NAME}" "${SERVICE_PLAN_NAME}" "${REGION}" -g "${RESOURCE_GROUP}" \
+    --allow-cleanup

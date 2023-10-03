@@ -5,9 +5,9 @@ metadata:
     openshift.io/node-selector: ""
   labels:
     kubernetes.io/metadata.name: openshift-powervm-rmc
-    name: "{{ rmc_name }}"
+    name: "powervm-rmc"
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/enforce: privileged
     pod-security.kubernetes.io/warn: privileged
     security.openshift.io/scc.podSecurityLabelSync: "false"
-  name: "{{ project_name }}"
+  name: "powervm-rmc"
