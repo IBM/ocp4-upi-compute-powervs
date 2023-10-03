@@ -90,6 +90,7 @@ else
     POWERVS_ZONE=$(${IBMCLOUD} resource service-instances --output json | jq -r '.[] | select(.guid == "'${POWERVS_SERVICE_INSTANCE_ID}'").region_id')
     POWERVS_REGION=$(
         case "$POWERVS_ZONE" in
+            ("dal10") echo "dal" ;;
             ("dal12") echo "dal" ;;
             ("us-south") echo "us-south" ;;
             ("wdc06") echo "wdc" ;;
