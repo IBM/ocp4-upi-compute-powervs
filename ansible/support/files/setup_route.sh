@@ -17,7 +17,7 @@ do
     if [ "${dev_name}" != "env3" ]
     then
       mv -f /etc/sysconfig/network-scripts/route-env3 /etc/sysconfig/network-scripts/route-${dev_name}
-      ifup ${dev_name}
+      nmcli device up ${dev_name}
       echo "device is up"
     else 
       echo "same device"
