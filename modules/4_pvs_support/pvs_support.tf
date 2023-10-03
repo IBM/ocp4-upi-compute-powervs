@@ -201,7 +201,7 @@ then
 oc patch Network.operator.openshift.io cluster --type=merge --patch   '{"spec": { "migration": { "mtu": { "machine": { "to" : 9100} } } } }'
 else
 oc patch Network.operator.openshift.io cluster --type=merge --patch \
-  '{"spec": { "migration": { "mtu": { "network": { "from": 1400, "to": 1350 } , "machine": { "to" : 9100} } } } }'
+  '{"spec": { "migration": { "mtu": { "network": { "from": 1350, "to": 1350 } , "machine": { "to" : 9100} } } } }'
 fi
 EOF
     ]
