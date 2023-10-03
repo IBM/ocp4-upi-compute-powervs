@@ -11,8 +11,8 @@
 locals {
   vpc_pvs = {
     us-south = {
-      region = "us-south",
-      zone   = "us-south"
+      region = "dal10",
+      zone   = "dal"
     },
     us-east = {
       region = "us-east",
