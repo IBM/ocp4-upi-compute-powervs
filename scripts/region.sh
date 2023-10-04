@@ -14,6 +14,7 @@ REGION="$1"
 OVERRIDE="$2"
 
 case "$REGION" in
+  ("us-south") echo "dal10" ;;
   ("jp-osa") echo "osa21" ;;
   ("eu-gb") echo "lon05" ;;
   ("ca-tor") echo "mon01" ;;
