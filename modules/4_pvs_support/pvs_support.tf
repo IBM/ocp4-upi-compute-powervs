@@ -186,12 +186,15 @@ resource "null_resource" "adjust_mtu" {
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
-if [ "$(oc get Network.config cluster -o jsonpath='{.status.networkType}')"  == "OpenShiftSDN" ]
+if [ "$(oc get Network.config cluster -o jsonpath='{.status.networkType}')" == "OpenShiftSDN" ]
 then
-oc patch Network.operator.openshift.io cluster --type=merge --patch   '{"spec": { "migration": { "mtu": { "machine": { "to" : 9100} } } } }'
+  FIRST_NODE=$(oc get nodes --no-headers | awk '{print $1}' | head -n1)
+  SOURCE_MTU=$(oc debug node/$${FIRST_NODE} -- chroot /host ip link 2>&1 | grep mtu | grep -v DOWN | grep tun0 | awk '{print $5}')
+  oc patch Network.operator.openshift.io cluster --type=merge --patch \
+    '{"spec": { "migration": { "mtu": { "network": { "from": '$${SOURCE_MTU}', "to": 1350 } , "machine": { "to" : 9100} } } } }'
 else
-oc patch Network.operator.openshift.io cluster --type=merge --patch \
-  '{"spec": { "migration": { "mtu": { "network": { "from": 1350, "to": 1350 } , "machine": { "to" : 9100} } } } }'
+  oc patch Network.operator.openshift.io cluster --type=merge --patch \
+    '{"spec": { "migration": { "mtu": { "network": { "from": 1400, "to": 1350 } , "machine": { "to" : 9100} } } } }'
 fi
 EOF
     ]
