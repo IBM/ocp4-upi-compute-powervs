@@ -320,9 +320,12 @@ resource "null_resource" "bastion_fix_up_networks" {
   }
 
 # dev-note: for PER networks, we have to lower from the default 1500. It shouldn't impact any other install.
+# also turning off tx-checksum per discussion
+# ip link set env2 mtu 1400
   provisioner "remote-exec" {
     inline = [<<EOF
 ip link set env2 mtu 1400
+/sbin/ethtool --offload env2 tx-checksumming off
 EOF
     ]
   }
