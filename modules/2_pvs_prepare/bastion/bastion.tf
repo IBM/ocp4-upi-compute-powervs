@@ -318,6 +318,14 @@ resource "null_resource" "bastion_fix_up_networks" {
     timeout     = "${var.connection_timeout}m"
   }
 
+# dev-note: for PER networks, we have to lower from the default 1500. It shouldn't impact any other install.
+  provisioner "remote-exec" {
+    inline = [<<EOF
+ip link set env2 mtu 1400
+EOF
+    ]
+  }
+
   # Identifies the networks, and picks the iface that is on the private networkfor_each
   # The macaddress is used to identify the private interface and setup with a static ip.
   provisioner "remote-exec" {
