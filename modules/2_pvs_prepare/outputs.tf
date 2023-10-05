@@ -44,5 +44,5 @@ output "powervs_bastion_name" {
 output "powervs_crn" {
   # Dev Note: generated pattern is as follows:
   # crn:v1:bluemix:public:power-iaas:<ZONE>:a/<TENANT_ID>:<SERVICE_INSTANCE_ID>::
-  value = format("crn:v1:bluemix:public:power-iaas:%s:a/%s:%s::",var.powervs_zone,data.ibm_pi_cloud_instance.pvs_cloud_instance.tenant_id, var.powervs_service_instance_id)
+  value = format("crn:v1:bluemix:public:power-iaas:%s:a/%s:%s::", var.powervs_zone, data.ibm_pi_cloud_instance.pvs_cloud_instance.tenant_id, var.powervs_service_instance_id)
 }

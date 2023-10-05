@@ -123,7 +123,7 @@ module "transit_gateway" {
   vpc_crn                       = module.vpc_support.vpc_crn
   transit_gateway_id            = module.vpc_support.transit_gateway_id
   override_transit_gateway_name = var.override_transit_gateway_name
-  powervs_crn       = module.pvs_prepare.powervs_crn
+  powervs_crn                   = module.pvs_prepare.powervs_crn
 }
 
 module "support" {

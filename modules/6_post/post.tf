@@ -127,7 +127,9 @@ resource "null_resource" "debug_and_remove_taints" {
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.nfs_server}:3128"
+echo "[All Nodes]"
 oc get nodes -owide
+echo "[Power Nodes]"
 oc get nodes -l 'kubernetes.io/arch=ppc64le' -o json | jq -r '.items[]'
 cd ${local.ansible_post_path}
 bash files/remove-worker-taints.sh "${var.nfs_server}" "${var.name_prefix}" "${var.worker["count"]}"
@@ -138,7 +140,7 @@ EOF
 
 # Dev Note: only on destroy - remove the the deployment for nfs storage, and leave after post_ansible
 resource "null_resource" "remove_nfs_deployment" {
-  depends_on = [null_resource.post_ansible]
+  depends_on = [null_resource.post_ansible, null_resource.debug_and_remove_taints]
 
   triggers = {
     vpc_support_server_ip = "${var.nfs_server}"
