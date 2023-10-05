@@ -15,6 +15,7 @@ resource "ibm_pi_instance" "bastion" {
   pi_key_pair_name     = var.key_name
   pi_sys_type          = var.system_type
   pi_health_status     = var.bastion_health_status
+  # Dev Note: PER Network enablement, we chose to use tier1 only.
   pi_storage_type      = "tier1"
   #pi_storage_pool = var.bastion_storage_pool
 
