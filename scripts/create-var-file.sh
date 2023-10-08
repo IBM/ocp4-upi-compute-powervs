@@ -185,7 +185,7 @@ processor_type = "shared"
 system_type    = "e980"
 bastion_health_status = "OK"
 bastion               = { memory = "16", processors = "1", "count" = 1 }
-worker                = { memory = "16", processors = "1", "count" = ${EXPECTED_NODES} }
+worker                = { memory = "16", processors = "2", "count" = ${EXPECTED_NODES} }
 override_region_check=true
 
 mac_tags = [ "mac-cicd-${CLEAN_VERSION}" ]
