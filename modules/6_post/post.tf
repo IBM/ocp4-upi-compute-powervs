@@ -190,11 +190,12 @@ resource "null_resource" "cicd_hold_while_updating" {
     agent       = var.ssh_agent
   }
 
+  # Dev Note: This command is not designed to fail when called. It's adding a delay.
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.nfs_server}:3128"
 cd ${local.ansible_post_path}
-bash files/cicd_hold_while_updating.sh "${var.nfs_server}"
+bash files/cicd_hold_while_updating.sh "${var.nfs_server}" || true
 EOF
     ]
   }
