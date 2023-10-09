@@ -201,7 +201,7 @@ bash files/cicd_hold_while_updating.sh "${var.nfs_server}" || true
 
 for IDX in $(seq 0 5)
 do
-echo "Approving any pending csrs ${IDX}"
+echo "Approving any pending csrs $${IDX}"
 oc get csr | grep Pending | awk '{print $1}' | xargs oc adm certificate approve
 sleep 30
 done
