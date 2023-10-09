@@ -15,17 +15,8 @@
 
 # v3: change to env2
 # Content: aWYgWyAiIiA9ICJlbnYyIiBdICYmIFsgIiIgPSAidXAiIF0KdGhlbgogIGVjaG8gIlR1cm5pbmcgb2ZmIHR4LWNoZWNrc3VtbWluZyIKICAvc2Jpbi9ldGh0b29sIC0tb2ZmbG9hZCBlbnYyIHR4LWNoZWNrc3VtbWluZyBvZmYKZWxzZSAKICAiZWNobyAibm90IHJ1bm5pbmcgdHgtY2hlY2tzdW1taW5nIG9mZiIKZmkKaWYgISBzeXN0ZW1jdGwgaXMtZmFpbGVkIE5ldHdvcmtNYW5hZ2VyLXdhaXQtb25saW5lCnRoZW4Kc3lzdGVtY3RsIHJlc3RhcnQgTmV0d29ya01hbmFnZXItd2FpdC1vbmxpbmUKZmkK
-cat << EOF | base64 --wrap=0
-if [ "$1" = "env2" ] && [ "$2" = "up" ]
-then
-  echo "Turning off tx-checksumming"
-  /sbin/ethtool --offload env2 tx-checksumming off
-else 
-  "echo "not running tx-checksumming off"
-fi
-if ! systemctl is-failed NetworkManager-wait-online
-then
-systemctl restart NetworkManager-wait-online
-fi
-EOF
+
+# v4: update the logic and fix missing variables
+# Content: aWYgWyAiJDEiID0gImVudjIiIF0gJiYgWyAiJDIiID0gInVwIiBdCnRoZW4KICBlY2hvICJUdXJuaW5nIG9mZiB0eC1jaGVja3N1bW1pbmciCiAgL3NiaW4vZXRodG9vbCAtLW9mZmxvYWQgZW52MiB0eC1jaGVja3N1bW1pbmcgb2ZmCmVsc2UgCiAgZWNobyAibm90IHJ1bm5pbmcgdHgtY2hlY2tzdW1taW5nIG9mZiIKZmkKaWYgc3lzdGVtY3RsIGlzLWZhaWxlZCBOZXR3b3JrTWFuYWdlci13YWl0LW9ubGluZQp0aGVuCnN5c3RlbWN0bCByZXN0YXJ0IE5ldHdvcmtNYW5hZ2VyLXdhaXQtb25saW5lCmZpCg==
+cat ethtool.raw | base64 --wrap=0
 echo ""

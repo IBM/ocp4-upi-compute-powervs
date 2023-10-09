@@ -26,7 +26,7 @@
                 "path": "/etc/NetworkManager/dispatcher.d/20-ethtool",
                 "user": {},
                 "contents": {
-                    "source": "data:text/plain;base64,aWYgWyAiIiA9ICJlbnYyIiBdICYmIFsgIiIgPSAidXAiIF0KdGhlbgogIGVjaG8gIlR1cm5pbmcgb2ZmIHR4LWNoZWNrc3VtbWluZyIKICAvc2Jpbi9ldGh0b29sIC0tb2ZmbG9hZCBlbnYyIHR4LWNoZWNrc3VtbWluZyBvZmYKZWxzZSAKICAiZWNobyAibm90IHJ1bm5pbmcgdHgtY2hlY2tzdW1taW5nIG9mZiIKZmkKaWYgISBzeXN0ZW1jdGwgaXMtZmFpbGVkIE5ldHdvcmtNYW5hZ2VyLXdhaXQtb25saW5lCnRoZW4Kc3lzdGVtY3RsIHJlc3RhcnQgTmV0d29ya01hbmFnZXItd2FpdC1vbmxpbmUKZmkK",
+                    "source": "data:text/plain;base64,aWYgWyAiJDEiID0gImVudjIiIF0gJiYgWyAiJDIiID0gInVwIiBdCnRoZW4KICBlY2hvICJUdXJuaW5nIG9mZiB0eC1jaGVja3N1bW1pbmciCiAgL3NiaW4vZXRodG9vbCAtLW9mZmxvYWQgZW52MiB0eC1jaGVja3N1bW1pbmcgb2ZmCmVsc2UgCiAgZWNobyAibm90IHJ1bm5pbmcgdHgtY2hlY2tzdW1taW5nIG9mZiIKZmkKaWYgc3lzdGVtY3RsIGlzLWZhaWxlZCBOZXR3b3JrTWFuYWdlci13YWl0LW9ubGluZQp0aGVuCnN5c3RlbWN0bCByZXN0YXJ0IE5ldHdvcmtNYW5hZ2VyLXdhaXQtb25saW5lCmZpCg==",
                     "verification": {}
                 },
                 "mode": 420
