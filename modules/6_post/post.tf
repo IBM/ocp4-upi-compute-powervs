@@ -127,7 +127,9 @@ resource "null_resource" "debug_and_remove_taints" {
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.nfs_server}:3128"
+echo "[All Nodes]"
 oc get nodes -owide
+echo "[Power Nodes]"
 oc get nodes -l 'kubernetes.io/arch=ppc64le' -o json | jq -r '.items[]'
 cd ${local.ansible_post_path}
 bash files/remove-worker-taints.sh "${var.nfs_server}" "${var.name_prefix}" "${var.worker["count"]}"
@@ -138,7 +140,7 @@ EOF
 
 # Dev Note: only on destroy - remove the the deployment for nfs storage, and leave after post_ansible
 resource "null_resource" "remove_nfs_deployment" {
-  depends_on = [null_resource.post_ansible]
+  depends_on = [null_resource.post_ansible, null_resource.debug_and_remove_taints]
 
   triggers = {
     vpc_support_server_ip = "${var.nfs_server}"
@@ -188,11 +190,21 @@ resource "null_resource" "cicd_hold_while_updating" {
     agent       = var.ssh_agent
   }
 
+  # Dev Note:
+  # 1. This command is not designed to fail when called. It's adding a delay.
+  # 2. In rare circumstances, the csrs resign and are pending and need re-approval.
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.nfs_server}:3128"
 cd ${local.ansible_post_path}
-bash files/cicd_hold_while_updating.sh "${var.nfs_server}"
+bash files/cicd_hold_while_updating.sh "${var.nfs_server}" || true
+
+for IDX in $(seq 0 5)
+do
+echo "Approving any pending csrs $${IDX}"
+oc get csr | grep Pending | awk '{print $1}' | xargs oc adm certificate approve
+sleep 30
+done
 EOF
     ]
   }

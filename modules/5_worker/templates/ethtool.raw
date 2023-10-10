@@ -1,0 +1,11 @@
+if [ "$1" = "env2" ] && [ "$2" = "up" ]
+then
+echo "Turning off tx-checksumming"
+/sbin/ethtool --offload env2 tx-checksumming off
+else 
+echo "not running tx-checksumming off"
+fi
+if systemctl is-failed NetworkManager-wait-online
+then
+systemctl restart NetworkManager-wait-online
+fi
