@@ -28,6 +28,7 @@
 
   - name: Download the ignition file to http server
     block:
+    # Poll until ignition is downloaded.
     - name: Downloading the ignition file
       get_url:
         url: "{{ openshift_machine_config_url }}"
@@ -36,6 +37,10 @@
         headers:
           "Accept": "application/vnd.coreos.ignition+json;version=3.2.0"
       ignore_errors: true
+      register: result
+      retries: 120
+      delay: 10
+      until: '"Request failed: <urlopen error timed out>" not in result.msg'
 
     - name: Downloading the ignition file using a https_proxy
       get_url:
