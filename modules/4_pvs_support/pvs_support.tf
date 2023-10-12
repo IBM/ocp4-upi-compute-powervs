@@ -348,14 +348,6 @@ do
   CHECK_CONFIG=$(oc get mc $${RENDERED_CONFIG} -ojson 2>&1 | grep TARGET_MTU=9100)
 done
 
-# Waiting on TARGET_MTU=9100
-echo 'Running waiting for a valid ignition file'
-while [ $(curl "${local.openshift_machine_config_url}:22623/config/worker" --header "Accept: application/vnd.coreos.ignition+json;version=3.2.0" -k | jq -r . |  grep 'TARGET_MTU=9100' | wc -l) -ne 1 ]
-do
-    echo "Waiting for the MTU to be valid TARGET_MTU=9100"
-    sleep 30
-done
-
 echo '-checking mtu-'
 oc get network cluster -o yaml | grep 'to: 9100' | awk '{print $NF}'
 [[ "$(oc get network cluster -o yaml | grep 'to: 9100' | awk '{print $NF}')" == "9100" ]] || false

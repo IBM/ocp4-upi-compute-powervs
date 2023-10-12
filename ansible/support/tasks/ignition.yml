@@ -25,9 +25,20 @@
 
   - name: Disable fcontext
     shell: "semanage fcontext -a -t httpd_sys_rw_content_t /var/www/html/ignition/worker.ign || true"
-
-  - name: Download the ignition file to http server
+  - name: Loop until TARGET_MTU is correct
     block:
+    - name: Connect to website using a previously stored cookie
+      ansible.builtin.uri:
+        url: "{{ openshift_machine_config_url }}"
+        method: GET
+        return_content: true
+        headers:
+          "Accept": "application/vnd.coreos.ignition+json;version=3.2.0"
+      ignore_errors: true
+      register: result
+      retries: 120
+      delay: 10
+      until: 'result.status in [200] and "TARGET_MTU=9100" in result.content'
     - name: Downloading the ignition file
       get_url:
         url: "{{ openshift_machine_config_url }}"
@@ -40,7 +51,6 @@
       retries: 120
       delay: 10
       until: '"Request failed: <urlopen error timed out>" not in result.msg'
-
     - name: Downloading the ignition file using a https_proxy
       get_url:
         url: "{{ openshift_machine_config_url }}"
