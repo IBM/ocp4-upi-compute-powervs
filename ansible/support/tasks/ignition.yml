@@ -25,9 +25,9 @@
 
   - name: Disable fcontext
     shell: "semanage fcontext -a -t httpd_sys_rw_content_t /var/www/html/ignition/worker.ign || true"
-  - name: Loop until TARGET_MTU is correct
+  - name: Download the Ignition file
     block:
-    - name: Connect to website using a previously stored cookie
+    - name: Loop until TARGET_MTU is correct
       ansible.builtin.uri:
         url: "{{ openshift_machine_config_url }}"
         method: GET
