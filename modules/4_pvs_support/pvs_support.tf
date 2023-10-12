@@ -15,10 +15,12 @@ locals {
     ]
   ])
 
+  openshift_machine_config_url = replace(replace(var.openshift_api_url, ":6443", ""), "://api.", "://api-int.")
+
   # you must use the api-int url so the bastion routes over the correct interface.
   helpernode_vars = {
     client_tarball               = var.openshift_client_tarball
-    openshift_machine_config_url = replace(replace(var.openshift_api_url, ":6443", ""), "://api.", "://api-int.")
+    openshift_machine_config_url = local.openshift_machine_config_url
     vpc_support_server_ip        = var.vpc_support_server_ip
     use_fixed_network            = var.use_fixed_network
     power_worker_count           = var.worker["count"]
@@ -346,10 +348,13 @@ do
   CHECK_CONFIG=$(oc get mc $${RENDERED_CONFIG} -ojson 2>&1 | grep TARGET_MTU=9100)
 done
 
-# Waiting on output
-oc wait mcp/worker \
-  --for condition=updated \
-  --timeout=5m || true
+# Waiting on TARGET_MTU=9100
+echo 'Running waiting for a valid ignition file'
+while [ $(curl "${local.openshift_machine_config_url}:22623/config/worker" --header "Accept: application/vnd.coreos.ignition+json;version=3.2.0" -k | jq -r . |  grep 'TARGET_MTU=9100' | wc -l) -ne 1 ]
+do
+    echo "Waiting for the MTU to be valid TARGET_MTU=9100"
+    sleep 30
+done
 
 echo '-checking mtu-'
 oc get network cluster -o yaml | grep 'to: 9100' | awk '{print $NF}'
