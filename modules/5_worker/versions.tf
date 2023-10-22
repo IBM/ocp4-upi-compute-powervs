@@ -18,6 +18,10 @@ terraform {
       version               = "~> 1.58.0"
       configuration_aliases = [ibm]
     }
+    http = {
+      source  = "hashicorp/http"
+      version = "3.4.0"
+    }
   }
   required_version = ">= 1.5.0"
 }

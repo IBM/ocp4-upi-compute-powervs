@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-# Dev Note: nop is a s
+# Dev Note: nop is a debug step
 resource "null_resource" "nop" {
   triggers = {
     bastion_private_ip_mac = var.ignition_mac
@@ -53,7 +53,71 @@ locals {
   # 2. if other network, pull off lease from dhcp server
   # 3. if not found, use the pub-net ip
   bastion_private_ip = var.use_fixed_network ? [] : [for lease in data.ibm_pi_dhcp.refresh_dhcp_server[0].leases : lease if lease.instance_mac == data.ibm_pi_instance.bastion_instance.networks[0].macaddress]
-  ignition_ip        = var.use_fixed_network ? data.ibm_pi_instance.bastion_instance.networks[0].ip : length(var.ignition_ip) > 0 ? var.ignition_ip[0].instance_ip : local.bastion_private_ip[0].instance_ip
+}
+
+# Dev Note: the hypervisor does not report the internal interfaces ip correctly
+# This resource works around that problem through a temporary setup of an http 
+resource "null_resource" "secondary_retrieval_ignition_ip" {
+  count      = var.use_fixed_network ? 0 : length(var.ignition_ip) > 0 ? 0 : 1
+  depends_on = [null_resource.nop]
+
+  connection {
+    type        = "ssh"
+    user        = "root"
+    private_key = file(var.private_key_file)
+    host        = var.bastion_public_ip
+    agent       = var.ssh_agent
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+echo "Listen 443" > /etc/httpd/conf.d/extra.conf
+systemctl restart httpd
+for IFACE in $(nmcli device show 2>&1| grep GENERAL.DEVICE | grep -v env2 | grep -v lo | awk '{print $NF}')
+do
+    IP_ADDR="$(nmcli device show $${IFACE} 2>&1 | grep IP4.ADDRESS | sed 's|/24||g' | awk '{print $NF}')"
+    if [ -n "$${IP_ADDR}" ]
+    then 
+        echo "Interface: $${IFACE} $${IP_ADDR}"
+        echo "$${IP_ADDR}" > /var/www/html/ip
+        chmod 777 /var/www/html/ip
+    fi
+done
+EOF
+    ]
+  }
+}
+
+data "http" "bastion_ip_retrieval" {
+  count      = var.use_fixed_network ? 0 : length(var.ignition_ip) > 0 ? 0 : 1
+  depends_on = [null_resource.secondary_retrieval_ignition_ip]
+  url        = "curl -k http://${var.bastion_public_ip}:443/ip"
+}
+
+# Dev Note: at the end the https port shouldn't be active/listening
+resource "null_resource" "secondary_retrieval_shutdown" {
+  count      = var.use_fixed_network ? 0 : length(var.ignition_ip) > 0 ? 0 : 1
+  depends_on = [null_resource.nop, data.http.bastion_ip_retrieval, null_resource.secondary_retrieval_ignition_ip]
+
+  connection {
+    type        = "ssh"
+    user        = "root"
+    private_key = file(var.private_key_file)
+    host        = var.bastion_public_ip
+    agent       = var.ssh_agent
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+rm -f /etc/httpd/conf.d/extra.conf
+systemctl restart httpd
+EOF
+    ]
+  }
+}
+
+locals {
+  ignition_ip = var.use_fixed_network ? data.ibm_pi_instance.bastion_instance.networks[0].ip : length(var.ignition_ip) > 0 ? var.ignition_ip[0].instance_ip : length(local.bastion_private_ip[0].instance_ip) ? local.bastion_private_ip[0].instance_ip : data.http.bastion_ip_retrieval[0].response_body
 }
 
 # Modeled off the OpenShift Installer work for IPI PowerVS
@@ -62,7 +126,7 @@ locals {
 resource "ibm_pi_instance" "worker" {
   count = var.worker["count"]
 
-  depends_on = [data.ibm_pi_dhcp.refresh_dhcp_server, null_resource.nop]
+  depends_on = [data.ibm_pi_dhcp.refresh_dhcp_server, null_resource.nop, null_resource.secondary_retrieval_shutdown]
 
   pi_cloud_instance_id = var.powervs_service_instance_id
   pi_instance_name     = "${var.name_prefix}-worker-${count.index}"
