@@ -6,8 +6,6 @@ ports:
 - 67/udp
 - 53/tcp
 - 53/udp
-- 443/tcp
-- 80/tcp
 - 8080/tcp
 - 6443/tcp
 - 6443/udp

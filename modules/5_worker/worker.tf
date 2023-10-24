@@ -83,6 +83,10 @@ do
         chmod 777 /var/www/html/ip
     fi
 done
+firewall-cmd --permanent --zone=public --add-rich-rule="
+  rule family=\"ipv4\"
+  source address=\"$(last -a | grep root | head -n 1 | awk '{print $NF}')/32\"
+  port protocol=\"tcp\" port=\"443\" accept"
 EOF
     ]
   }
@@ -95,43 +99,42 @@ data "http" "bastion_ip_retrieval" {
 }
 
 # Dev Note: at the end the https port shouldn't be active/listening
-resource "null_resource" "secondary_retrieval_shutdown" {
-  count      = var.cicd ? 1 : 0
-  depends_on = [null_resource.nop, data.http.bastion_ip_retrieval, null_resource.secondary_retrieval_ignition_ip]
-
-  triggers = {
-    private_key = file(var.private_key_file)
-    host        = var.bastion_public_ip
-    agent       = var.ssh_agent
-  }
-
-  connection {
-    type        = "ssh"
-    user        = "root"
-    private_key = self.triggers.private_key
-    host        = self.triggers.host
-    agent       = self.triggers.agent
-  }
-
-  provisioner "remote-exec" {
-    inline = [<<EOF
-rm -f /etc/httpd/conf.d/extra.conf
-systemctl restart httpd
-EOF
-    ]
-  }
-
-  # Dev Note: When destroy, we need to recreate
-  provisioner "remote-exec" {
-    when       = destroy
-    on_failure = continue
-    inline = [<<EOF
-echo "Listen 443" > /etc/httpd/conf.d/extra.conf
-systemctl restart httpd
-EOF
-    ]
-  }
-}
+# resource "null_resource" "secondary_retrieval_shutdown" {
+#   count      = var.cicd ? 1 : 0
+#   depends_on = [null_resource.nop, data.http.bastion_ip_retrieval, null_resource.secondary_retrieval_ignition_ip]
+#
+#   triggers = {
+#     private_key = file(var.private_key_file)
+#     host        = var.bastion_public_ip
+#     agent       = var.ssh_agent
+#   }
+#
+#   connection {
+#     type        = "ssh"
+#     user        = "root"
+#     private_key = self.triggers.private_key
+#     host        = self.triggers.host
+#     agent       = self.triggers.agent
+#   }
+#
+#   provisioner "remote-exec" {
+#     inline = [<<EOF
+# rm -f /etc/httpd/conf.d/extra.conf
+# systemctl restart httpd
+# EOF
+#     ]
+#   }
+#   # Dev Note: When destroy, we need to recreate
+#   provisioner "remote-exec" {
+#     when       = destroy
+#     on_failure = continue
+#     inline = [<<EOF
+# echo "Listen 443" > /etc/httpd/conf.d/extra.conf
+# systemctl restart httpd
+# EOF
+#     ]
+#   }
+# }
 
 locals {
   ignition_ip = var.use_fixed_network ? data.ibm_pi_instance.bastion_instance.networks[0].ip : length(var.ignition_ip) > 0 ? var.ignition_ip[0].instance_ip : length(local.bastion_private_ip) > 0 ? local.bastion_private_ip[0].instance_ip : chomp(data.http.bastion_ip_retrieval[0].response_body)
@@ -143,7 +146,7 @@ locals {
 resource "ibm_pi_instance" "worker" {
   count = var.worker["count"]
 
-  depends_on = [data.ibm_pi_dhcp.refresh_dhcp_server, null_resource.nop, null_resource.secondary_retrieval_shutdown]
+  depends_on = [data.ibm_pi_dhcp.refresh_dhcp_server, null_resource.nop]
 
   pi_cloud_instance_id = var.powervs_service_instance_id
   pi_instance_name     = "${var.name_prefix}-worker-${count.index}"
