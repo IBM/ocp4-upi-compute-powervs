@@ -99,17 +99,34 @@ resource "null_resource" "secondary_retrieval_shutdown" {
   count      = var.cicd ? 1 : 0
   depends_on = [null_resource.nop, data.http.bastion_ip_retrieval, null_resource.secondary_retrieval_ignition_ip]
 
-  connection {
-    type        = "ssh"
-    user        = "root"
+  triggers = {
     private_key = file(var.private_key_file)
     host        = var.bastion_public_ip
     agent       = var.ssh_agent
   }
 
+  connection {
+    type        = "ssh"
+    user        = "root"
+    private_key = self.triggers.private_key
+    host        = self.triggers.bastion_public_ip
+    agent       = self.triggers.ssh_agent
+  }
+
   provisioner "remote-exec" {
     inline = [<<EOF
 rm -f /etc/httpd/conf.d/extra.conf
+systemctl restart httpd
+EOF
+    ]
+  }
+
+  # Dev Note: When destroy, we need to recreate
+  provisioner "remote-exec" {
+    when       = destroy
+    on_failure = continue
+    inline = [<<EOF
+echo "Listen 443" > /etc/httpd/conf.d/extra.conf
 systemctl restart httpd
 EOF
     ]
