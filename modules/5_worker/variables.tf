@@ -19,7 +19,7 @@ variable "use_fixed_network" {}
 variable "private_key_file" {}
 variable "ssh_agent" {}
 variable "bastion_public_ip" {}
-
+variable "cicd" {}
 variable "worker" {
   type = object({ count = number, memory = string, processors = string })
   default = {

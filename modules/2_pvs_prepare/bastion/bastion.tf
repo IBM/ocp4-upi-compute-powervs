@@ -24,9 +24,9 @@ resource "ibm_pi_instance" "bastion" {
   }
 
   # Dev Note: this dhcp network ip does not register with the dhcp server.
-  # pi_network {
-  #   network_id = var.powervs_dhcp_network_id
-  # }
+  pi_network {
+    network_id = var.powervs_network_id
+  }
 }
 
 # Dev Note: injects a delay before a hard-reboot
@@ -293,13 +293,13 @@ EOF
 # 4. Add route 
 # ip route add 10.245.1.0/24 via 192.168.200.1 dev env9
 
-resource "ibm_pi_network_port_attach" "bastion_priv_net" {
-  depends_on                  = [null_resource.manage_packages]
-  pi_cloud_instance_id        = var.powervs_service_instance_id
-  pi_instance_id              = ibm_pi_instance.bastion[0].instance_id
-  pi_network_name             = var.powervs_network_name
-  pi_network_port_description = "private network port"
-}
+# resource "ibm_pi_network_port_attach" "bastion_priv_net" {
+#   depends_on                  = [null_resource.manage_packages]
+#   pi_cloud_instance_id        = var.powervs_service_instance_id
+#   pi_instance_id              = ibm_pi_instance.bastion[0].instance_id
+#   pi_network_name             = var.powervs_network_name
+#   pi_network_port_description = "private network port"
+# }
 
 locals {
   cidr = split("/", var.powervs_network_cidr)[0]
@@ -308,7 +308,8 @@ locals {
 
 resource "null_resource" "bastion_fix_up_networks" {
   count      = 1
-  depends_on = [ibm_pi_network_port_attach.bastion_priv_net]
+  depends_on = [null_resource.manage_packages]
+  #[ibm_pi_network_port_attach.bastion_priv_net]
 
   connection {
     type        = "ssh"
@@ -332,12 +333,13 @@ EOF
 
   # Identifies the networks, and picks the iface that is on the private networkfor_each
   # The macaddress is used to identify the private interface and setup with a static ip.
+  # originally used ${ibm_pi_network_port_attach.bastion_priv_net.macaddress}
   provisioner "remote-exec" {
     inline = [<<EOF
     if [[ "${var.use_fixed_network}" == "true" ]]
     then
       DEV_NAME=$(find /sys/class/net -mindepth 1 -maxdepth 1 ! -name lo ! -name '*bond*' -printf "%P " -execdir cat {}/address \; | \
-        grep ${ibm_pi_network_port_attach.bastion_priv_net.macaddress} | awk '{print $1}')
+        grep -v lo | grep -v env2 | awk '{print $1}')
 
       nmcli dev mod $${DEV_NAME} ipv4.addresses ${var.powervs_network_cidr} \
         ipv4.gateway ${local.gw} \

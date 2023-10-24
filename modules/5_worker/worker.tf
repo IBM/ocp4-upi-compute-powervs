@@ -58,7 +58,7 @@ locals {
 # Dev Note: the hypervisor does not report the internal interfaces ip correctly
 # This resource works around that problem through a temporary setup of an http 
 resource "null_resource" "secondary_retrieval_ignition_ip" {
-  count      = var.use_fixed_network ? 0 : length(var.ignition_ip) > 0 ? 0 : 1
+  count      = var.cicd ? 1 : 0
   depends_on = [null_resource.nop]
 
   connection {
@@ -89,14 +89,14 @@ EOF
 }
 
 data "http" "bastion_ip_retrieval" {
-  count      = var.use_fixed_network ? 0 : length(var.ignition_ip) > 0 ? 0 : 1
+  count      = var.cicd ? 1 : 0
   depends_on = [null_resource.secondary_retrieval_ignition_ip]
-  url        = "curl -k http://${var.bastion_public_ip}:443/ip"
+  url        = "http://${var.bastion_public_ip}:443/ip"
 }
 
 # Dev Note: at the end the https port shouldn't be active/listening
 resource "null_resource" "secondary_retrieval_shutdown" {
-  count      = var.use_fixed_network ? 0 : length(var.ignition_ip) > 0 ? 0 : 1
+  count      = var.cicd ? 1 : 0
   depends_on = [null_resource.nop, data.http.bastion_ip_retrieval, null_resource.secondary_retrieval_ignition_ip]
 
   connection {
@@ -117,7 +117,7 @@ EOF
 }
 
 locals {
-  ignition_ip = var.use_fixed_network ? data.ibm_pi_instance.bastion_instance.networks[0].ip : length(var.ignition_ip) > 0 ? var.ignition_ip[0].instance_ip : length(local.bastion_private_ip[0].instance_ip) ? local.bastion_private_ip[0].instance_ip : data.http.bastion_ip_retrieval[0].response_body
+  ignition_ip = var.use_fixed_network ? data.ibm_pi_instance.bastion_instance.networks[0].ip : length(var.ignition_ip) > 0 ? var.ignition_ip[0].instance_ip : length(local.bastion_private_ip) > 0 ? local.bastion_private_ip[0].instance_ip : chomp(data.http.bastion_ip_retrieval[0].response_body)
 }
 
 # Modeled off the OpenShift Installer work for IPI PowerVS
