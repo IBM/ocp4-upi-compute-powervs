@@ -15,6 +15,13 @@
   ####################################################################################
   tasks:
 
+  - name: Delete ignition directory
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+      - /var/www/html/ignition
+
   - name: Create Apache directories for installing
     file:
       path: "{{ item }}"
@@ -34,6 +41,7 @@
         return_content: true
         headers:
           "Accept": "application/vnd.coreos.ignition+json;version=3.2.0"
+        validate_certs: false
       ignore_errors: true
       register: result
       retries: 120
