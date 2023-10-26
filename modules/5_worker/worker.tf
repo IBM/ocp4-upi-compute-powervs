@@ -71,22 +71,35 @@ resource "null_resource" "secondary_retrieval_ignition_ip" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-echo "Listen 443" > /etc/httpd/conf.d/extra.conf
+cat << EOFX > /etc/httpd/conf.d/extra.conf
+Listen $(ip -j -4 -o address  | jq -r '.[].addr_info[] | select(.dev == "env2").local'):443
+<VirtualHost $(ip -j -4 -o address  | jq -r '.[].addr_info[] | select(.dev == "env2").local'):443>
+  ServerName cicd
+  ServerAdmin cicd@localhost
+  DocumentRoot /var/www/vhosts/1/
+  <Directory /var/www/vhosts/1/>
+    AllowOverride None
+  </Directory>
+  ErrorLog /var/log/apache2-error.log
+</VirtualHost>
+EOFX
+mkdir -p /var/www/vhosts/1
 systemctl restart httpd
+
 for IFACE in $(nmcli device show 2>&1| grep GENERAL.DEVICE | grep -v env2 | grep -v lo | awk '{print $NF}')
 do
     IP_ADDR="$(nmcli device show $${IFACE} 2>&1 | grep IP4.ADDRESS | sed 's|/24||g' | awk '{print $NF}')"
     if [ -n "$${IP_ADDR}" ]
     then 
         echo "Interface: $${IFACE} $${IP_ADDR}"
-        echo "$${IP_ADDR}" > /var/www/html/ip
-        chmod 777 /var/www/html/ip
+        echo "$${IP_ADDR}" > /var/www/vhosts/1/ip
+        echo "$${IP_ADDR}" > /var/www/vhosts/1/index.html
+        chmod -R 777 /var/www/vhosts/1/
     fi
 done
-firewall-cmd --permanent --zone=public --add-rich-rule="
-  rule family=\"ipv4\"
-  source address=\"$(last -a | grep root | head -n 1 | awk '{print $NF}')/32\"
-  port protocol=\"tcp\" port=\"443\" accept"
+chown -R nobody:nobody /var/www/vhosts
+firewall-cmd --permanent --zone=public --add-service=https 
+firewall-cmd --reload
 EOF
     ]
   }
