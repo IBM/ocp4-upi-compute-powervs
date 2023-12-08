@@ -256,6 +256,28 @@ resource "ibm_is_security_group_rule" "openshift_net_sg_r1_in_udp" {
   }
 }
 
+resource "ibm_is_security_group_rule" "openshift_net_sg_r1_out_tcp" {
+  count     = contains(local.openshift_net_sg_rule_exists_hashes, format("%s%s", "tcp/outbound/30000/65000/", var.powervs_machine_cidr)) ? 0 : 1
+  group     = local.openshift_net_sg[0].id
+  direction = "outbound"
+  remote    = var.powervs_machine_cidr
+  tcp {
+    port_min = 30000
+    port_max = 32767
+  }
+}
+
+resource "ibm_is_security_group_rule" "openshift_net_sg_r1_out_udp" {
+  count     = contains(local.openshift_net_sg_rule_exists_hashes, format("%s%s", "udp/outbound/30000/65000/", var.powervs_machine_cidr)) ? 0 : 1
+  group     = local.openshift_net_sg[0].id
+  direction = "outbound"
+  remote    = var.powervs_machine_cidr
+  udp {
+    port_min = 30000
+    port_max = 32767
+  }
+}
+
 resource "ibm_is_security_group_rule" "openshift_net_sg_500" {
   count     = contains(local.openshift_net_sg_rule_exists_hashes, format("%s%s", "udp/inbound/500/500/", var.powervs_machine_cidr)) ? 0 : 1
   group     = local.openshift_net_sg[0].id
