@@ -44,7 +44,7 @@ resource "null_resource" "remove_workers" {
     count                 = var.worker["count"]
     name_prefix           = "${var.name_prefix}"
     vpc_support_server_ip = "${var.nfs_server}"
-    private_key           = file(var.private_key_file)
+    private_key           = sensitive(file(var.private_key_file))
     host                  = var.bastion_public_ip[0]
     agent                 = var.ssh_agent
     ansible_post_path     = local.ansible_post_path
@@ -144,7 +144,7 @@ resource "null_resource" "remove_nfs_deployment" {
 
   triggers = {
     vpc_support_server_ip = "${var.nfs_server}"
-    private_key           = file(var.private_key_file)
+    private_key           = sensitive(file(var.private_key_file))
     host                  = var.bastion_public_ip[0]
     agent                 = var.ssh_agent
     nfs_namespace         = local.nfs_namespace
