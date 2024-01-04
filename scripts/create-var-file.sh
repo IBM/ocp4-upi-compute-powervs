@@ -83,11 +83,9 @@ then
     echo "From the newly created workspace"
     return
 else
-    # PowerVS Service Instance exists
-    # To get the CRN...
-    # POWERVS_CRN=$(ibmcloud resource service-instances --output json | jq -r '.[] | select(.guid == "'${POWERVS_SERVICE_INSTANCE_ID}'").id')
-    # ibmcloud pi st "${POWERVS_CRN}"
-    POWERVS_ZONE=$(${IBMCLOUD} resource service-instances --output json | jq -r '.[] | select(.guid == "'${POWERVS_SERVICE_INSTANCE_ID}'").region_id')
+    # Dev Note: The original approach scanned the service-instances which is paged.
+    # We must search for the CRN
+    POWERVS_ZONE=$(${IBMCLOUD} resource service-instance "${POWERVS_SERVICE_INSTANCE_ID}" --output json | jq -r '.region_id')
     POWERVS_REGION=$(
         case "$POWERVS_ZONE" in
             ("dal10") echo "dal" ;;
