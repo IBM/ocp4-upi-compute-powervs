@@ -20,7 +20,6 @@ for (const line of lines) {
 	} else {
 		if (line.includes("IBM-Cloud/ibm")) {
 			ibmcloud = true
-			console.log("Found")
 		}
 		console.log(line);
 	}
