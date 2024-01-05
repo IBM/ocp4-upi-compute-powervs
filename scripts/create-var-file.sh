@@ -85,7 +85,7 @@ then
 else
     # Dev Note: The original approach scanned the service-instances which is paged.
     # We must search for the CRN
-    POWERVS_ZONE=$(${IBMCLOUD} resource service-instance "${POWERVS_SERVICE_INSTANCE_ID}" --output json | jq -r '.region_id')
+    POWERVS_ZONE=$(${IBMCLOUD} resource service-instance "${POWERVS_SERVICE_INSTANCE_ID}" --output json | jq -r '.[].region_id')
     POWERVS_REGION=$(
         case "$POWERVS_ZONE" in
             ("dal10") echo "dal" ;;
