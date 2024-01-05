@@ -5,7 +5,7 @@ The [`ocp4-upi-compute-powervs` project](https://github.com/ibm/ocp4-upi-compute
 ## Prerequisites
 
 1. Requires Terraform v1.5.0 to v1.5.5
-2. A PowerVS Workspace on IBM Cloud
+2. A PowerVS Workspace on IBM Cloud enabled with [Power Edge Router](https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-per). The legacy Cloud Connection is only in the `release-4.14` and `release-4.15` branches.
 3. An RHCOS Image loaded to the PowerVS Service
 4. Optional: An Centos Image loaded to the PowerVS Service
 5. An Existing OpenShift Container Platform Cluster installed on IBMCloud VPC with Intel architecture.
@@ -20,8 +20,12 @@ The [`ocp4-upi-compute-powervs` project](https://github.com/ibm/ocp4-upi-compute
 
 ### Plan
 
+Copy the `var.tfvars` into a sub-folder data/
+
+Edit for your usage
+
 ```
-❯ terraform plan -var-file=var.tfvars
+❯ terraform plan -var-file=data/var.tfvars
 ```
 
 Note: The PowerVS and IBMCloud VPC regions must be compatible.
@@ -29,13 +33,13 @@ Note: The PowerVS and IBMCloud VPC regions must be compatible.
 ### Apply 
 
 ```
-❯ terraform apply -var-file=var.tfvars
+❯ terraform apply -var-file=data/var.tfvars
 ```
 
 ### Destroy
 
 ```
-❯ terraform destroy -var-file=var.tfvars
+❯ terraform destroy -var-file=data/var.tfvars
 ```
 
 Note, the `destroy` command removes the Node resource, removes the NFS deployment, and destroys the virtual servers. Please backup your NFS Server first - it is destroyed.
