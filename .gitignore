@@ -30,3 +30,4 @@ override.tf.json
 *tfplan*
 
 **/.DS_Store
+node_modules
