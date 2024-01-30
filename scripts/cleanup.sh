@@ -40,28 +40,28 @@ function cleanup_mac() {
   done
 
   echo "Cleaning up workspaces for ${service_instance_id}"
-  for CRN in $(ibmcloud pi sl 2> /dev/null | grep "${service_instance_id}" | awk '{print $1}')
+  for CRN in $(ibmcloud pi workspace ls 2> /dev/null | grep "${service_instance_id}" | awk '{print $1}')
   do
     echo "Targetting power cloud instance"
-    ibmcloud pi st "${CRN}"
+    ibmcloud pi workspace target "${CRN}"
 
     echo "Deleting the PVM Instances"
-    for INSTANCE_ID in $(ibmcloud pi ins --json | jq -r '.pvmInstances[].pvmInstanceID')
+    for INSTANCE_ID in $(ibmcloud pi instance ls --json | jq -r '.pvmInstances[].pvmInstanceID')
     do
       echo "Deleting PVM Instance ${INSTANCE_ID}"
-      ibmcloud pi ind "${INSTANCE_ID}" --delete-data-volumes
+      ibmcloud pi instance delete "${INSTANCE_ID}" --delete-data-volumes
     done
     sleep 60
 
     echo "Deleting the Images"
-    for IMAGE_ID in $(ibmcloud pi imgs --json | jq -r '.images[].imageID')
+    for IMAGE_ID in $(ibmcloud pi images ls --json | jq -r '.images[].imageID')
     do
       echo "Deleting Images ${IMAGE_ID}"
-      ibmcloud pi image-delete "${IMAGE_ID}"
+      ibmcloud pi image delete "${IMAGE_ID}"
       sleep 60
     done
 
-    if [ -n "$(ibmcloud pi nets 2>&1| grep DHCP)" ]
+    if [ -n "$(ibmcloud pi network ls 2>&1| grep DHCP)" ]
     then
       curl -L -o pvsadm "https://github.com/ppc64le-cloud/pvsadm/releases/download/v0.1.12/pvsadm-darwin-amd64"
       chmod +x pvsadm
@@ -72,10 +72,10 @@ function cleanup_mac() {
     fi
 
     echo "Deleting the Network"
-    for NETWORK_ID in $(ibmcloud pi nets 2>&1| awk '{print $1}')
+    for NETWORK_ID in $(ibmcloud pi network ls 2>&1| awk '{print $1}')
     do
       echo "Deleting network ${NETWORK_ID}"
-      ibmcloud pi network-delete "${NETWORK_ID}"
+      ibmcloud pi network delete "${NETWORK_ID}"
       sleep 60
     done
 
