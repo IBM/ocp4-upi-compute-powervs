@@ -22,12 +22,14 @@ echo ""
 echo "Resource Group is [${RESOURCE_GROUP}]"
 
 # 1. Create the service instance
-ibmcloud resource service-instance-create "${WORKSPACE_NAME}" \
-    "${SERVICE_NAME}" "${SERVICE_PLAN_NAME}" "${POWERVS_REGION}" \
-    -g "${RESOURCE_GROUP}" 2>&1
+ibmcloud pi workspace create "${WORKSPACE_NAME}" \
+    --plan public \
+    --datacenter "${POWERVS_REGION}" \
+    --json \
+    --group "${RESOURCE_GROUP}" 2>&1
 
 # 2. Store the CRN
-CRN=$(ibmcloud pi sl --json | jq -r '.[] | select(.Name == "'"${WORKSPACE_NAME}"'").CRN')
+CRN=$(ibmcloud pi workspace ls --json | jq -r '.Payload.workspaces[] | select(.Name == "'"${WORKSPACE_NAME}"'").CRN')
 
 # 3. Tag the resource for easier MAC management
 ibmcloud resource tag-attach --tag-names "mac-power-worker" \
@@ -70,9 +72,9 @@ echo "SERVICE_STATE: ${SERVICE_STATE}"
 # The VMs created using this image are used in support of ignition on PowerVS.
 echo "Creating the Centos Stream Image"
 echo "PowerVS Target CRN is: ${CRN}"
-ibmcloud pi st "${CRN}"
-ibmcloud pi images
-ibmcloud pi image-create CentOS-Stream-8 --json
+ibmcloud pi workspace target "${CRN}"
+ibmcloud pi image list
+ibmcloud pi image create CentOS-Stream-8 --json
 echo "Import image status is: $?"
 
 # This CRN is useful when manually destroying.
@@ -80,7 +82,7 @@ echo "PowerVS Service CRN: ${CRN}"
 
 # 6. Create Cloud Connection
 # 7. Attach Cloud Connection
-ibmcloud pi connection-create ${WORKSPACE_NAME}-conn --transit-enabled \
+ibmcloud pi cloud-connection create ${WORKSPACE_NAME}-conn --transit-enabled \
     --global-routing --speed 1000
 
 # 8. Create DHCP Network
@@ -105,3 +107,5 @@ ibmcloud tg connection-create \
     --name ${WORKSPACE_NAME}-conn \
     --network-id ${DL_CRN} \
     --network-type directlink
+
+echo "done cicd setup"

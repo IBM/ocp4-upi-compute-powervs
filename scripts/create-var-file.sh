@@ -96,6 +96,7 @@ else
             ("sao01") echo "sao" ;;
             ("tor01") echo "tor" ;;
             ("mon01") echo "mon" ;;
+            ("mad01") echo "mad" ;;
             ("eu-de-1") echo "eu-de" ;;
             ("eu-de-2") echo "eu-de" ;;
             ("lon04") echo "lon" ;;
@@ -152,7 +153,7 @@ then
     RHEL_IMAGE_NAME="CentOS-Stream-8"
 fi
 
-OVERRIDE_PREFIX=$(${IBMCLOUD} pi sl 2>&1 | grep $POWERVS_SERVICE_INSTANCE_ID | awk '{print $NF}')
+OVERRIDE_PREFIX=$(${IBMCLOUD} pi workspace list 2>&1 | grep $POWERVS_SERVICE_INSTANCE_ID | awk '{print $NF}')
 
 # creates the var file
 cat << EOFXEOF > data/var.tfvars
