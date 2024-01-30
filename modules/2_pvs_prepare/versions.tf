@@ -11,7 +11,7 @@ terraform {
     }
     ibm = {
       source                = "IBM-Cloud/ibm"
-      version               = "~> 1.61.0"
+      version               = "~> 1.62.0"
       configuration_aliases = [ibm]
     }
     time = {
@@ -21,4 +21,5 @@ terraform {
   }
   required_version = ">= 1.5.0"
 }
+
 
