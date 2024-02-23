@@ -46,7 +46,7 @@ function cleanup_mac() {
     ibmcloud pi workspace target "${CRN}"
 
     echo "Deleting the PVM Instances"
-    for INSTANCE_ID in $(ibmcloud pi instance ls --json | jq -r '.pvmInstances[].pvmInstanceID')
+    for INSTANCE_ID in $(ibmcloud pi instance ls --json | jq -r '.pvmInstances[] | .id')
     do
       echo "Deleting PVM Instance ${INSTANCE_ID}"
       ibmcloud pi instance delete "${INSTANCE_ID}" --delete-data-volumes
