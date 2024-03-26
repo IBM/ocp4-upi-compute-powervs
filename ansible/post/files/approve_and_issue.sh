@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-# Approve and Issue CSRs for our generated Power Workers only
+# Approve and Issue CSRs for our generated Power workers only
 
 # Var: ${self.triggers.vpc_support_server_ip}
 PROXY_SERVER="${1}"
@@ -16,97 +16,97 @@ POWER_COUNT="${2}"
 # Var: ${self.triggers.approve}
 POWER_PREFIX="${3}"
 
-APPROVED_WORKERS=0
-ISSUED_WORKERS=0
+# Machine Prefix
+MACHINE_PREFIX="${POWER_PREFIX}-worker"
 
+# Check count for Power worker/s to be added is not zero
+if [ "0" -eq "${POWER_COUNT}" ]
+then
+  echo "Supplied Worker count is zero hence exiting."
+  exit 0
+fi
+
+# Setting values for variables
+APPROVED_WORKERS=0
 IDX=0
-while [ "$IDX" -lt "121" ]
+READY_COUNT=$(oc get nodes -l kubernetes.io/arch=ppc64le | grep "${MACHINE_PREFIX}" | grep -v NotReady | grep -c Ready)
+
+# Approce CSR and Check Ready status
+while [ "${READY_COUNT}" -ne "${POWER_COUNT}" ]
 do
+  
   export HTTPS_PROXY="http://${PROXY_SERVER}:3128"
 
-  echo "Try number: ${IDX}"
-  echo "List of Power Workers: "
+  echo "List of All Power Workers: "
   oc get nodes -l 'kubernetes.io/arch=ppc64le' -o json | jq -r '.items[] | .metadata.name'
   echo ""
 
+  echo "Approve and Issue - #${IDX}"
+  echo "List of Power Workers to be added with prefix '${POWER_PREFIX}': "
+  oc get nodes -l 'kubernetes.io/arch=ppc64le' --no-headers=true | grep "${MACHINE_PREFIX}"
+  echo ""
+
+  # Approve openshift-machine-config-operator:node-bootstrapper CSR/s
+  APPROVED_WORKERS=0
   JSON_BODY=$(oc get csr -o json | jq -r '.items[] | select (.spec.username == "system:serviceaccount:openshift-machine-config-operator:node-bootstrapper")' | jq -r '. | select(.status == {})')
   for CSR_REQUEST in $(echo ${JSON_BODY} | jq -r '. | "\(.metadata.name),\(.spec.request)"')
-  do 
+  do
     CSR_NAME=$(echo ${CSR_REQUEST} | sed 's|,| |'| awk '{print $1}')
     CSR_REQU=$(echo ${CSR_REQUEST} | sed 's|,| |'| awk '{print $2}')
     echo "CSR_NAME: ${CSR_NAME}"
     NODE_NAME=$(echo ${CSR_REQU} | base64 -d | openssl req -text | grep 'Subject:' | awk '{print $NF}')
-    echo "NODE_NAME: ${NODE_NAME}"
+    echo "Pending CSR found for NODE_NAME: ${NODE_NAME}"
 
-    if grep -q "system:node:${POWER_PREFIX}-worker-" <<< "$NODE_NAME"
+    if grep -q "system:node:${MACHINE_PREFIX}-" <<< "$NODE_NAME"
     then
-      echo ""
-      echo "${CSR_NAME}" | xargs -r oc adm certificate approve
+      oc adm certificate approve "${CSR_NAME}"
       APPROVED_WORKERS=$(($APPROVED_WORKERS + 1))
     fi
   done
 
+  # Approve system:node:${MACHINE_PREFIX} CSRs
   LOCAL_WORKER_SCAN=0
   while [ "$LOCAL_WORKER_SCAN" -lt "$POWER_COUNT" ]
   do
     # username: system:node:mac-674e-worker-0
-    for CSR_NAME in $(oc get csr -o json | jq -r '.items[] | select (.spec.username == "'system:node:${POWER_PREFIX}-worker-${ISSUED_WORKERS}'")' | jq -r '.metadata.name')
+    for CSR_NAME in $(oc get csr -o json | jq -r '.items[] | select (.spec.username == "'system:node:${MACHINE_PREFIX}-${LOCAL_WORKER_SCAN}'")' | jq -r '.metadata.name')
     do
       # Dev note: will approve more than one matching csr
-      echo "Approving: ${CSR_NAME} system:node:${POWER_PREFIX}-worker-${ISSUED_WORKERS}"
-      echo "${CSR_NAME}" | xargs -r oc adm certificate approve
+      echo "Approving: ${CSR_NAME} system:node:${MACHINE_PREFIX}-${LOCAL_WORKER_SCAN}"
+      oc adm certificate approve "${CSR_NAME}"
     done
     LOCAL_WORKER_SCAN=$(($LOCAL_WORKER_SCAN + 1))
   done
 
-  if [ "${IDX}" -eq "240" ]
+  # Wait for 30 seconds before we hammer the system
+  echo "Sleeping before re-running - 30 seconds"
+  sleep 30
+
+  # Re-read the 'Ready' count
+  READY_COUNT=$(oc get nodes -l kubernetes.io/arch=ppc64le | grep "${MACHINE_PREFIX}" | grep -v NotReady | grep -c Ready)
+
+  # Increment counter
+  IDX=$(($IDX + 1))
+
+  # End Early... we've checked enough.
+  if [ "${IDX}" -eq "60" ]
   then
-    echo "Exceeded the wait time for CSRs to be generated - >120 minutes"
+    echo "Exceeded the wait time for CSRs to be generated and Worker/s node to be ready - > 30 minutes"
+    echo "Printing all Nodes"
+    oc get nodes -owide
+    echo ""
+    echo "Get All CSRs"
+    oc get csr
+    echo "Exiting with Error. Ready count - ${READY_COUNT} is not matching with expected Power Worker count - ${POWER_COUNT}"
+    echo "Supplied Worker/s with prefix: '${MACHINE_PREFIX}' are not yet Ready."
     exit -1
   fi
 
-  NODE_COUNT=0
-  STOP_SEARCH=""
-  while [ "$NODE_COUNT" -lt "$POWER_COUNT" ]
-  do
-    EXISTS=$(oc get nodes -l kubernetes.io/arch=ppc64le -o json | \
-      jq -r '.items[].metadata.name' | \
-      grep "${POWER_PREFIX}-worker-${ISSUED_WORKERS}")
-    if [ -z "${EXISTS}" ]
-    then
-      echo "Haven't found worker yet: ${POWER_PREFIX}-worker-${ISSUED_WORKERS}"
-      STOP_SEARCH="NOT_FOUND"
-      break
-    fi
-    NODE_COUNT=$(($NODE_COUNT + 1))
-  done
-
-  if [ -z "${STOP_SEARCH}" ]
-  then
-    # Checks if the nodes are READY
-    INTER_COUNT=$(oc get nodes -owide | grep ppc64le | grep -v NotReady | grep Ready | wc -l)
-    if [ "${INTER_COUNT}" == "${POWER_COUNT}" ]
-    then
-      IDX=1000
-      echo "Nodes are ready"
-    else
-      echo "Nodes are NOT ready"
-      oc get nodes -owide
-      oc get csr
-    fi
-  else 
-    # 30 second sleep
-    echo "waiting for the csrs"
-    sleep 30
-  fi
-  IDX=$(($IDX + 1))
 done
 
-READY_COUNT=$(oc get nodes -l kubernetes.io/arch=ppc64le | grep Ready | wc -l)
-while [ "$NODE_COUNT" -ne "$POWER_COUNT" ]
-do
-  oc get csr | grep 'kubernetes.io/kubelet-serving' \
-    | grep 'Pending' | awk '{print $1}' \
-    | xargs -r oc adm certificate approve
-  sleep 30
-done
+# Final Check
+if [ "${READY_COUNT}" -eq "${POWER_COUNT}" ]
+then
+  echo "Supplied Worker/s with prefix: '${MACHINE_PREFIX}' are Ready."
+  oc get nodes -l 'kubernetes.io/arch=ppc64le' --no-headers=true | grep "${MACHINE_PREFIX}"
+fi
