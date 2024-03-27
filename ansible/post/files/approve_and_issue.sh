@@ -20,14 +20,13 @@ POWER_PREFIX="${3}"
 MACHINE_PREFIX="${POWER_PREFIX}-worker"
 
 # Check count for Power worker/s to be added is not zero
-if [ "0" -eq "${POWER_COUNT}" ]
+if [ "${POWER_COUNT}" -eq "0" ]
 then
-  echo "Supplied Worker count is zero hence exiting."
+  echo "No Power workers to approve."
   exit 0
 fi
 
 # Setting values for variables
-APPROVED_WORKERS=0
 IDX=0
 READY_COUNT=$(oc get nodes -l kubernetes.io/arch=ppc64le | grep "${MACHINE_PREFIX}" | grep -v NotReady | grep -c Ready)
 
@@ -47,9 +46,8 @@ do
   echo ""
 
   # Approve openshift-machine-config-operator:node-bootstrapper CSR/s
-  APPROVED_WORKERS=0
   JSON_BODY=$(oc get csr -o json | jq -r '.items[] | select (.spec.username == "system:serviceaccount:openshift-machine-config-operator:node-bootstrapper")' | jq -r '. | select(.status == {})')
-  for CSR_REQUEST in $(echo ${JSON_BODY} | jq -r '. | "\(.metadata.name),\(.spec.request)"')
+  for CSR_REQUEST in $(echo ${JSON_BODY} | jq -cr '. | "\(.metadata.name),\(.spec.request)"')
   do
     CSR_NAME=$(echo ${CSR_REQUEST} | sed 's|,| |'| awk '{print $1}')
     CSR_REQU=$(echo ${CSR_REQUEST} | sed 's|,| |'| awk '{print $2}')
@@ -59,8 +57,7 @@ do
 
     if grep -q "system:node:${MACHINE_PREFIX}-" <<< "$NODE_NAME"
     then
-      oc adm certificate approve "${CSR_NAME}"
-      APPROVED_WORKERS=$(($APPROVED_WORKERS + 1))
+      oc adm certificate approve "${CSR_NAME}"      
     fi
   done
 
@@ -75,6 +72,7 @@ do
       echo "Approving: ${CSR_NAME} system:node:${MACHINE_PREFIX}-${LOCAL_WORKER_SCAN}"
       oc adm certificate approve "${CSR_NAME}"
     done
+    sleep 10
     LOCAL_WORKER_SCAN=$(($LOCAL_WORKER_SCAN + 1))
   done
 
