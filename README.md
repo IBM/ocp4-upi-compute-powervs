@@ -2,10 +2,12 @@
 
 The [`ocp4-upi-compute-powervs` project](https://github.com/ibm/ocp4-upi-compute-powervs) provides Terraform based automation code to help with the deployment of OpenShift Container Platform (OCP) 4.x compute workers on [IBM® Power Systems™ Virtual Server on IBM Cloud](https://www.ibm.com/cloud/power-virtual-server).
 
+*Warning* Active code updates in progress to make the code base more resilient.
+
 ## Prerequisites
 
-1. Requires Terraform v1.5.0 to v1.5.5
-2. A PowerVS Workspace on IBM Cloud enabled with [Power Edge Router](https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-per). The legacy Cloud Connection is only in the `release-4.14` and `release-4.15` branches, and is not maintained.
+1. Requires Terraform v1.5.0 to v1.5.5. You may use the alternative [OpenTofu](https://opentofu.org/docs/intro/install/).
+2. A PowerVS Workspace on IBM Cloud that supports [Power Edge Router](https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-per).
 3. An RHCOS Image loaded to the PowerVS Service
 4. Optional: An Centos Image loaded to the PowerVS Service
 5. An Existing OpenShift Container Platform Cluster installed on IBMCloud VPC with Intel architecture.
@@ -92,7 +94,7 @@ If you would like to see the detailed LICENSE click [here](LICENSE).
 
 ```text
 #
-# Copyright 2023 - IBM Corporation. All rights reserved
+# Copyright 2024 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 #
 ```
@@ -100,6 +102,4 @@ If you would like to see the detailed LICENSE click [here](LICENSE).
 # Support
 Is this a Red Hat or IBM supported solution?
 
-No. This is only an early alpha version of multi-architecture compute.
-
-This notice will be removed when the feature is generally available or in Tech Preview. 
+Multi-Arch Compute with an Intel Control Plane and Intel/Power compute is supported.
