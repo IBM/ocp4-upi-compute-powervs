@@ -1,11 +1,12 @@
-if [ "$1" = "env2" ] && [ "$2" = "up" ]
+if [[ "$2" == "up" && "${1}" == "env2" ]]
 then
-echo "Turning off tx-checksumming"
+echo "multi-arch-installer: turning off tx-checksumming"
 /sbin/ethtool --offload env2 tx-checksumming off
-else 
-echo "not running tx-checksumming off"
+ethtool --show-offload env2 | grep check
+/sbin/ethtool --offload env2 rx-checksumming off
 fi
 if systemctl is-failed NetworkManager-wait-online
 then
+echo "multi-arch-installer: restarting wait-online"
 systemctl restart NetworkManager-wait-online
 fi

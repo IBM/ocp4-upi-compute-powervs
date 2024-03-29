@@ -26,10 +26,10 @@
                 "path": "/etc/NetworkManager/dispatcher.d/20-ethtool",
                 "user": {},
                 "contents": {
-                    "source": "data:text/plain;base64,aWYgWyAiJDEiID0gImVudjIiIF0gJiYgWyAiJDIiID0gInVwIiBdCnRoZW4KICBlY2hvICJUdXJuaW5nIG9mZiB0eC1jaGVja3N1bW1pbmciCiAgL3NiaW4vZXRodG9vbCAtLW9mZmxvYWQgZW52MiB0eC1jaGVja3N1bW1pbmcgb2ZmCmVsc2UgCiAgZWNobyAibm90IHJ1bm5pbmcgdHgtY2hlY2tzdW1taW5nIG9mZiIKZmkKaWYgc3lzdGVtY3RsIGlzLWZhaWxlZCBOZXR3b3JrTWFuYWdlci13YWl0LW9ubGluZQp0aGVuCnN5c3RlbWN0bCByZXN0YXJ0IE5ldHdvcmtNYW5hZ2VyLXdhaXQtb25saW5lCmZpCg==",
+                    "source": "data:text/plain;base64,aWYgW1sgIiQyIiA9PSAidXAiICYmICIkezF9IiA9PSAiZW52MiIgXV0KdGhlbgplY2hvICJtdWx0aS1hcmNoLWluc3RhbGxlcjogdHVybmluZyBvZmYgdHgtY2hlY2tzdW1taW5nIgovc2Jpbi9ldGh0b29sIC0tb2ZmbG9hZCBlbnYyIHR4LWNoZWNrc3VtbWluZyBvZmYKZXRodG9vbCAtLXNob3ctb2ZmbG9hZCBlbnYyIHwgZ3JlcCBjaGVjawovc2Jpbi9ldGh0b29sIC0tb2ZmbG9hZCBlbnYyIHJ4LWNoZWNrc3VtbWluZyBvZmYKZmkKaWYgc3lzdGVtY3RsIGlzLWZhaWxlZCBOZXR3b3JrTWFuYWdlci13YWl0LW9ubGluZQp0aGVuCmVjaG8gIm11bHRpLWFyY2gtaW5zdGFsbGVyOiByZXN0YXJ0aW5nIHdhaXQtb25saW5lIgpzeXN0ZW1jdGwgcmVzdGFydCBOZXR3b3JrTWFuYWdlci13YWl0LW9ubGluZQpmaQo=",
                     "verification": {}
                 },
-                "mode": 420
+                "mode": 484
             }
         ]
     }
