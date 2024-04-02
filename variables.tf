@@ -106,7 +106,7 @@ variable "processor_type" {
 # The default is s922.
 variable "system_type" {
   type        = string
-  description = "The type of system (s922/e980)"
+  description = "The type of system (s922/e980/s1022/s1080)"
   default     = "s922"
 }
 
