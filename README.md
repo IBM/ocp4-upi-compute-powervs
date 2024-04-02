@@ -7,7 +7,7 @@ The [`ocp4-upi-compute-powervs` project](https://github.com/ibm/ocp4-upi-compute
 ## Prerequisites
 
 1. Requires Terraform v1.5.0 to v1.5.5. You may use the alternative [OpenTofu](https://opentofu.org/docs/intro/install/).
-2. A PowerVS Workspace on IBM Cloud that supports [Power Edge Router](https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-per).
+2. A PowerVS Workspace on IBM Cloud that supports [Power Edge Router](https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-per). If your workspace supports s922,s1022,e980,e1080, you'll have to update the var.tfvars to the supported `system_type`.
 3. An RHCOS Image loaded to the PowerVS Service
 4. Optional: An Centos Image loaded to the PowerVS Service
 5. An Existing OpenShift Container Platform Cluster installed on IBMCloud VPC with Intel architecture.
