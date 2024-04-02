@@ -181,7 +181,7 @@ rhcos_import_image_filename        = "${COREOS_NAME}-0-ppc64le-powervs.ova.gz"
 rhcos_import_image_region_override = "us-east"
 
 processor_type = "shared"
-system_type    = "e980"
+system_type    = "s922"
 bastion_health_status = "OK"
 bastion               = { memory = "16", processors = "1", "count" = 1 }
 worker                = { memory = "16", processors = "1", "count" = ${EXPECTED_NODES} }
