@@ -24,7 +24,7 @@ openshift_client_tarball = "<openshift_client_tarball_url>"
 
 # Power Instance Configuration
 processor_type = "shared"
-system_type    = "e980"
+system_type    = "s922"
 
 # Machine Details
 bastion_health_status = "WARNING"

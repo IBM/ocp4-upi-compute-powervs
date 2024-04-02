@@ -103,11 +103,11 @@ variable "processor_type" {
 }
 
 # Reference https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-about-virtual-server
-# The default is e980.
+# The default is s922.
 variable "system_type" {
   type        = string
   description = "The type of system (s922/e980)"
-  default     = "e980"
+  default     = "s922"
 }
 
 ################################################################
