@@ -181,16 +181,18 @@ variable "rhel_smt" {
 ################################################################
 
 variable "worker" {
-  type = object({ count = number, memory = string, processors = string })
   default = {
     count      = 1
     memory     = "16"
     processors = "1"
   }
+  type = object({ count = number, memory = string, processors = string })
+  description = "The worker configuration details. You may have 0 or more workers"
   validation {
-    condition     = lookup(var.worker, "count", 1) >= 1
-    error_message = "The worker.count value must be greater than 1."
+    condition     = lookup(var.worker, "count", 1) >= 0
+    error_message = "The worker.count value must be greater than 0."
   }
+  nullable = false
 }
 
 ################################################################
