@@ -177,35 +177,3 @@ EOF
     ]
   }
 }
-
-# Dev Note: For CICD, we're spinning until we get a good setup.
-resource "null_resource" "cicd_hold_while_updating" {
-  depends_on = [null_resource.remove_nfs_deployment, null_resource.debug_and_remove_taints]
-  count      = var.cicd ? 1 : 0
-  connection {
-    type        = "ssh"
-    user        = "root"
-    private_key = file(var.private_key_file)
-    host        = var.bastion_public_ip[0]
-    agent       = var.ssh_agent
-  }
-
-  # Dev Note:
-  # 1. This command is not designed to fail when called. It's adding a delay.
-  # 2. In rare circumstances, the csrs resign and are pending and need re-approval.
-  provisioner "remote-exec" {
-    inline = [<<EOF
-export HTTPS_PROXY="http://${var.nfs_server}:3128"
-cd ${local.ansible_post_path}
-bash files/cicd_hold_while_updating.sh "${var.nfs_server}" || true
-
-for IDX in $(seq 0 5)
-do
-echo "Approving any pending csrs $${IDX}"
-oc get csr | grep Pending | awk '{print $1}' | xargs oc adm certificate approve
-sleep 30
-done
-EOF
-    ]
-  }
-}
