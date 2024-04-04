@@ -186,7 +186,7 @@ variable "worker" {
     memory     = "16"
     processors = "1"
   }
-  type = object({ count = number, memory = string, processors = string })
+  type        = object({ count = number, memory = string, processors = string })
   description = "The worker configuration details. You may have 0 or more workers"
   validation {
     condition     = lookup(var.worker, "count", 1) >= 0
