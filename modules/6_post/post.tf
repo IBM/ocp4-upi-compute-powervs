@@ -80,7 +80,7 @@ EOF
 resource "null_resource" "post_ansible" {
   depends_on = [null_resource.remove_workers, null_resource.post_setup]
 
-    # Trigger for count and name_prefix enable scale-up and scale-down
+  # Trigger for count and name_prefix enable scale-up and scale-down
   triggers = {
     count       = var.worker["count"]
     name_prefix = "${var.name_prefix}"
