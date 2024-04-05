@@ -40,8 +40,8 @@ resource "null_resource" "post_setup" {
 resource "null_resource" "remove_workers" {
   depends_on = [null_resource.post_setup]
 
+  # var.worker["count"] is intentionally not included as a trigger
   triggers = {
-    count                 = var.worker["count"]
     name_prefix           = "${var.name_prefix}"
     vpc_support_server_ip = "${var.nfs_server}"
     private_key           = sensitive(file(var.private_key_file))
@@ -70,7 +70,7 @@ oc login \
   "${self.triggers.openshift_api_url}" -u "${self.triggers.openshift_user}" -p "${self.triggers.openshift_pass}" --insecure-skip-tls-verify=true
 
 cd ${self.triggers.ansible_post_path}
-bash files/destroy-workers.sh "${self.triggers.count}" "${self.triggers.vpc_support_server_ip}" "${self.triggers.name_prefix}"
+bash files/destroy-workers.sh "${self.triggers.vpc_support_server_ip}" "${self.triggers.name_prefix}"
 EOF
     ]
   }
@@ -79,6 +79,13 @@ EOF
 #command to run ansible playbook on Bastion
 resource "null_resource" "post_ansible" {
   depends_on = [null_resource.remove_workers, null_resource.post_setup]
+
+  # Trigger for count and name_prefix enable scale-up and scale-down
+  triggers = {
+    count       = var.worker["count"]
+    name_prefix = "${var.name_prefix}"
+  }
+
   connection {
     type        = "ssh"
     user        = "root"
@@ -173,38 +180,6 @@ oc login \
 
 cd ${self.triggers.ansible_post_path}
 bash files/destroy-nfs-deployment.sh "${self.triggers.nfs_deployment}" "${self.triggers.vpc_support_server_ip}" "${self.triggers.nfs_namespace}"
-EOF
-    ]
-  }
-}
-
-# Dev Note: For CICD, we're spinning until we get a good setup.
-resource "null_resource" "cicd_hold_while_updating" {
-  depends_on = [null_resource.remove_nfs_deployment, null_resource.debug_and_remove_taints]
-  count      = var.cicd ? 1 : 0
-  connection {
-    type        = "ssh"
-    user        = "root"
-    private_key = file(var.private_key_file)
-    host        = var.bastion_public_ip[0]
-    agent       = var.ssh_agent
-  }
-
-  # Dev Note:
-  # 1. This command is not designed to fail when called. It's adding a delay.
-  # 2. In rare circumstances, the csrs resign and are pending and need re-approval.
-  provisioner "remote-exec" {
-    inline = [<<EOF
-export HTTPS_PROXY="http://${var.nfs_server}:3128"
-cd ${local.ansible_post_path}
-bash files/cicd_hold_while_updating.sh "${var.nfs_server}" || true
-
-for IDX in $(seq 0 5)
-do
-echo "Approving any pending csrs $${IDX}"
-oc get csr | grep Pending | awk '{print $1}' | xargs oc adm certificate approve
-sleep 30
-done
 EOF
     ]
   }
