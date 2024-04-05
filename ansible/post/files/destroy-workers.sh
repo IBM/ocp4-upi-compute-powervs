@@ -14,9 +14,9 @@ PROXY_SERVER="${1}"
 # Var: self.triggers.name_prefix
 NAME_PREFIX="${2}"
 
-# Get COUNT for all power workers with name having MACHINE_PREFIX 
-COUNT=$(oc get nodes -l kubernetes.io/arch=ppc64le | grep "${MACHINE_PREFIX}" | grep -c Ready)
-echo "Available COUNT for Power worker/s with Prefix '${MACHINE_PREFIX}' is $COUNT"
+# Get COUNT for all power workers with name having NAME_PREFIX 
+COUNT=$(oc get nodes -l kubernetes.io/arch=ppc64le | grep "${NAME_PREFIX}" | grep -c Ready)
+echo "Available COUNT for Power worker/s with Prefix '${NAME_PREFIX}' is $COUNT"
 
 IDX=0
 while [ "$IDX" -lt "$COUNT" ]
