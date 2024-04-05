@@ -41,7 +41,7 @@ resource "null_resource" "remove_workers" {
   depends_on = [null_resource.post_setup]
 
   triggers = {
-    count                 = var.worker["count"]
+    #    count                 = var.worker["count"]
     name_prefix           = "${var.name_prefix}"
     vpc_support_server_ip = "${var.nfs_server}"
     private_key           = sensitive(file(var.private_key_file))
@@ -70,7 +70,7 @@ oc login \
   "${self.triggers.openshift_api_url}" -u "${self.triggers.openshift_user}" -p "${self.triggers.openshift_pass}" --insecure-skip-tls-verify=true
 
 cd ${self.triggers.ansible_post_path}
-bash files/destroy-workers.sh "${self.triggers.count}" "${self.triggers.vpc_support_server_ip}" "${self.triggers.name_prefix}"
+bash files/destroy-workers.sh "${self.triggers.vpc_support_server_ip}" "${self.triggers.name_prefix}"
 EOF
     ]
   }
@@ -79,6 +79,12 @@ EOF
 #command to run ansible playbook on Bastion
 resource "null_resource" "post_ansible" {
   depends_on = [null_resource.remove_workers, null_resource.post_setup]
+
+  triggers = {
+    count       = var.worker["count"]
+    name_prefix = "${var.name_prefix}"
+  }
+
   connection {
     type        = "ssh"
     user        = "root"
