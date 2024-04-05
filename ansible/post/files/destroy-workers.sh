@@ -15,8 +15,9 @@ PROXY_SERVER="${1}"
 NAME_PREFIX="${2}"
 
 # Get COUNT for all power workers with name having NAME_PREFIX 
+# Nodes that are NotReady are included in the count intentionally
 COUNT=$(oc get nodes -l kubernetes.io/arch=ppc64le | grep "${NAME_PREFIX}" | grep -c Ready)
-echo "Available COUNT for Power worker/s with Prefix '${NAME_PREFIX}' is $COUNT"
+echo "Available COUNT for Power worker/s with Prefix '${NAME_PREFIX}' is ${COUNT}"
 
 IDX=0
 while [ "$IDX" -lt "$COUNT" ]
