@@ -40,8 +40,8 @@ resource "null_resource" "post_setup" {
 resource "null_resource" "remove_workers" {
   depends_on = [null_resource.post_setup]
 
+  # var.worker["count"] is intentionally not included as a trigger
   triggers = {
-    #    count                 = var.worker["count"]
     name_prefix           = "${var.name_prefix}"
     vpc_support_server_ip = "${var.nfs_server}"
     private_key           = sensitive(file(var.private_key_file))
@@ -80,6 +80,7 @@ EOF
 resource "null_resource" "post_ansible" {
   depends_on = [null_resource.remove_workers, null_resource.post_setup]
 
+    # Trigger for count and name_prefix enable scale-up and scale-down
   triggers = {
     count       = var.worker["count"]
     name_prefix = "${var.name_prefix}"
