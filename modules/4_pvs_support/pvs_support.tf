@@ -379,3 +379,22 @@ EOF
     ]
   }
 }
+
+# This resource is independent and is purely a warning for debugging purposes, and is marked as INFO intentionally.
+resource "null_resource" "warn_worker_count" {
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = var.bastion_public_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+echo "INFO: number of workers is '${var.worker["count"]}''"
+EOF
+    ]
+  }
+}
