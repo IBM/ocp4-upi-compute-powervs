@@ -136,8 +136,10 @@ resource "null_resource" "debug_and_remove_taints" {
 export HTTPS_PROXY="http://${var.nfs_server}:3128"
 echo "[All Nodes]"
 oc get nodes -owide
+echo ""
 echo "[Power Nodes]"
 oc get nodes -l 'kubernetes.io/arch=ppc64le' -o json | jq -r '.items[]'
+echo ""
 cd ${local.ansible_post_path}
 bash files/remove-worker-taints.sh "${var.nfs_server}" "${var.name_prefix}" "${var.worker["count"]}"
 EOF
