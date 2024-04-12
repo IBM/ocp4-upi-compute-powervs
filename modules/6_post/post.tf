@@ -114,7 +114,7 @@ EOF
     inline = [
       "echo Running ansible-playbook for Post Activities",
       "cd ${local.ansible_post_path}",
-      "ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-post.log ansible-playbook tasks/main.yml --extra-vars @ansible_post_vars.json"
+      "ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-post.log ansible-playbook tasks/main.yml --extra-vars @ansible_post_vars.json --extra-vars @vars/vars.yml"
     ]
   }
 }

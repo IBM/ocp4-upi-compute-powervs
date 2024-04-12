@@ -1,8 +1,6 @@
 ---
 - name: Post Installation Tasks (Approving CSRs, Setting up Node Labels, Installation of RSCT Daemonset, Setup NFS storage)
   hosts: all
-  vars_files:
-    - ../vars/main.yml
 
   tasks:
   - name: Install Pre-requisites

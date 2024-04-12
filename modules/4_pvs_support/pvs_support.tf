@@ -118,7 +118,7 @@ EOF
   # Currently this is a NOP
   provisioner "remote-exec" {
     inline = [<<EOF
-echo 'Running ocp4-upi-compute-powervs playbook...'
+echo 'Running ocp4-upi-compute-powervs playbook for local dhcp setup...'
 cd ocp4-upi-compute-powervs/support
 ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support-dhcp.log ansible-playbook -e @vars/vars.yaml tasks/dhcp.yml --become || true
 EOF
