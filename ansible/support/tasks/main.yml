@@ -29,6 +29,12 @@
       - git
       state: present
 
+  - name: Install OpenShift Pre-requisites
+    pip:
+      name:
+        - kubernetes
+        - openshift
+
   - name: Copy httpd conf file
     copy:
       src: ../files/httpd.conf
@@ -129,3 +135,8 @@
       port: 3128
       delay: 30
       timeout: 600
+
+  - name: Setup NFS storage if NFS_SERVER is provided
+    import_tasks: nfs_provisioner.yaml
+    when: nfs_server != "none"
+

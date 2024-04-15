@@ -26,6 +26,8 @@ locals {
     power_worker_count           = var.worker["count"]
     start_host                   = join(",", local.worker_hosts)
     gateway                      = cidrhost(var.powervs_machine_cidr, 1)
+    nfs_server                   = var.nfs_server
+    nfs_path                     = var.nfs_path
   }
 
   cidrs = {
@@ -393,7 +395,7 @@ resource "null_resource" "warn_worker_count" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-echo "INFO: number of workers is '${var.worker["count"]}''"
+echo "INFO: number of workers is '${var.worker["count"]}'"
 EOF
     ]
   }

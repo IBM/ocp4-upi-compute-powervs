@@ -147,8 +147,10 @@ EOF
   }
 }
 
-# Dev Note: only on destroy - remove the the deployment for nfs storage, and leave after post_ansible
+# Dev Note: only on destroy - remove the deployment for nfs storage and leave after post_ansible
+# This does not delete the underlying data stored in /export directory of the nfs server
 resource "null_resource" "remove_nfs_deployment" {
+  count      = var.remove_nfs_deployment ? 1 : 0
   depends_on = [null_resource.post_ansible, null_resource.debug_and_remove_taints]
 
   triggers = {
