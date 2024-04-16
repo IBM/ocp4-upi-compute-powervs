@@ -151,6 +151,28 @@ EOF
   }
 }
 
+# Dev Note: setup nfs deployment
+resource "null_resource" "nfs_deployment" {
+  depends_on = [null_resource.config_login]
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = var.bastion_public_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+echo 'Running ocp4-upi-compute-powervs playbook...'
+cd ocp4-upi-compute-powervs/support
+ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support-nfs-deploy.log ansible-playbook -e @vars/vars.yaml tasks/nfs_provisioner.yml --become || true
+EOF
+    ]
+  }
+}
+
 resource "null_resource" "config_csi" {
   depends_on = [null_resource.config_login, null_resource.config]
   connection {
