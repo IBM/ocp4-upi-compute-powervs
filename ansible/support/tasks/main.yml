@@ -136,7 +136,3 @@
       delay: 30
       timeout: 600
 
-  - name: Setup NFS storage if NFS_SERVER is provided
-    import_tasks: nfs_provisioner.yaml
-    when: nfs_server != "none"
-
