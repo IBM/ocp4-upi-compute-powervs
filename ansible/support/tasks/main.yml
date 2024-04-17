@@ -25,6 +25,7 @@
       - vim
       - bash-completion
       - podman
+      - python3-pip
       - nfs-utils
       - git
       state: present
