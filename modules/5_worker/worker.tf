@@ -96,7 +96,7 @@ else
     IFACES=$(nmcli device show 2>&1| grep GENERAL.DEVICE | grep -v eth1 | grep -v lo | awk '{print $NF}')
 fi
 
-for IFACE in $(echo ${IFACES})
+for IFACE in $(echo $${IFACES})
 do
     IP_ADDR="$(nmcli device show $${IFACE} 2>&1 | grep IP4.ADDRESS | sed 's|/24||g' | awk '{print $NF}')"
     if [ -n "$${IP_ADDR}" ]
