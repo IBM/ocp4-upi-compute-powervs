@@ -421,6 +421,12 @@ variable "remove_nfs_deployment" {
   default     = false
 }
 
+variable "skip_vpc_key" {
+  type        = bool
+  description = "Flag to skip creation of key in VPC"
+  default     = false
+}
+
 ##########################################
 
 variable "public_key_file" {

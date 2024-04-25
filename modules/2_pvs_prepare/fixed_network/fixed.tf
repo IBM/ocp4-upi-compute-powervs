@@ -10,6 +10,10 @@ resource "ibm_pi_network" "bastion_public_network" {
   pi_network_mtu       = 9000
   # Dev Note: There appears to be an issue when 2 dns providers are passed in.connection {
   # Opting to leave commented out for now, as it is implicitly using 9.9.9.9
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "ibm_pi_network" "fixed_network" {
@@ -20,4 +24,8 @@ resource "ibm_pi_network" "fixed_network" {
   pi_dns               = [var.vpc_support_server_ip]
   pi_network_mtu       = 9000
   # Dev Note: take the pi_gateway default
+
+  lifecycle {
+    ignore_changes = all
+  }
 }

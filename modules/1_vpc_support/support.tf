@@ -24,6 +24,7 @@ module "keys" {
   resource_group  = data.ibm_is_vpc.vpc.resource_group
   vpc_name        = var.vpc_name
   public_key      = var.public_key
+  skip_vpc_key    = var.skip_vpc_key
 }
 
 module "routes" {

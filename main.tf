@@ -59,6 +59,7 @@ module "vpc_support" {
   vpc_zone                      = var.vpc_zone
   public_key                    = var.public_key
   public_key_file               = var.public_key_file
+  skip_vpc_key                  = var.skip_vpc_key
   openshift_api_url             = var.openshift_api_url
   powervs_machine_cidr          = var.powervs_machine_cidr
   vpc_supp_public_ip            = var.vpc_supp_public_ip
