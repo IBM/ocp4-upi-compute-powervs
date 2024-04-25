@@ -1,7 +1,5 @@
 ---
 - hosts: all
-  vars_files:
-    - ../vars/main.yml
 
   ####################################################################################
   # Verify and Validate prior to starting execution

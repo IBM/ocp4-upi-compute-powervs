@@ -86,7 +86,17 @@ EOFX
 mkdir -p /var/www/vhosts/1
 systemctl restart httpd
 
-for IFACE in $(nmcli device show 2>&1| grep GENERAL.DEVICE | grep -v env2 | grep -v lo | awk '{print $NF}')
+os_ver=$(cat /etc/os-release | egrep "^VERSION_ID=" | awk -F'"' '{print $2}')
+if [[ $os_ver != "9"* ]]
+then
+    # RHEL8
+    IFACES=$(nmcli device show 2>&1| grep GENERAL.DEVICE | grep -v env2 | grep -v lo | awk '{print $NF}')
+else
+    # RHEL9
+    IFACES=$(nmcli device show 2>&1| grep GENERAL.DEVICE | grep -v eth1 | grep -v lo | awk '{print $NF}')
+fi
+
+for IFACE in $(echo $${IFACES})
 do
     IP_ADDR="$(nmcli device show $${IFACE} 2>&1 | grep IP4.ADDRESS | sed 's|/24||g' | awk '{print $NF}')"
     if [ -n "$${IP_ADDR}" ]

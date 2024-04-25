@@ -11,7 +11,7 @@ terraform {
     }
     time = {
       source  = "hashicorp/time"
-      version = "0.10.0"
+      version = "0.11.1"
     }
     ibm = {
       source                = "IBM-Cloud/ibm"
@@ -20,13 +20,11 @@ terraform {
     }
     http = {
       source  = "hashicorp/http"
-      version = "3.4.1"
+      version = "3.4.2"
     }
   }
   required_version = ">= 1.5.0"
 }
-
-
 
 
 

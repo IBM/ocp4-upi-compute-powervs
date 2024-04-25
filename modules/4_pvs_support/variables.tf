@@ -18,6 +18,8 @@ variable "cidrs" {}
 variable "powervs_machine_cidr" {}
 variable "keep_dns" {}
 variable "use_fixed_network" {}
+variable "nfs_server" {}
+variable "nfs_path" {}
 variable "worker" {
   type = object({ count = number, memory = string, processors = string })
   default = {
@@ -26,7 +28,9 @@ variable "worker" {
     processors = "1"
   }
   validation {
-    condition     = lookup(var.worker, "count", 1) >= 1
-    error_message = "The worker.count value must be greater than 1."
+    condition     = lookup(var.worker, "count", 1) >= 0
+    error_message = "The worker.count value must be greater than 0."
   }
+  nullable = false
 }
+

@@ -1,0 +1,47 @@
+---
+- hosts: all
+
+  handlers:
+  - import_tasks: ../handlers/main.yml
+
+  tasks:
+
+  - name: Create nfs-provisioner Project
+    kubernetes.core.k8s:
+      state: present
+      proxy: "http://{{ nfs_server }}:3128"
+      definition: "{{ lookup('template', '../templates/nfs-ns.yml') }}"
+
+  - name: Create RBAC for nfs-provisioner
+    kubernetes.core.k8s:
+      state: present
+      proxy: "http://{{ nfs_server }}:3128"
+      definition: "{{ lookup('template', '../templates/nfs-rbac.yml') }}"
+
+  - name: Setup Authorization
+    shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:nfs-provisioner:nfs-client-provisioner"
+
+  - name: Create Deployment for nfs-provisioner
+    kubernetes.core.k8s:
+      state: present
+      proxy: "http://{{ nfs_server }}:3128"
+      definition: "{{ lookup('template', '../templates/nfs-deployment.yml.j2') }}"
+
+  - name: Create Storage Class for nfs
+    kubernetes.core.k8s:
+      state: present
+      proxy: "http://{{ nfs_server }}:3128"
+      definition: "{{ lookup('template', '../templates/nfs-sc.yml') }}"
+
+  - name: Ensure nfs-provisioner Pod is up and running fine
+    shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get pods -n nfs-provisioner"
+    register: pod_output
+    until: pod_output.stdout.find("Running") != -1
+    retries: 10
+    delay: 30
+
+  - name: Remove the block storage as the default.
+    shell: |
+      export HTTPS_PROXY=http://{{ nfs_server }}:3128 \
+        && oc patch storageclass ibmc-vpc-block-10iops-tier -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+

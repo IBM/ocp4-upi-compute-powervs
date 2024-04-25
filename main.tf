@@ -59,6 +59,7 @@ module "vpc_support" {
   vpc_zone                      = var.vpc_zone
   public_key                    = var.public_key
   public_key_file               = var.public_key_file
+  skip_vpc_key                  = var.skip_vpc_key
   openshift_api_url             = var.openshift_api_url
   powervs_machine_cidr          = var.powervs_machine_cidr
   vpc_supp_public_ip            = var.vpc_supp_public_ip
@@ -149,6 +150,8 @@ module "support" {
   keep_dns                 = var.keep_dns
   worker                   = var.worker
   use_fixed_network        = var.use_fixed_network
+  nfs_server               = module.vpc_support.vpc_support_server_ip
+  nfs_path                 = var.nfs_path
 }
 
 module "worker" {
@@ -184,18 +187,19 @@ module "post" {
   depends_on = [module.worker]
   source     = "./modules/6_post"
 
-  ssh_agent         = var.ssh_agent
-  bastion_public_ip = module.pvs_prepare.bastion_public_ip
-  private_key_file  = var.private_key_file
-  powervs_region    = module.checks.powervs_region
-  powervs_zone      = module.checks.powervs_zone
-  system_type       = var.system_type
-  nfs_server        = module.vpc_support.vpc_support_server_ip
-  nfs_path          = var.nfs_path
-  name_prefix       = local.name_prefix
-  worker            = var.worker
-  cicd              = var.cicd
-  openshift_api_url = var.openshift_api_url
-  openshift_user    = var.openshift_user
-  openshift_pass    = var.openshift_pass
+  ssh_agent             = var.ssh_agent
+  bastion_public_ip     = module.pvs_prepare.bastion_public_ip
+  private_key_file      = var.private_key_file
+  powervs_region        = module.checks.powervs_region
+  powervs_zone          = module.checks.powervs_zone
+  system_type           = var.system_type
+  nfs_server            = module.vpc_support.vpc_support_server_ip
+  nfs_path              = var.nfs_path
+  remove_nfs_deployment = var.remove_nfs_deployment
+  name_prefix           = local.name_prefix
+  worker                = var.worker
+  cicd                  = var.cicd
+  openshift_api_url     = var.openshift_api_url
+  openshift_user        = var.openshift_user
+  openshift_pass        = var.openshift_pass
 }

@@ -24,7 +24,7 @@ openshift_client_tarball = "<openshift_client_tarball_url>"
 
 # Power Instance Configuration
 processor_type = "shared"
-system_type    = "e980"
+system_type    = "s922"
 
 # Machine Details
 bastion_health_status = "WARNING"
@@ -33,7 +33,7 @@ worker                = { memory = "16", processors = "1", "count" = 1 }
 
 # Images for Power Systems
 rhel_image_name  = "centos-03112022"
-rhcos_image_name = "rhcos-414-92-202306140644-t1"
+rhcos_image_name = "rhcos-415-92-202403051622-t1"
 
 # Public and Private Key for Bastion Nodes
 public_key_file  = "data/compute_id_rsa.pub"

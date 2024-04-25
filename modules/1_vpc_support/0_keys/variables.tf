@@ -7,3 +7,4 @@ variable "resource_group" {}
 variable "public_key_file" {}
 variable "vpc_name" {}
 variable "public_key" {}
+variable "skip_vpc_key" {}

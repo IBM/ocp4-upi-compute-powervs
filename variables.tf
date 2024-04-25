@@ -415,6 +415,18 @@ variable "nfs_path" {
   default     = "/export"
 }
 
+variable "remove_nfs_deployment" {
+  type        = bool
+  description = "Removes the NFS deployment running in nfs-provisioner Namespace"
+  default     = false
+}
+
+variable "skip_vpc_key" {
+  type        = bool
+  description = "Flag to skip creation of key in VPC"
+  default     = false
+}
+
 ##########################################
 
 variable "public_key_file" {

@@ -26,6 +26,8 @@ locals {
     power_worker_count           = var.worker["count"]
     start_host                   = join(",", local.worker_hosts)
     gateway                      = cidrhost(var.powervs_machine_cidr, 1)
+    nfs_server                   = var.nfs_server
+    nfs_path                     = var.nfs_path
   }
 
   cidrs = {
@@ -118,7 +120,7 @@ EOF
   # Currently this is a NOP
   provisioner "remote-exec" {
     inline = [<<EOF
-echo 'Running ocp4-upi-compute-powervs playbook...'
+echo 'Running ocp4-upi-compute-powervs playbook for local dhcp setup...'
 cd ocp4-upi-compute-powervs/support
 ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support-dhcp.log ansible-playbook -e @vars/vars.yaml tasks/dhcp.yml --become || true
 EOF
@@ -144,6 +146,28 @@ resource "null_resource" "config_login" {
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc login \
   "${var.openshift_api_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
+EOF
+    ]
+  }
+}
+
+# Dev Note: setup nfs deployment
+resource "null_resource" "nfs_deployment" {
+  depends_on = [null_resource.config_login]
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = var.bastion_public_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+echo 'Running ocp4-upi-compute-powervs playbook...'
+cd ocp4-upi-compute-powervs/support
+ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support-nfs-deploy.log ansible-playbook -e @vars/vars.yaml tasks/nfs_provisioner.yml --become || true
 EOF
     ]
   }
@@ -393,7 +417,7 @@ resource "null_resource" "warn_worker_count" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-echo "INFO: number of workers is '${var.worker["count"]}''"
+echo "INFO: number of workers is '${var.worker["count"]}'"
 EOF
     ]
   }

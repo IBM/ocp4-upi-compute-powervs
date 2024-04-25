@@ -1,10 +1,14 @@
 ---
 - name: Post Installation Tasks (Approving CSRs, Setting up Node Labels, Installation of RSCT Daemonset, Setup NFS storage)
   hosts: all
-  vars_files:
-    - ../vars/main.yml
 
   tasks:
+  - name: Install needed packages
+    package:
+      name:
+      - python3-pip
+      state: present
+
   - name: Install Pre-requisites
     pip:
       name:
@@ -70,10 +74,6 @@
         metadata:
           labels: "{{ node_labels }}"
     with_items: "{{ node_names.stdout_lines }}"
-
-  - name: Setup NFS storage if NFS_SERVER is provided
-    import_tasks: nfs_provisioner.yaml
-    when: nfs_server != "none"
 
   - name: Cleanup events in openshift-etcd for cicd
     when: cicd == "true"

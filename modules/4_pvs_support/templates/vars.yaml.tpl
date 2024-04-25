@@ -21,3 +21,8 @@ ports:
 ssh_gen_key: false
 use_fixed_network: ${use_fixed_network}
 power_worker_count: ${power_worker_count}
+
+# NFS Deployment Details
+nfs_server: "${nfs_server}"
+nfs_path: "${nfs_path}"
+nfs_provisioner_image: "registry.k8s.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2"

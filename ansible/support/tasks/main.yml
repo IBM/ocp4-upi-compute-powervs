@@ -1,7 +1,6 @@
 ---
 - hosts: all
-  vars_files:
-    - ../vars/main.yml
+
   handlers:
   - import_tasks: ../handlers/main.yml
 
@@ -26,9 +25,16 @@
       - vim
       - bash-completion
       - podman
+      - python3-pip
       - nfs-utils
       - git
       state: present
+
+  - name: Install OpenShift Pre-requisites
+    pip:
+      name:
+        - kubernetes
+        - openshift
 
   - name: Copy httpd conf file
     copy:
@@ -130,3 +136,4 @@
       port: 3128
       delay: 30
       timeout: 600
+
