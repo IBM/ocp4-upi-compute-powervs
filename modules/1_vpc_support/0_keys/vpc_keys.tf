@@ -18,7 +18,8 @@ locals {
 }
 
 resource "ibm_is_ssh_key" "vpc_support_ssh_key_cond_create" {
-  count          = local.keys == [] ? 1 : 0
+  #  count          = local.keys == [] ? 1 : 0
+  count          = var.skip_vpc_key ? 0 : 1
   name           = "${var.vpc_name}-keypair"
   public_key     = local.public_key
   resource_group = var.resource_group

@@ -31,6 +31,10 @@ resource "ibm_is_instance" "supp_vm_vsi" {
   }
 
   user_data = templatefile("${path.cwd}/modules/1_vpc_support/4_vsi/templates/cloud-init.yaml.tpl", {})
+
+  lifecycle {
+    ignore_changes = [image]
+  }
 }
 
 resource "ibm_is_floating_ip" "supp_vm_fip" {

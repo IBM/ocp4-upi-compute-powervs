@@ -13,7 +13,7 @@ locals {
 }
 
 resource "ibm_is_security_group" "supp_vm_sg" {
-  count          = local.sgs == [] ? 1 : 0
+  #  count          = local.sgs == [] ? 1 : 0
   name           = "${var.vpc_name}-supp-sg"
   vpc            = var.vpc
   resource_group = var.resource_group
@@ -21,16 +21,16 @@ resource "ibm_is_security_group" "supp_vm_sg" {
 
 # allow all outgoing network traffic
 resource "ibm_is_security_group_rule" "supp_vm_sg_outgoing_all" {
-  count     = local.sgs == [] ? 1 : 0
-  group     = ibm_is_security_group.supp_vm_sg[0].id
+  #  count     = local.sgs == [] ? 1 : 0
+  group     = ibm_is_security_group.supp_vm_sg.id
   direction = "outbound"
   remote    = "0.0.0.0/0"
 }
 
 # allow all incoming network traffic on port 22
 resource "ibm_is_security_group_rule" "supp_vm_sg_ssh_all" {
-  count     = local.sgs == [] ? 1 : 0
-  group     = ibm_is_security_group.supp_vm_sg[0].id
+  #  count     = local.sgs == [] ? 1 : 0
+  group     = ibm_is_security_group.supp_vm_sg.id
   direction = "inbound"
   remote    = "0.0.0.0/0"
   tcp {
@@ -42,8 +42,8 @@ resource "ibm_is_security_group_rule" "supp_vm_sg_ssh_all" {
 # Dev Note: The rules apply to powervs instances to connect to the api-int
 # allow all incoming network traffic on port 3128
 resource "ibm_is_security_group_rule" "squid_vm_sg_ssh_all" {
-  count     = local.sgs == [] ? 1 : 0
-  group     = ibm_is_security_group.supp_vm_sg[0].id
+  #  count     = local.sgs == [] ? 1 : 0
+  group     = ibm_is_security_group.supp_vm_sg.id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
 
@@ -55,8 +55,8 @@ resource "ibm_is_security_group_rule" "squid_vm_sg_ssh_all" {
 
 # allow all incoming network traffic on port 53
 resource "ibm_is_security_group_rule" "supp_vm_sg_supp_all" {
-  count     = local.sgs == [] ? 1 : 0
-  group     = ibm_is_security_group.supp_vm_sg[0].id
+  #  count     = local.sgs == [] ? 1 : 0
+  group     = ibm_is_security_group.supp_vm_sg.id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
   udp {
@@ -68,8 +68,8 @@ resource "ibm_is_security_group_rule" "supp_vm_sg_supp_all" {
 # Dev Note: the following are used by PowerVS and VPC VSIs.
 # allow all incoming network traffic on port 2049
 resource "ibm_is_security_group_rule" "nfs_1_vm_sg_ssh_all" {
-  count     = local.sgs == [] ? 1 : 0
-  group     = ibm_is_security_group.supp_vm_sg[0].id
+  #  count     = local.sgs == [] ? 1 : 0
+  group     = ibm_is_security_group.supp_vm_sg.id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
   tcp {
@@ -79,8 +79,8 @@ resource "ibm_is_security_group_rule" "nfs_1_vm_sg_ssh_all" {
 }
 
 resource "ibm_is_security_group_rule" "nfs_1_vm_sg_ssh_all_vpc" {
-  count     = local.sgs == [] ? 1 : 0
-  group     = ibm_is_security_group.supp_vm_sg[0].id
+  #  count     = local.sgs == [] ? 1 : 0
+  group     = ibm_is_security_group.supp_vm_sg.id
   direction = "inbound"
   remote    = local.openshift_net_sg[0].id
   tcp {
@@ -91,8 +91,8 @@ resource "ibm_is_security_group_rule" "nfs_1_vm_sg_ssh_all_vpc" {
 
 # allow all incoming network traffic on port 111
 resource "ibm_is_security_group_rule" "nfs_2_vm_sg_ssh_all" {
-  count     = local.sgs == [] ? 1 : 0
-  group     = ibm_is_security_group.supp_vm_sg[0].id
+  #  count     = local.sgs == [] ? 1 : 0
+  group     = ibm_is_security_group.supp_vm_sg.id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
   tcp {
@@ -102,8 +102,8 @@ resource "ibm_is_security_group_rule" "nfs_2_vm_sg_ssh_all" {
 }
 
 resource "ibm_is_security_group_rule" "nfs_2_vm_sg_ssh_all_vpc" {
-  count     = local.sgs == [] ? 1 : 0
-  group     = ibm_is_security_group.supp_vm_sg[0].id
+  #  count     = local.sgs == [] ? 1 : 0
+  group     = ibm_is_security_group.supp_vm_sg.id
   direction = "inbound"
   remote    = local.openshift_net_sg[0].id
   tcp {
@@ -114,8 +114,8 @@ resource "ibm_is_security_group_rule" "nfs_2_vm_sg_ssh_all_vpc" {
 
 # allow all incoming network traffic on port 2049
 resource "ibm_is_security_group_rule" "nfs_3_vm_sg_ssh_all" {
-  count     = local.sgs == [] ? 1 : 0
-  group     = ibm_is_security_group.supp_vm_sg[0].id
+  #  count     = local.sgs == [] ? 1 : 0
+  group     = ibm_is_security_group.supp_vm_sg.id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
 
@@ -126,8 +126,8 @@ resource "ibm_is_security_group_rule" "nfs_3_vm_sg_ssh_all" {
 }
 
 resource "ibm_is_security_group_rule" "nfs_3_vm_sg_ssh_all_vpc" {
-  count     = local.sgs == [] ? 1 : 0
-  group     = ibm_is_security_group.supp_vm_sg[0].id
+  #  count     = local.sgs == [] ? 1 : 0
+  group     = ibm_is_security_group.supp_vm_sg.id
   direction = "inbound"
   remote    = local.openshift_net_sg[0].id
   udp {
@@ -138,8 +138,8 @@ resource "ibm_is_security_group_rule" "nfs_3_vm_sg_ssh_all_vpc" {
 
 # allow all incoming network traffic on port 111
 resource "ibm_is_security_group_rule" "nfs_4_vm_sg_ssh_all" {
-  count     = local.sgs == [] ? 1 : 0
-  group     = ibm_is_security_group.supp_vm_sg[0].id
+  #  count     = local.sgs == [] ? 1 : 0
+  group     = ibm_is_security_group.supp_vm_sg.id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
   udp {
@@ -149,8 +149,8 @@ resource "ibm_is_security_group_rule" "nfs_4_vm_sg_ssh_all" {
 }
 
 resource "ibm_is_security_group_rule" "nfs_4_vm_sg_ssh_all_vpc" {
-  count     = local.sgs == [] ? 1 : 0
-  group     = ibm_is_security_group.supp_vm_sg[0].id
+  #  count     = local.sgs == [] ? 1 : 0
+  group     = ibm_is_security_group.supp_vm_sg.id
   direction = "inbound"
   remote    = local.openshift_net_sg[0].id
   udp {
@@ -161,8 +161,8 @@ resource "ibm_is_security_group_rule" "nfs_4_vm_sg_ssh_all_vpc" {
 
 # allow all incoming network traffic for ping
 resource "ibm_is_security_group_rule" "supp_vm_sg_ping_all" {
-  count     = local.sgs == [] ? 1 : 0
-  group     = ibm_is_security_group.supp_vm_sg[0].id
+  #  count     = local.sgs == [] ? 1 : 0
+  group     = ibm_is_security_group.supp_vm_sg.id
   direction = "inbound"
   remote    = var.powervs_machine_cidr
   icmp {
@@ -172,8 +172,8 @@ resource "ibm_is_security_group_rule" "supp_vm_sg_ping_all" {
 }
 
 resource "ibm_is_security_group_rule" "supp_vm_sg_ping_all_vpc" {
-  count     = local.sgs == [] ? 1 : 0
-  group     = ibm_is_security_group.supp_vm_sg[0].id
+  #  count     = local.sgs == [] ? 1 : 0
+  group     = ibm_is_security_group.supp_vm_sg.id
   direction = "inbound"
   remote    = local.openshift_net_sg[0].id
   icmp {
@@ -183,5 +183,5 @@ resource "ibm_is_security_group_rule" "supp_vm_sg_ping_all_vpc" {
 }
 
 locals {
-  sg_id = local.sgs == [] ? ibm_is_security_group.supp_vm_sg[0].id : local.sgs[0]
+  sg_id = local.sgs == [] ? ibm_is_security_group.supp_vm_sg.id : local.sgs[0]
 }

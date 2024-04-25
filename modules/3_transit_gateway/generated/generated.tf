@@ -8,4 +8,8 @@ resource "ibm_tg_connection" "powervs_ibm_tg_connection" {
   network_type = "power_virtual_server"
   name         = "${var.vpc_name}-pvs-conn"
   network_id   = var.powervs_crn
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
