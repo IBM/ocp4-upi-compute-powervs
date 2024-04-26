@@ -155,6 +155,9 @@ fi
 
 OVERRIDE_PREFIX=$(${IBMCLOUD} pi workspace list 2>&1 | grep $POWERVS_SERVICE_INSTANCE_ID | awk '{print $NF}')
 
+# SKIP_VPC_KEY is conditionally switched
+ibmcloud pi ssh-key create cicd-key-$(date +%s) --key "$(<data/id_rsa.pub)" || true
+
 # creates the var file
 cat << EOFXEOF > data/var.tfvars
 ibmcloud_api_key = "${IC_API_KEY}"
@@ -193,6 +196,7 @@ mac_tags = [ "mac-cicd-${CLEAN_VERSION}" ]
 #override_transit_gateway_name="${OVERRIDE_PREFIX}-tg"
 #use_fixed_network=true
 cicd = true
+skip_vpc_key = true
 EOFXEOF
 }
 
