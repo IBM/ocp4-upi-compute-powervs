@@ -8,7 +8,7 @@
 resource "ibm_tg_gateway" "mac_tg_gw" {
   name           = "${var.vpc_name}-tg"
   location       = var.vpc_region
-  global         = true
+  global         = false
   resource_group = var.resource_group
 }
 
