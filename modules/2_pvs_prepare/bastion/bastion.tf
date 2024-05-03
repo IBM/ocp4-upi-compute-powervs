@@ -122,7 +122,7 @@ resource "null_resource" "bastion_register" {
   triggers = {
     external_ip        = local.ext_ip
     rhel_username      = var.rhel_username
-    private_key        = file(var.private_key_file)
+    private_key        = sensitive(file(var.private_key_file))
     ssh_agent          = var.ssh_agent
     connection_timeout = var.connection_timeout
   }

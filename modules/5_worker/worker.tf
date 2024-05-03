@@ -127,7 +127,7 @@ data "http" "bastion_ip_retrieval" {
 #   depends_on = [null_resource.nop, data.http.bastion_ip_retrieval, null_resource.secondary_retrieval_ignition_ip]
 #
 #   triggers = {
-#     private_key = file(var.private_key_file)
+#     private_key = sensitive(file(var.private_key_file))
 #     host        = var.bastion_public_ip
 #     agent       = var.ssh_agent
 #   }
