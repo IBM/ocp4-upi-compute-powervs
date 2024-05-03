@@ -48,9 +48,9 @@ resource "null_resource" "remove_workers" {
     host                  = var.bastion_public_ip[0]
     agent                 = var.ssh_agent
     ansible_post_path     = local.ansible_post_path
-    openshift_api_url     = var.openshift_api_url
-    openshift_user        = var.openshift_user
-    openshift_pass        = var.openshift_pass
+    openshift_api_url     = sensitive(var.openshift_api_url)
+    openshift_user        = sensitive(var.openshift_user)
+    openshift_pass        = sensitive(var.openshift_pass)
   }
 
   connection {
@@ -157,9 +157,9 @@ resource "null_resource" "remove_nfs_deployment" {
     nfs_namespace         = local.nfs_namespace
     nfs_deployment        = local.nfs_deployment
     ansible_post_path     = local.ansible_post_path
-    openshift_api_url     = var.openshift_api_url
-    openshift_user        = var.openshift_user
-    openshift_pass        = var.openshift_pass
+    openshift_api_url     = sensitive(var.openshift_api_url)
+    openshift_user        = sensitive(var.openshift_user)
+    openshift_pass        = sensitive(var.openshift_pass)
   }
 
   connection {

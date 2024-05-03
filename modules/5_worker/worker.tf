@@ -12,7 +12,7 @@ resource "null_resource" "nop" {
   connection {
     type        = "ssh"
     user        = "root"
-    private_key = file(var.private_key_file)
+    private_key = sensitive(file(var.private_key_file))
     host        = var.bastion_public_ip
     agent       = var.ssh_agent
   }
