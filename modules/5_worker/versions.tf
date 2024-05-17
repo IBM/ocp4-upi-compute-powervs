@@ -15,7 +15,7 @@ terraform {
     }
     ibm = {
       source                = "IBM-Cloud/ibm"
-      version               = "~> 1.65.0"
+      version               = "~> 1.65.1"
       configuration_aliases = [ibm]
     }
     http = {
@@ -25,6 +25,7 @@ terraform {
   }
   required_version = ">= 1.5.0"
 }
+
 
 
 
