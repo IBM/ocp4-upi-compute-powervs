@@ -16,5 +16,13 @@ output "vpc_crn" {
 }
 
 output "transit_gateway_id" {
-  value = var.override_transit_gateway_name == "" ? module.transit_gateway[0].new_tg : module.existing_gateway[0].existing_tg
+  value = var.setup_transit_gateway == true ? module.transit_gateway[0].new_tg : module.existing_gateway[0].existing_tg
+}
+
+output "transit_gateway_name" {
+  value = var.setup_transit_gateway == false ? module.existing_gateway[0].existing_tg_name : module.transit_gateway[0].new_tg_name
+}
+
+output "transit_gateway_status" {
+  value = var.setup_transit_gateway == false ? module.existing_gateway[0].existing_tg_status : module.transit_gateway[0].new_tg_status
 }
