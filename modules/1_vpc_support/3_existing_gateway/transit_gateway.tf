@@ -9,15 +9,7 @@
 
 # Loads the asserted transit gateway
 data "ibm_tg_gateway" "existing_tg" {
-  name = var.override_transit_gateway_name
-}
-
-# Dev Note: loads an existing transit gateway
-resource "ibm_tg_connection" "vpc_tg_connection_update" {
-  gateway      = data.ibm_tg_gateway.existing_tg.id
-  network_type = "vpc"
-  name         = "${var.vpc_name}-conn"
-  network_id   = var.resource_crn
+  name = var.transit_gateway_name
 }
 
 resource "ibm_resource_tag" "tag" {

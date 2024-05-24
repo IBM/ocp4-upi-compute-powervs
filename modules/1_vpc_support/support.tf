@@ -52,32 +52,34 @@ module "security_groups" {
 }
 
 module "existing_gateway" {
-  count = var.override_transit_gateway_name != "" ? 1 : 0
+  count = var.setup_transit_gateway != true ? 1 : 0
 
   providers = {
     ibm = ibm
   }
   source = "./3_existing_gateway"
 
-  override_transit_gateway_name = var.override_transit_gateway_name
-  resource_crn                  = data.ibm_is_vpc.vpc.resource_crn
-  vpc_name                      = var.vpc_name
-  mac_tags                      = var.mac_tags
+  setup_transit_gateway = var.setup_transit_gateway
+  transit_gateway_name  = var.transit_gateway_name
+  resource_crn          = data.ibm_is_vpc.vpc.resource_crn
+  vpc_name              = var.vpc_name
+  mac_tags              = var.mac_tags
 }
 
 module "transit_gateway" {
-  count = var.override_transit_gateway_name != "" ? 0 : 1
+  count = var.setup_transit_gateway != true ? 0 : 1
 
   providers = {
     ibm = ibm
   }
   source = "./3_transit_gateway"
 
-  resource_crn   = data.ibm_is_vpc.vpc.resource_crn
-  vpc_name       = var.vpc_name
-  vpc_region     = var.vpc_region
-  resource_group = data.ibm_is_vpc.vpc.resource_group
-  mac_tags       = var.mac_tags
+  setup_transit_gateway = var.setup_transit_gateway
+  resource_crn          = data.ibm_is_vpc.vpc.resource_crn
+  vpc_name              = var.vpc_name
+  vpc_region            = var.vpc_region
+  resource_group        = data.ibm_is_vpc.vpc.resource_group
+  mac_tags              = var.mac_tags
 }
 
 module "vsi" {

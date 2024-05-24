@@ -6,6 +6,7 @@
 variable "cluster_id" {}
 variable "vpc_name" {}
 variable "vpc_crn" {}
+variable "setup_transit_gateway" {}
 variable "transit_gateway_id" {}
-variable "override_transit_gateway_name" {}
+variable "transit_gateway_name" {}
 variable "powervs_crn" {}

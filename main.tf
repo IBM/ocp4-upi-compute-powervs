@@ -54,17 +54,18 @@ module "vpc_support" {
   depends_on = [module.checks]
   source     = "./modules/1_vpc_support"
 
-  vpc_name                      = var.vpc_name
-  vpc_region                    = var.vpc_region
-  vpc_zone                      = var.vpc_zone
-  public_key                    = var.public_key
-  public_key_file               = var.public_key_file
-  skip_vpc_key                  = var.skip_vpc_key
-  openshift_api_url             = var.openshift_api_url
-  powervs_machine_cidr          = var.powervs_machine_cidr
-  vpc_supp_public_ip            = var.vpc_supp_public_ip
-  override_transit_gateway_name = var.override_transit_gateway_name
-  mac_tags                      = var.mac_tags
+  vpc_name              = var.vpc_name
+  vpc_region            = var.vpc_region
+  vpc_zone              = var.vpc_zone
+  public_key            = var.public_key
+  public_key_file       = var.public_key_file
+  skip_vpc_key          = var.skip_vpc_key
+  openshift_api_url     = var.openshift_api_url
+  powervs_machine_cidr  = var.powervs_machine_cidr
+  vpc_supp_public_ip    = var.vpc_supp_public_ip
+  setup_transit_gateway = var.setup_transit_gateway
+  transit_gateway_name  = var.transit_gateway_name
+  mac_tags              = var.mac_tags
 }
 
 ### Prepares the PowerVS workspace for Day-2 Workers
@@ -119,12 +120,13 @@ module "transit_gateway" {
   depends_on = [module.pvs_prepare]
   source     = "./modules/3_transit_gateway"
 
-  cluster_id                    = local.cluster_id
-  vpc_name                      = var.vpc_name
-  vpc_crn                       = module.vpc_support.vpc_crn
-  transit_gateway_id            = module.vpc_support.transit_gateway_id
-  override_transit_gateway_name = var.override_transit_gateway_name
-  powervs_crn                   = module.pvs_prepare.powervs_crn
+  cluster_id            = local.cluster_id
+  vpc_name              = var.vpc_name
+  vpc_crn               = module.vpc_support.vpc_crn
+  setup_transit_gateway = var.setup_transit_gateway
+  transit_gateway_id    = module.vpc_support.transit_gateway_id
+  transit_gateway_name  = var.transit_gateway_name
+  powervs_crn           = module.pvs_prepare.powervs_crn
 }
 
 module "support" {

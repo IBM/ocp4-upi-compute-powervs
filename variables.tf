@@ -527,7 +527,13 @@ variable "keep_dns" {
 # PowerVS perspective.
 ################################################################
 
-variable "override_transit_gateway_name" {
+variable "setup_transit_gateway" {
+  type        = bool
+  description = "Flag to create the new transit gateway by automation"
+  default     = false
+}
+
+variable "transit_gateway_name" {
   type        = string
   description = "uses an existing transit gateway"
   default     = ""

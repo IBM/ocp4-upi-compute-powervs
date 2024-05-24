@@ -8,3 +8,4 @@ variable "vpc_name" {}
 variable "vpc_region" {}
 variable "resource_group" {}
 variable "mac_tags" {}
+variable "setup_transit_gateway" {}

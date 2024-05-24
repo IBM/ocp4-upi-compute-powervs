@@ -21,6 +21,16 @@ output "vpc_check_key" {
   value       = module.vpc_support.vpc_check_key
 }
 
+output "transit_gateway_name" {
+  description = "The name of the Transit Gateway"
+  value       = module.vpc_support.transit_gateway_name
+}
+
+output "transit_gateway_status" {
+  description = "The staus for the Transit Gateway"
+  value       = module.vpc_support.transit_gateway_status
+}
+
 output "bastion_private_interface" {
   value       = module.worker.bastion_private_ip
   description = "The interface mac and ip details"
