@@ -4,7 +4,7 @@
 ################################################################
 
 module "generated" {
-  count = var.setup_transit_gateway == true ? 1 : 0
+  count = var.setup_transit_gateway ? 1 : 0
   providers = {
     ibm = ibm
   }
