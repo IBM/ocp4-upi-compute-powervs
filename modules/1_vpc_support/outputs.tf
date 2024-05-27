@@ -20,7 +20,7 @@ output "transit_gateway_id" {
 }
 
 output "transit_gateway_name" {
-  value = var.setup_transit_gateway == false ? module.existing_gateway[0].existing_tg_name : module.transit_gateway[0].new_tg_name
+  value = !var.setup_transit_gateway ? module.existing_gateway[0].existing_tg_name : module.transit_gateway[0].new_tg_name
 }
 
 output "transit_gateway_status" {
