@@ -67,7 +67,7 @@ module "existing_gateway" {
 }
 
 module "transit_gateway" {
-  count = var.setup_transit_gateway != true ? 0 : 1
+  count = !var.setup_transit_gateway ? 0 : 1
 
   providers = {
     ibm = ibm
