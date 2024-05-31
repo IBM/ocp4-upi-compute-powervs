@@ -15,8 +15,8 @@ locals {
       zone   = "dal"
     },
     us-east = {
-      region = "us-east",
-      zone   = "us-east"
+      region = "wdc",
+      zone   = "wdc07"
     },
     br-sao = {
       region = "sao",
