@@ -31,5 +31,4 @@ variable "bastion_public_network_cidr" {}
 variable "powervs_network_id" {}
 variable "powervs_network_name" {}
 variable "powervs_network_cidr" {}
-variable "use_fixed_network" {}
 variable "vpc_support_server_ip" {}

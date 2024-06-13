@@ -544,10 +544,3 @@ variable "override_network_name" {
   description = "overrides network creation for a specific dhcp network"
   default     = ""
 }
-
-# FIXED Networks are not fully enabled, and are left in case we need to move back to it.
-variable "use_fixed_network" {
-  type        = bool
-  description = "Switches to using a PowerVS `vlan` instead of `dhcp-vlan`"
-  default     = false
-}

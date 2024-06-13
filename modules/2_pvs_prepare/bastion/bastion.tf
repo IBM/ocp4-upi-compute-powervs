@@ -44,7 +44,7 @@ resource "ibm_pi_instance_action" "restart_bastion" {
 }
 
 data "ibm_pi_instance_ip" "bastion_public_ip" {
-  count      = var.use_fixed_network ? 0 : 1
+  count      = 1
   depends_on = [ibm_pi_instance.bastion]
 
   pi_instance_name     = ibm_pi_instance.bastion[count.index].pi_instance_name
@@ -53,7 +53,7 @@ data "ibm_pi_instance_ip" "bastion_public_ip" {
 }
 
 locals {
-  ext_ip = var.use_fixed_network ? ibm_pi_instance.bastion[0].pi_network[0].external_ip : data.ibm_pi_instance_ip.bastion_public_ip[0].external_ip
+  ext_ip = data.ibm_pi_instance_ip.bastion_public_ip[0].external_ip
 }
 
 resource "null_resource" "bastion_nop" {
@@ -334,25 +334,26 @@ EOF
   # Identifies the networks, and picks the iface that is on the private networkfor_each
   # The macaddress is used to identify the private interface and setup with a static ip.
   # originally used ${ibm_pi_network_port_attach.bastion_priv_net.macaddress}
-  provisioner "remote-exec" {
-    inline = [<<EOF
-    if [[ "${var.use_fixed_network}" == "true" ]]
-    then
-      DEV_NAME=$(find /sys/class/net -mindepth 1 -maxdepth 1 ! -name lo ! -name '*bond*' -printf "%P " -execdir cat {}/address \; | \
-        grep -v lo | grep -v env2 | awk '{print $1}')
+  # Convert this to set ta fixed network for the internal IP for the bastion.
+  #   provisioner "remote-exec" {
+  #     inline = [<<EOF
+  #     if [[ "false" == "true" ]]
+  #     then
+  #       DEV_NAME=$(find /sys/class/net -mindepth 1 -maxdepth 1 ! -name lo ! -name '*bond*' -printf "%P " -execdir cat {}/address \; | \
+  #         grep -v lo | grep -v env2 | awk '{print $1}')
 
-      nmcli dev mod $${DEV_NAME} ipv4.addresses ${var.powervs_network_cidr} \
-        ipv4.gateway ${local.gw} \
-        ipv4.dns "${var.vpc_support_server_ip}" \
-        ipv4.method manual \
-        connection.autoconnect yes \
-        802-3-ethernet.mtu 9000
+  #       nmcli dev mod $${DEV_NAME} ipv4.addresses ${var.powervs_network_cidr} \
+  #         ipv4.gateway ${local.gw} \
+  #         ipv4.dns "${var.vpc_support_server_ip}" \
+  #         ipv4.method manual \
+  #         connection.autoconnect yes \
+  #         802-3-ethernet.mtu 9000
 
-      nmcli dev up $${DEV_NAME}
-    fi
-EOF
-    ]
-  }
+  #       nmcli dev up $${DEV_NAME}
+  #     fi
+  # EOF
+  #    ]
+  #  }
 
   provisioner "remote-exec" {
     inline = [

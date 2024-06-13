@@ -110,7 +110,6 @@ module "pvs_prepare" {
   system_type                        = var.system_type
   vpc_support_server_ip              = module.vpc_support.vpc_support_server_ip
   override_network_name              = var.override_network_name
-  use_fixed_network                  = var.use_fixed_network
 }
 
 module "transit_gateway" {
@@ -151,7 +150,6 @@ module "support" {
   powervs_machine_cidr     = var.powervs_machine_cidr
   keep_dns                 = var.keep_dns
   worker                   = var.worker
-  use_fixed_network        = var.use_fixed_network
   nfs_server               = module.vpc_support.vpc_support_server_ip
   nfs_path                 = var.nfs_path
 }
@@ -181,7 +179,6 @@ module "worker" {
   private_key_file  = var.private_key_file
   ssh_agent         = var.ssh_agent
   bastion_public_ip = module.pvs_prepare.bastion_public_ip[0]
-  use_fixed_network = var.use_fixed_network
   cicd              = var.cicd
 }
 

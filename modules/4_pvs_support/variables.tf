@@ -17,7 +17,6 @@ variable "kubeconfig_file" {}
 variable "cidrs" {}
 variable "powervs_machine_cidr" {}
 variable "keep_dns" {}
-variable "use_fixed_network" {}
 variable "nfs_server" {}
 variable "nfs_path" {}
 variable "worker" {

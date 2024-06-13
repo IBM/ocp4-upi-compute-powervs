@@ -34,7 +34,7 @@ EOF
 
 ### Grab the Bastion Data
 data "ibm_pi_dhcp" "refresh_dhcp_server" {
-  count                = var.use_fixed_network ? 0 : 1
+  count                = 1
   depends_on           = [null_resource.nop]
   pi_cloud_instance_id = var.powervs_service_instance_id
   pi_dhcp_id           = var.powervs_dhcp_service
@@ -49,10 +49,9 @@ data "ibm_pi_instance" "bastion_instance" {
 locals {
   # Dev Note: Leases should return the IP, however, they are returning empty in some data centers and existing workspaces.
   # the conditionals are: 
-  # 1. if fixed network, pull off the bastion_instance
-  # 2. if other network, pull off lease from dhcp server
-  # 3. if not found, use the pub-net ip
-  bastion_private_ip = var.use_fixed_network ? [] : [for lease in data.ibm_pi_dhcp.refresh_dhcp_server[0].leases : lease if lease.instance_mac == data.ibm_pi_instance.bastion_instance.networks[0].macaddress]
+  # 1. if other network, pull off lease from dhcp server
+  # 2. if not found, use the pub-net ip
+  bastion_private_ip = [for lease in data.ibm_pi_dhcp.refresh_dhcp_server[0].leases : lease if lease.instance_mac == data.ibm_pi_instance.bastion_instance.networks[0].macaddress]
 }
 
 # Dev Note: the hypervisor does not report the internal interfaces ip correctly
@@ -160,7 +159,7 @@ data "http" "bastion_ip_retrieval" {
 # }
 
 locals {
-  ignition_ip = var.use_fixed_network ? data.ibm_pi_instance.bastion_instance.networks[0].ip : length(var.ignition_ip) > 0 ? var.ignition_ip[0].instance_ip : length(local.bastion_private_ip) > 0 ? local.bastion_private_ip[0].instance_ip : chomp(data.http.bastion_ip_retrieval[0].response_body)
+  ignition_ip = length(var.ignition_ip) > 0 ? var.ignition_ip[0].instance_ip : length(local.bastion_private_ip) > 0 ? local.bastion_private_ip[0].instance_ip : chomp(data.http.bastion_ip_retrieval[0].response_body)
 }
 
 # Modeled off the OpenShift Installer work for IPI PowerVS

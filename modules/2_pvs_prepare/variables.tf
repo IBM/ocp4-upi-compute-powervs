@@ -35,7 +35,5 @@ variable "rhel_smt" {}
 variable "rhel_subscription_activationkey" {}
 variable "ssh_agent" {}
 variable "system_type" {}
-#variable "vpc_crn" {}
 variable "vpc_support_server_ip" {}
 variable "override_network_name" {}
-variable "use_fixed_network" {}
