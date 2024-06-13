@@ -67,14 +67,14 @@ done
 echo "SERVICE_STATE: ${SERVICE_STATE}"
 
 # 5. CREATE CENTOS IMAGE
-# The CentOS-Stream-8 image is stock-image on PowerVS.
+# The Centos-Stream-9 image is stock-image on PowerVS.
 # This image is available across all PowerVS workspaces.
 # The VMs created using this image are used in support of ignition on PowerVS.
 echo "Creating the Centos Stream Image"
 echo "PowerVS Target CRN is: ${CRN}"
 ibmcloud pi workspace target "${CRN}"
 ibmcloud pi image list
-ibmcloud pi image create CentOS-Stream-8 --json
+ibmcloud pi image create Centos-Stream-9 --json
 echo "Import image status is: $?"
 
 # This CRN is useful when manually destroying.

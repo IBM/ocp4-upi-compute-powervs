@@ -137,11 +137,11 @@ variable "bastion_health_status" {
   }
 }
 
-# Centos default is CentOS-Stream-8
+# Centos default is Centos-Stream-9
 variable "rhel_image_name" {
   type        = string
   description = "Name of the RHEL or Centos image that you want to use for the bastion node"
-  default     = "CentOS-Stream-8"
+  default     = "Centos-Stream-9"
 }
 
 variable "rhel_username" {

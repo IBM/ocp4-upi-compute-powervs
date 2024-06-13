@@ -149,8 +149,8 @@ COREOS_NAME=$(echo ${COREOS_FILE} | sed 's|\.ova\.gz||' | tr '.' '-' | sed 's|-0
 # RHEL_IMAGE_NAME
 if [ -z "${RHEL_IMAGE_NAME}" ]
 then
-    echo "WARNING: RHEL_IMAGE_NAME is not set, defaulting to 'CentOS-Stream-8'"
-    RHEL_IMAGE_NAME="CentOS-Stream-8"
+    echo "WARNING: RHEL_IMAGE_NAME is not set, defaulting to 'Centos-Stream-9'"
+    RHEL_IMAGE_NAME="Centos-Stream-9"
 fi
 
 OVERRIDE_PREFIX=$(${IBMCLOUD} pi workspace list 2>&1 | grep $POWERVS_SERVICE_INSTANCE_ID | awk '{print $NF}')
