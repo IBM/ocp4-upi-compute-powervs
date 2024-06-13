@@ -39,4 +39,6 @@ resource "ibm_pi_instance" "worker" {
         ignition_ip : "${local.ignition_ip}",
         name : base64encode("${var.name_prefix}-worker-${count.index}"),
   }))
+
+  lifecycle { ignore_changes = [pi_user_data] }
 }
