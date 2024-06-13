@@ -23,7 +23,7 @@ resource "ibm_pi_instance" "bastion" {
     network_id = var.bastion_public_network_id
   }
 
-  # Dev Note: this dhcp network ip does not register with the dhcp server.
+  # Dev Note: this dhcp network ip does not always register with the cloud api
   pi_network {
     network_id = var.powervs_network_id
   }
@@ -32,7 +32,7 @@ resource "ibm_pi_instance" "bastion" {
 # Dev Note: injects a delay before a hard-reboot
 resource "time_sleep" "wait_bastion" {
   depends_on      = [ibm_pi_instance.bastion]
-  create_duration = "180s"
+  create_duration = "120s"
 }
 
 resource "ibm_pi_instance_action" "restart_bastion" {
@@ -310,19 +310,18 @@ EOF
   }
 
   # Identifies the networks, and picks the iface that is on the private networkfor_each
-  # The macaddress is used to identify the private interface and setup with a static ip.
-  # Convert this to set ta fixed network for the internal IP for the bastion.
+
   provisioner "remote-exec" {
     inline = [<<EOF
       DEV_NAME=$(find /sys/class/net -mindepth 1 -maxdepth 1 ! -name lo ! -name '*bond*' -printf "%P " -execdir cat {}/address \; | \
-          grep -v lo | grep -v env2 | awk '{print $1}')
+          grep -v lo | grep -v env2 | awk '{print $1}' | head -n 1)
 
-        nmcli dev mod $${DEV_NAME} ipv4.addresses ${var.powervs_network_cidr} \
-          ipv4.gateway ${local.gw} \
-          ipv4.dns "${var.vpc_support_server_ip}" \
-          ipv4.method manual \
-          connection.autoconnect yes \
-          802-3-ethernet.mtu 9000
+      nmcli dev mod $${DEV_NAME} ipv4.addresses ${local.int_ip} \
+        ipv4.gateway ${local.gw} \
+        ipv4.dns "${var.vpc_support_server_ip}" \
+        ipv4.method manual \
+        connection.autoconnect yes \
+        802-3-ethernet.mtu 9000
 
         nmcli dev up $${DEV_NAME}
   EOF
