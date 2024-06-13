@@ -18,6 +18,7 @@ variable "system_type" {}
 variable "private_key_file" {}
 variable "ssh_agent" {}
 variable "bastion_public_ip" {}
+variable "powervs_machine_cidr" {}
 variable "cicd" {}
 variable "worker" {
   default = {

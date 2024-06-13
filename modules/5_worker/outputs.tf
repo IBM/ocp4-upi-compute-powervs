@@ -4,5 +4,5 @@
 ################################################################
 
 output "bastion_private_ip" {
-  value = local.bastion_private_ip
+  value = local.ignition_ip
 }
