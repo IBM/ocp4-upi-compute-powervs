@@ -26,6 +26,7 @@ resource "time_sleep" "wait_dhcp" {
   destroy_duration = "120s"
 }
 
+# The 3rd IP in this new network will be reserved for the bastion, and fixed.
 resource "ibm_pi_dhcp" "new_dhcp_service" {
   depends_on           = [time_sleep.wait_dhcp]
   pi_cloud_instance_id = var.powervs_service_instance_id
