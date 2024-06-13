@@ -279,37 +279,15 @@ EOF
   }
 }
 
-### DEV NOTE to fully support FIXED NETWORK
-# 1. Grab the MAC Address for the Bastion Private INterace
-# 2. Search for the right connection 
-# 3. Modify the Settings 
-# nmcli con mod 'Wired connection 1' ipv4.addresses 192.168.200.104/24
-# nmcli con mod 'Wired connection 1' ipv4.gateway 192.168.200.1
-# nmcli con mod 'Wired connection 1' ipv4.dns "10.245.1.19"
-# nmcli con mod 'Wired connection 1' ipv4.method manual
-# nmcli con mod 'Wired connection 1' connection.autoconnect yes
-# ** set mtu
-# nmcli connection up 'Wired connection 1'
-# 4. Add route 
-# ip route add 10.245.1.0/24 via 192.168.200.1 dev env9
-
-# resource "ibm_pi_network_port_attach" "bastion_priv_net" {
-#   depends_on                  = [null_resource.manage_packages]
-#   pi_cloud_instance_id        = var.powervs_service_instance_id
-#   pi_instance_id              = ibm_pi_instance.bastion[0].instance_id
-#   pi_network_name             = var.powervs_network_name
-#   pi_network_port_description = "private network port"
-# }
-
 locals {
-  cidr = split("/", var.powervs_network_cidr)[0]
-  gw   = cidrhost(var.powervs_network_cidr, 1)
+  cidr   = split("/", var.powervs_network_cidr)[0]
+  gw     = cidrhost(var.powervs_network_cidr, 1)
+  int_ip = cidrhost(var.powervs_network_cidr, 3)
 }
 
 resource "null_resource" "bastion_fix_up_networks" {
   count      = 1
   depends_on = [null_resource.manage_packages]
-  #[ibm_pi_network_port_attach.bastion_priv_net]
 
   connection {
     type        = "ssh"
@@ -335,25 +313,22 @@ EOF
   # The macaddress is used to identify the private interface and setup with a static ip.
   # originally used ${ibm_pi_network_port_attach.bastion_priv_net.macaddress}
   # Convert this to set ta fixed network for the internal IP for the bastion.
-  #   provisioner "remote-exec" {
-  #     inline = [<<EOF
-  #     if [[ "false" == "true" ]]
-  #     then
-  #       DEV_NAME=$(find /sys/class/net -mindepth 1 -maxdepth 1 ! -name lo ! -name '*bond*' -printf "%P " -execdir cat {}/address \; | \
-  #         grep -v lo | grep -v env2 | awk '{print $1}')
+  provisioner "remote-exec" {
+    inline = [<<EOF
+      DEV_NAME=$(find /sys/class/net -mindepth 1 -maxdepth 1 ! -name lo ! -name '*bond*' -printf "%P " -execdir cat {}/address \; | \
+          grep -v lo | grep -v env2 | awk '{print $1}')
 
-  #       nmcli dev mod $${DEV_NAME} ipv4.addresses ${var.powervs_network_cidr} \
-  #         ipv4.gateway ${local.gw} \
-  #         ipv4.dns "${var.vpc_support_server_ip}" \
-  #         ipv4.method manual \
-  #         connection.autoconnect yes \
-  #         802-3-ethernet.mtu 9000
+        nmcli dev mod $${DEV_NAME} ipv4.addresses ${var.powervs_network_cidr} \
+          ipv4.gateway ${local.gw} \
+          ipv4.dns "${var.vpc_support_server_ip}" \
+          ipv4.method manual \
+          connection.autoconnect yes \
+          802-3-ethernet.mtu 9000
 
-  #       nmcli dev up $${DEV_NAME}
-  #     fi
-  # EOF
-  #    ]
-  #  }
+        nmcli dev up $${DEV_NAME}
+  EOF
+    ]
+  }
 
   provisioner "remote-exec" {
     inline = [
