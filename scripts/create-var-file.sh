@@ -158,6 +158,14 @@ OVERRIDE_PREFIX=$(${IBMCLOUD} pi workspace list 2>&1 | grep $POWERVS_SERVICE_INS
 # SKIP_VPC_KEY is conditionally switched
 ibmcloud pi ssh-key create cicd-key-$(date +%s) --key "$(<data/id_rsa.pub)" || true
 
+# Set the Machine Type
+if [ "${POWERVS_REGION}" == "wdc06" ]
+    MACHINE_TYPE="s922"
+else
+    # Default
+    MACHINE_TYPE="s1022"
+fi
+
 # creates the var file
 cat << EOFXEOF > data/var.tfvars
 ibmcloud_api_key = "${IC_API_KEY}"
@@ -184,7 +192,7 @@ rhcos_import_image_filename        = "${COREOS_NAME}-0-ppc64le-powervs.ova.gz"
 rhcos_import_image_region_override = "us-east"
 
 processor_type = "shared"
-system_type    = "s922"
+system_type    = "${MACHINE_TYPE}"
 bastion_health_status = "OK"
 bastion               = { memory = "16", processors = "1", "count" = 1 }
 worker                = { memory = "16", processors = "1", "count" = ${EXPECTED_NODES} }
@@ -192,8 +200,6 @@ override_region_check=true
 
 mac_tags = [ "mac-cicd-${CLEAN_VERSION}" ]
 
-#override_network_name="DHCPSERVERmac-dhcp-${VPC_REGION}_Private"
-#override_transit_gateway_name="${OVERRIDE_PREFIX}-tg"
 cicd = true
 skip_vpc_key = true
 setup_transit_gateway = true
