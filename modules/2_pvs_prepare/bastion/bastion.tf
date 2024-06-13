@@ -311,7 +311,6 @@ EOF
 
   # Identifies the networks, and picks the iface that is on the private networkfor_each
   # The macaddress is used to identify the private interface and setup with a static ip.
-  # originally used ${ibm_pi_network_port_attach.bastion_priv_net.macaddress}
   # Convert this to set ta fixed network for the internal IP for the bastion.
   provisioner "remote-exec" {
     inline = [<<EOF
