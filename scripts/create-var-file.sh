@@ -196,6 +196,7 @@ mac_tags = [ "mac-cicd-${CLEAN_VERSION}" ]
 #override_transit_gateway_name="${OVERRIDE_PREFIX}-tg"
 cicd = true
 skip_vpc_key = true
+setup_transit_gateway = true
 EOFXEOF
 }
 
