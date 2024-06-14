@@ -37,6 +37,6 @@ output "bastion_private_ip" {
 }
 
 output "bastion_public_ip" {
-  value = join(", ", module.pvs_prepare.bastion_public_ip)
+  value       = join(", ", module.pvs_prepare.bastion_public_ip)
   description = "The public ip of the bastion"
 }
