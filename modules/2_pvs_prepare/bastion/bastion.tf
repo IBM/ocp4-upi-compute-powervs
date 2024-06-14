@@ -283,6 +283,7 @@ locals {
   cidr   = split("/", var.powervs_network_cidr)[0]
   gw     = cidrhost(var.powervs_network_cidr, 1)
   int_ip = cidrhost(var.powervs_network_cidr, 3)
+  mask   = split("/", var.powervs_network_cidr)[1]
 }
 
 resource "null_resource" "bastion_fix_up_networks" {
@@ -313,17 +314,19 @@ EOF
 
   provisioner "remote-exec" {
     inline = [<<EOF
+      sudo systemctl unmask NetworkManager
       DEV_NAME=$(find /sys/class/net -mindepth 1 -maxdepth 1 ! -name lo ! -name '*bond*' -printf "%P " -execdir cat {}/address \; | \
           grep -v lo | grep -v env2 | awk '{print $1}' | head -n 1)
 
-      nmcli dev mod $${DEV_NAME} ipv4.addresses ${local.int_ip} \
+      nmcli dev mod $${DEV_NAME} ipv4.addresses ${local.int_ip}/${local.mask} \
         ipv4.gateway ${local.gw} \
         ipv4.dns "${var.vpc_support_server_ip}" \
         ipv4.method manual \
         connection.autoconnect yes \
         802-3-ethernet.mtu 9000
-
-        nmcli dev up $${DEV_NAME}
+      sed -i "s|IPADDR=.*|IPADDR=${local.int_ip}|g" /etc/sysconfig/network-scripts/ifcfg-$${DEV_NAME}
+      sed -i "s|BOOTPROTO=.*|BOOTPROTO=static|g" /etc/sysconfig/network-scripts/ifcfg-$${DEV_NAME}
+      nmcli dev up $${DEV_NAME}
   EOF
     ]
   }

@@ -31,11 +31,12 @@ output "transit_gateway_status" {
   value       = module.vpc_support.transit_gateway_status
 }
 
-output "bastion_private_interface" {
+output "bastion_private_ip" {
   value       = module.worker.bastion_private_ip
-  description = "The interface mac and ip details"
+  description = "The private ip of the bastion"
 }
 
 output "bastion_public_ip" {
   value = join(", ", module.pvs_prepare.bastion_public_ip)
+  description = "The public ip of the bastion"
 }
