@@ -32,7 +32,17 @@ bastion               = { memory = "16", processors = "1", "count" = 1 }
 worker                = { memory = "16", processors = "1", "count" = 1 }
 
 # Images for Power Systems
-rhel_image_name  = "centos-03112022"
+# Bastion Image
+rhel_image_name  = "Centos-Stream-9"
+# Red Hat CoreOS Workers
+# 4.14
+# rhcos_image_name = "rhcos-414-92-202306140644-t1"
+# 4.15
+# rhcos_image_name = "rhcos-415-92-202403051622-t1"
+# 4.16
+# rhcos_image_name = "rhcos-416-94-202404250459-t1"
+# 4.17 (Development Only)
+# rhcos_image_name = "rhcos-417-94-202406050030-t1"
 rhcos_image_name = "rhcos-416-94-202404250459-t1"
 
 # Public and Private Key for Bastion Nodes
