@@ -33,7 +33,7 @@ worker                = { memory = "16", processors = "1", "count" = 1 }
 
 # Images for Power Systems
 # Bastion Image
-rhel_image_name  = "Centos-Stream-9"
+rhel_image_name = "Centos-Stream-9"
 # Red Hat CoreOS Workers
 # 4.14
 # rhcos_image_name = "rhcos-414-92-202306140644-t1"
