@@ -27,6 +27,8 @@ resource "ibm_pi_instance" "bastion" {
   pi_network {
     network_id = var.powervs_network_id
   }
+
+  lifecycle { ignore_changes = all }
 }
 
 # Dev Note: injects a delay before a hard-reboot
