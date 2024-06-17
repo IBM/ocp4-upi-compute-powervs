@@ -40,5 +40,5 @@ resource "ibm_pi_instance" "worker" {
         name : base64encode("${var.name_prefix}-worker-${count.index}"),
   }))
 
-  lifecycle { ignore_changes = [pi_user_data] }
+  lifecycle { ignore_changes = all }
 }

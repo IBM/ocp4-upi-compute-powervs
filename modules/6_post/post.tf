@@ -74,6 +74,9 @@ bash files/destroy-workers.sh "${self.triggers.vpc_support_server_ip}" "${self.t
 EOF
     ]
   }
+
+  lifecycle { ignore_changes = all }
+
 }
 
 #command to run ansible playbook on Bastion
