@@ -88,7 +88,7 @@ audit() {
     ERRORS=0
     while true
     do
-        ibmcloud cis dns-records "${TARGET_INSTANCE}" --output json --per-page 1000 --page ${PAGE} > "${JSON_BODY}"
+        ${IBMCLOUD} cis dns-records "${TARGET_INSTANCE}" --output json --per-page 1000 --page ${PAGE} > "${JSON_BODY}"
 
         if [[ $? != 0 ]]
         then
@@ -128,7 +128,7 @@ cleanup() {
     ERRORS=0
     while true
     do
-        ibmcloud cis dns-records "${TARGET_INSTANCE}" --output json --per-page 1000 --page ${PAGE} > "${JSON_BODY}"
+        ${IBMCLOUD} cis dns-records "${TARGET_INSTANCE}" --output json --per-page 1000 --page ${PAGE} > "${JSON_BODY}"
 
         if [[ $? != 0 ]]
         then
@@ -157,7 +157,7 @@ cleanup() {
                 CREATED_ON=$(echo $DETAIL | awk -F ',' '{print $2}')
                 if [[ "${CREATED_ON}" != *${PROTECTED_DATE_1}* && "${CREATED_ON}" != *${PROTECTED_DATE_2}* ]]
                 then
-                    ibmcloud cis dns-record-delete $(echo ${TARGET_INSTANCE} | tr -d '"') ${ID}
+                    ${IBMCLOUD} cis dns-record-delete $(echo ${TARGET_INSTANCE} | tr -d '"') ${ID}
                 fi
             done
         fi
