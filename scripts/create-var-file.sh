@@ -159,12 +159,14 @@ OVERRIDE_PREFIX=$(${IBMCLOUD} pi workspace list 2>&1 | grep $POWERVS_SERVICE_INS
 ibmcloud pi ssh-key create cicd-key-$(date +%s) --key "$(<data/id_rsa.pub)" || true
 
 # Set the Machine Type
-if [ "${POWERVS_REGION}" == "wdc06" ]
+if [[ "${POWERVS_REGION}" == "wdc06" ]]
+then
     MACHINE_TYPE="s922"
 else
     # Default
     MACHINE_TYPE="s1022"
 fi
+echo "MACHINE_TYPE=${MACHINE_TYPE}"
 
 # creates the var file
 cat << EOFXEOF > data/var.tfvars
