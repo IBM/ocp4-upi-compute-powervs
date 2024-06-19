@@ -5,8 +5,9 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
-# runs an audit across the CIS instance for a given set of variables
-# must already be logged into ibmcloud
+# runs an audit and cleanup across the CIS instance for a given set of variables
+# More than 2 day old, it'll be cleaned up.
+# Pre-Req: must already be logged into ibmcloud
 
 # Command:
 # scripts/cleanup/cis.sh multi-arch-cicd-resource-group ex.ex.ex.net
