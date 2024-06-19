@@ -10,7 +10,7 @@
 # it does not delete the VPC or PowerVS workspace
 
 # Cleans up the failed prior jobs
-function cleanup_mac() {
+function cleanup_multi_arch_compute() {
   local vpc_name="${1}"
   local service_instance_id="${2}"
   local api_key="${3}"
@@ -103,4 +103,4 @@ function cleanup_mac() {
 }
 
 echo "usage: vpc_name service_instance_id api_key region"
-cleanup_mac "${1}" "${2}" "${3}" "${4}"
+cleanup_multi_arch_compute "${1}" "${2}" "${3}" "${4}"
