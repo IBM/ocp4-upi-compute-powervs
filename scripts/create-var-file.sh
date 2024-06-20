@@ -157,6 +157,7 @@ OVERRIDE_PREFIX=$(${IBMCLOUD} pi workspace list 2>&1 | grep $POWERVS_SERVICE_INS
 
 # SKIP_VPC_KEY is conditionally switched
 ${IBMCLOUD} pi ssh-key create cicd-key-$(date +%s) --key "$(<data/id_rsa.pub)" || true
+${IBMCLOUD} is key-create cicd-key @data/id_rsa.pub  || true
 
 # Set the Machine Type
 if [[ "${POWERVS_REGION}" == "wdc06" ]]
