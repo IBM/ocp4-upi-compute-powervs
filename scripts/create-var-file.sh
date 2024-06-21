@@ -164,8 +164,8 @@ if [[ "${POWERVS_REGION}" == "wdc06" ]]
 then
     MACHINE_TYPE="s922"
 else
-    # Default
-    MACHINE_TYPE="s1022"
+    # Default (original s1022)
+    MACHINE_TYPE="s922"
 fi
 echo "MACHINE_TYPE=${MACHINE_TYPE}"
 
