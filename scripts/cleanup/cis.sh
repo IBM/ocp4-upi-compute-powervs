@@ -88,7 +88,6 @@ audit() {
     ERRORS=0
     while true
     do
-        ${IBMCLOUD} cis instance-set "${TARGET_INSTANCE}"
         ${IBMCLOUD} cis dns-records "${TARGET_INSTANCE}" --output json --per-page 1000 --page ${PAGE} > "${JSON_BODY}"
 
         if [[ $? != 0 ]]
