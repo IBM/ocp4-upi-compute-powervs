@@ -28,14 +28,15 @@ fi
 
 # Setting values for variables
 IDX=0
+export HTTPS_PROXY="http://${PROXY_SERVER}:3128"
+echo "HTTPS_PROXY is set to $HTTPS_PROXY"
+
 READY_COUNT=$(oc get nodes -l kubernetes.io/arch=ppc64le | grep "${MACHINE_PREFIX}" | grep -v NotReady | grep -c Ready)
 
 # Approce CSR and Check Ready status
 while [ "${READY_COUNT}" -ne "${POWER_COUNT}" ]
 do
   
-  export HTTPS_PROXY="http://${PROXY_SERVER}:3128"
-
   echo "List of All Power Workers: "
   oc get nodes -l 'kubernetes.io/arch=ppc64le' -o json | jq -r '.items[] | .metadata.name'
   echo ""
