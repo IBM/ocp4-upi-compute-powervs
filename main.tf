@@ -152,6 +152,7 @@ module "support" {
   worker                   = var.worker
   nfs_server               = module.vpc_support.vpc_support_server_ip
   nfs_path                 = var.nfs_path
+  cluster_network_mtu      = var.cluster_network_mtu
 }
 
 module "worker" {

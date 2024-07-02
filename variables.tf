@@ -317,6 +317,11 @@ variable "use_zone_info_for_names" {
   description = "Add zone info to instance name or not"
 }
 
+variable "cluster_network_mtu" {
+  type        = number
+  description = "MTU value for the OCP cluster network"
+  default     = 1350
+}
 ################################################################
 # Additional Settings
 ################################################################

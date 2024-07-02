@@ -196,13 +196,25 @@ resource "null_resource" "adjust_mtu" {
     timeout     = "${var.connection_timeout}m"
   }
 
-  # The mtu.network.to was originally targetting 9000, and has been moved to 1350 based on the VPC/IBM Cloud configurations.
+  # The mtu.network.to was originally targetting 9000, and has been moved to ${var.cluster_network_mtu} (Default 1350) based on the VPC/IBM Cloud configurations. User can override it by setting desired value in var.tfvars file
   # we previously supported OpenShiftSDN since it's deprecation we have removed it from automation.
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
-oc patch Network.operator.openshift.io cluster --type=merge --patch \
-    '{"spec": { "migration": { "mtu": { "network": { "from": 1400, "to": 1350 } , "machine": { "to" : 9100} } } } }'
+
+EXISTING_MTU=$(oc get network cluster -o yaml | grep -i clusterNetworkMTU | awk '{print $2}')
+
+if [ $EXISTING_MTU != ${var.cluster_network_mtu} ]
+then
+  echo "Setting clusterNetworkMTU to ${var.cluster_network_mtu}"
+  output=$(oc patch Network.operator.openshift.io cluster --type=merge --patch \
+    '{"spec": { "migration": { "mtu": { "network": { "from": '$EXISTING_MTU', "to": ${var.cluster_network_mtu} } , "machine": { "to" : 9100} } } } }')
+  echo "Patch command output is $output"
+
+else
+  echo "clusterNetworkMTU is already set to ${var.cluster_network_mtu}"
+fi
+
 EOF
     ]
   }
@@ -307,6 +319,25 @@ while [[ "$(oc get network cluster -o yaml | grep 'to: 9100' | awk '{print $NF}'
 do
   echo "waiting on worker"
   sleep 30
+done
+
+# Check clusterNetworkMTU
+cl_network_mtu=$(oc get network cluster -o yaml | grep -i clusterNetworkMTU | awk '{print $2}')
+echo "(DEBUG) clusterNetworkMTU FOUND?: $${cl_network_mtu}"
+
+# While loop waits for clusterNetworkMTU=var.cluster_network_mtu (Default 1350) till timeout has not reached
+while [[ "$(oc get network cluster -o yaml | grep -i clusterNetworkMTU | awk '{print $2}')" != "${var.cluster_network_mtu}" ]]
+do
+  echo "waiting for clusterNetworkMTU to be ${var.cluster_network_mtu}"
+  sleep 30
+
+  start_counter=$(expr $start_counter + 1)
+
+  # Break the loop if timeout occurs
+  if [ $start_counter -gt $timeout_counter ]
+  then
+    break
+  fi
 done
 
 RENDERED_CONFIG=$(oc get mcp/worker -o json | jq -r '.spec.configuration.name')
