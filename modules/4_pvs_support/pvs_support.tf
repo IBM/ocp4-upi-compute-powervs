@@ -207,9 +207,9 @@ EXISTING_MTU=$(oc get network cluster -o json | jq -r .status.clusterNetworkMTU)
 if [ $EXISTING_MTU != ${var.cluster_network_mtu} ]
 then
   echo "Setting clusterNetworkMTU to ${var.cluster_network_mtu}"
-  output=$(oc patch Network.operator.openshift.io cluster --type=merge --patch \
-    '{"spec": { "migration": { "mtu": { "network": { "from": '$EXISTING_MTU', "to": ${var.cluster_network_mtu} } , "machine": { "to" : 9100} } } } }')
-  echo "Patch command output is $output"
+  echo "Patch command output is:"
+  oc patch Network.operator.openshift.io cluster --type=merge --patch \
+    '{"spec": { "migration": { "mtu": { "network": { "from": '$EXISTING_MTU', "to": ${var.cluster_network_mtu} } , "machine": { "to" : 9100} } } } }'
 
 else
   echo "clusterNetworkMTU is already set to ${var.cluster_network_mtu}"
