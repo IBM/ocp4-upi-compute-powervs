@@ -214,7 +214,6 @@ then
 else
   echo "clusterNetworkMTU is already set to ${var.cluster_network_mtu}"
 fi
-
 EOF
     ]
   }
