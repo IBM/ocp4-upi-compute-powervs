@@ -336,6 +336,7 @@ do
   # Break the loop if timeout occurs
   if [ $start_counter -gt $timeout_counter ]
   then
+    echo "exceeding the loop timeout: $${start_counter}"
     break
   fi
 done
