@@ -202,7 +202,7 @@ resource "null_resource" "adjust_mtu" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 
-EXISTING_MTU=$(oc get network cluster -o yaml | grep -i clusterNetworkMTU | awk '{print $2}')
+EXISTING_MTU=$(oc get network cluster -o json | jq -r .status.clusterNetworkMTU)
 
 if [ $EXISTING_MTU != ${var.cluster_network_mtu} ]
 then
