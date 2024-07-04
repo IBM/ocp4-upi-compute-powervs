@@ -321,7 +321,7 @@ do
 done
 
 # Check clusterNetworkMTU
-cl_network_mtu=$(oc get network cluster -o yaml | grep -i clusterNetworkMTU | awk '{print $2}')
+cl_network_mtu=$(oc get network cluster -o json | jq -r .status.clusterNetworkMTU)
 echo "(DEBUG) clusterNetworkMTU FOUND?: $${cl_network_mtu}"
 
 # While loop waits for clusterNetworkMTU=var.cluster_network_mtu (Default 1350) till timeout has not reached
