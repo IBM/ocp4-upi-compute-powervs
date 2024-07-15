@@ -1,4 +1,5 @@
 ---
+cicd: "${cicd}"
 ocp_client: "${client_tarball}"
 openshift_machine_config_url: "${openshift_machine_config_url}:22623/config/worker"
 vpc_support_server_ip: "${vpc_support_server_ip}"

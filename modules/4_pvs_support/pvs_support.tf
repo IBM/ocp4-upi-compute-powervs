@@ -27,6 +27,7 @@ locals {
     gateway                      = cidrhost(var.powervs_machine_cidr, 1)
     nfs_server                   = var.nfs_server
     nfs_path                     = var.nfs_path
+    cicd                         = var.cicd
   }
 
   cidrs = {
