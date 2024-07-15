@@ -20,6 +20,7 @@ variable "keep_dns" {}
 variable "nfs_server" {}
 variable "nfs_path" {}
 variable "cluster_network_mtu" {}
+variable "cicd" {}
 variable "worker" {
   type = object({ count = number, memory = string, processors = string })
   default = {
