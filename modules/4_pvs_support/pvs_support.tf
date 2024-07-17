@@ -111,6 +111,7 @@ chmod +x files/setup_route.sh
 files/setup_route.sh "${local.cidr_str}"
 
 echo 'Running ocp4-upi-compute-powervs playbook...'
+mkdir -p /root/.openshift
 ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support.log ansible-playbook -e @vars/vars.yaml tasks/main.yml --become
 EOF
     ]
@@ -142,7 +143,7 @@ EOF
 
 # Dev Note: setup nfs deployment
 resource "null_resource" "nfs_deployment" {
-  depends_on = [null_resource.config_login]
+  depends_on = [null_resource.config_login, null_resource.config]
   connection {
     type        = "ssh"
     user        = var.rhel_username
@@ -156,6 +157,7 @@ resource "null_resource" "nfs_deployment" {
     inline = [<<EOF
 echo 'Running ocp4-upi-compute-powervs playbook...'
 cd ocp4-upi-compute-powervs/support
+mkdir -p /root/.openshift
 ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support-nfs-deploy.log ansible-playbook -e @vars/vars.yaml tasks/nfs_provisioner.yml --become || true
 EOF
     ]
