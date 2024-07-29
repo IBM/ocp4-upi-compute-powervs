@@ -527,6 +527,13 @@ variable "keep_dns" {
   default     = false
 }
 
+variable "cicd_disable_defrag" {
+  type        = bool
+  description = "Creates a config map 'etcd-disable-defrag' to disable the etcd defragmentation"
+  default     = false
+  # User needs to manually remove the config map to restore the settings
+}
+
 ################################################################
 # Overrides the dhcp network, transit gateway creation from a 
 # PowerVS perspective.
