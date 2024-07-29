@@ -204,6 +204,7 @@ override_region_check=true
 mac_tags = [ "mac-cicd-${CLEAN_VERSION}" ]
 
 cicd = true
+cicd_disable_defrag = true
 skip_vpc_key = true
 setup_transit_gateway = true
 EOFXEOF
