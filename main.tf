@@ -154,6 +154,7 @@ module "support" {
   nfs_path                 = var.nfs_path
   cluster_network_mtu      = var.cluster_network_mtu
   cicd                     = var.cicd
+  cicd_disable_defrag      = var.cicd_disable_defrag
 }
 
 module "worker" {

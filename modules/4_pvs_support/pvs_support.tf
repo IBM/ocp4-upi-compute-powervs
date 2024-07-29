@@ -141,6 +141,34 @@ EOF
   }
 }
 
+# Dev Note: disable etcd defragmentation using flag cicd_disable_defrag
+resource "null_resource" "disable_etcd_defrag" {
+  depends_on = [null_resource.config_login, null_resource.config]
+  count      = var.cicd_disable_defrag ? 1 : 0
+  connection {
+    type        = "ssh"
+    user        = var.rhel_username
+    host        = var.bastion_public_ip
+    private_key = file(var.private_key_file)
+    agent       = var.ssh_agent
+    timeout     = "${var.connection_timeout}m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
+outval=$(oc get configmap etcd-disable-defrag -n openshift-etcd-operator)
+if [ -z "$outval" ]
+then
+  oc create configmap etcd-disable-defrag -n openshift-etcd-operator
+else
+  echo "configmap etcd-disable-defrag already exists"
+fi
+EOF
+    ]
+  }
+}
+
 # Dev Note: setup nfs deployment
 resource "null_resource" "nfs_deployment" {
   depends_on = [null_resource.config_login, null_resource.config]

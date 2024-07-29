@@ -21,6 +21,7 @@ variable "nfs_server" {}
 variable "nfs_path" {}
 variable "cluster_network_mtu" {}
 variable "cicd" {}
+variable "cicd_disable_defrag" {}
 variable "worker" {
   type = object({ count = number, memory = string, processors = string })
   default = {
