@@ -1,5 +1,5 @@
 ---
-rsct_image: "quay.io/powercloud/rsct-ppc64le:latest"
+rsct_image: "quay.io/powercloud/rsct-ppc64le:latest-ubi9"
 rmc_name: "powervm-rmc"
 project_name: "powervm-rmc"
 nfs_provisioner_image: "registry.k8s.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2"
