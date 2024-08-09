@@ -1,0 +1,192 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: master
+  name: 98-var-lib-etcd
+spec:
+  config:
+    ignition:
+      version: 3.1.0
+    storage:
+      files:
+        - path: /etc/find-secondary-device
+          mode: 0755
+          contents:
+            source: data:text/plain;charset=utf-8;base64,IyEvYmluL2Jhc2gKc2V0IC11byBwaXBlZmFpbAoKZm9yIGRldmljZSBpbiAvZGV2L3ZkKjsgZG8gCi91c3Ivc2Jpbi9ibGtpZCAkZGV2aWNlICY+IC9kZXYvbnVsbArCoGlmIFsgJD8gPT0gMiDCoF07IHRoZW4KwqAgwqAgZWNobyAic2Vjb25kYXJ5IGRldmljZSBmb3VuZCAkZGV2aWNlIgrCoCDCoCBlY2hvICJjcmVhdGluZyBmaWxlc3lzdGVtIGZvciBldGNkIG1vdW50IgrCoCDCoCBta2ZzLnhmcyAtTCB2YXItbGliLWV0Y2QgLWYgJGRldmljZSAmPiAvZGV2L251bGwKwqAgwqAgdWRldmFkbSBzZXR0bGUKwqAgwqAgdG91Y2ggL2V0Yy92YXItbGliLWV0Y2QtbW91bnQKwqAgwqAgZXhpdArCoGZpCmRvbmUKZWNobyAiQ291bGRuJ3QgZmluZCBzZWNvbmRhcnkgYmxvY2sgZGV2aWNlISIgPiYyCmV4aXQgNzcK 
+    systemd:
+      units:
+        - name: find-secondary-device.service
+          enabled: true
+          contents: |
+            [Unit]
+            Description=Find secondary device
+            DefaultDependencies=false
+            After=systemd-udev-settle.service
+            Before=local-fs-pre.target
+            ConditionPathExists=!/etc/var-lib-etcd-mount
+
+            [Service]
+            RemainAfterExit=yes
+            ExecStart=/etc/find-secondary-device
+
+            RestartForceExitStatus=77
+
+            [Install]
+            WantedBy=multi-user.target
+        - name: var-lib-etcd.mount
+          enabled: true
+          contents: |
+            [Unit]
+            Before=local-fs.target
+
+            [Mount]
+            What=/dev/disk/by-label/var-lib-etcd
+            Where=/var/lib/etcd
+            Type=xfs
+            TimeoutSec=120s
+
+            [Install]
+            RequiredBy=local-fs.target
+        - name: sync-var-lib-etcd-to-etcd.service
+          enabled: true
+          contents: |
+            [Unit]
+            Description=Sync etcd data if new mount is empty
+            DefaultDependencies=no
+            After=var-lib-etcd.mount var.mount
+            Before=crio.service
+
+            [Service]
+            Type=oneshot
+            RemainAfterExit=yes
+            ExecCondition=/usr/bin/test ! -d /var/lib/etcd/member
+            ExecStart=/usr/sbin/setsebool -P rsync_full_access 1
+            ExecStart=/bin/rsync -ar /sysroot/ostree/deploy/rhcos/var/lib/etcd/ /var/lib/etcd/
+            ExecStart=/usr/sbin/semanage fcontext -a -t container_var_lib_t '/var/lib/etcd(/.*)?'
+            ExecStart=/usr/sbin/setsebool -P rsync_full_access 0
+            TimeoutSec=0
+
+            [Install]
+            WantedBy=multi-user.target graphical.target
+        - name: restorecon-var-lib-etcd.service
+          enabled: true
+          contents: |
+            [Unit]
+            Description=Restore recursive SELinux security contexts
+            DefaultDependencies=no
+            After=var-lib-etcd.mount
+            Before=crio.service
+
+            [Service]
+            Type=oneshot
+            RemainAfterExit=yes
+            ExecStart=/sbin/restorecon -R /var/lib/etcd/
+            TimeoutSec=0
+
+            [Install]
+            WantedBy=multi-user.target graphical.target
+
+
+
+
+========================
+Take etcd backup on Master Nodes
+[root@wdc-416-vm-bastion-0 ~]# oc debug node/rdr-ca-wdc-s2hjr-master-0
+Starting pod/rdr-ca-wdc-s2hjr-master-0-debug-bkss2 ...
+To use host binaries, run `chroot /host`
+Pod IP: 10.241.0.7
+If you don't see a command prompt, try pressing enter.
+sh-5.1# chroot /host
+sh-5.1# /usr/local/bin/cluster-backup.sh /home/core/assets/backup
+Certificate /etc/kubernetes/static-pod-certs/configmaps/etcd-serving-ca/ca-bundle.crt is missing. Checking in different directory
+Certificate /etc/kubernetes/static-pod-resources/etcd-certs/configmaps/etcd-serving-ca/ca-bundle.crt found!
+found latest kube-apiserver: /etc/kubernetes/static-pod-resources/kube-apiserver-pod-17
+found latest kube-controller-manager: /etc/kubernetes/static-pod-resources/kube-controller-manager-pod-8
+found latest kube-scheduler: /etc/kubernetes/static-pod-resources/kube-scheduler-pod-6
+found latest etcd: /etc/kubernetes/static-pod-resources/etcd-pod-8
+663e90e6463d711a08ec47fffd4d8d54a90dec006a00bfddeb2abe495211d95d
+etcdctl version: 3.5.13
+API version: 3.5
+{"level":"info","ts":"2024-08-06T12:57:23.428883Z","caller":"snapshot/v3_snapshot.go:65","msg":"created temporary db file","path":"/home/core/assets/backup/snapshot_2024-08-06_125718.db.part"}
+{"level":"info","ts":"2024-08-06T12:57:23.487017Z","logger":"client","caller":"v3@v3.5.13/maintenance.go:212","msg":"opened snapshot stream; downloading"}
+{"level":"info","ts":"2024-08-06T12:57:23.491976Z","caller":"snapshot/v3_snapshot.go:73","msg":"fetching snapshot","endpoint":"https://10.241.0.7:2379"}
+{"level":"info","ts":"2024-08-06T12:57:26.590606Z","logger":"client","caller":"v3@v3.5.13/maintenance.go:220","msg":"completed snapshot read; closing"}
+{"level":"info","ts":"2024-08-06T12:57:30.826519Z","caller":"snapshot/v3_snapshot.go:88","msg":"fetched snapshot","endpoint":"https://10.241.0.7:2379","size":"257 MB","took":"7 seconds ago"}
+{"level":"info","ts":"2024-08-06T12:57:30.826885Z","caller":"snapshot/v3_snapshot.go:97","msg":"saved","path":"/home/core/assets/backup/snapshot_2024-08-06_125718.db"}
+Snapshot saved at /home/core/assets/backup/snapshot_2024-08-06_125718.db
+{"hash":1507478591,"revision":20013313,"totalKey":18706,"totalSize":256786432}
+snapshot db and kube resources are successfully saved to /home/core/assets/backup
+sh-5.1#
+sh-5.1# ls -lrt /home/core/assets/backup/
+total 250856
+-rw-------. 1 root root     83960 Aug  6 12:57 static_kuberesources_2024-08-06_125718.tar.gz
+-rw-------. 1 root root 256786464 Aug  6 12:57 snapshot_2024-08-06_125718.db
+sh-5.1#
+======================
+[root@wdc-416-vm-bastion-0 ~]# oc debug node/rdr-ca-wdc-s2hjr-master-1
+Starting pod/rdr-ca-wdc-s2hjr-master-1-debug-pml9r ...
+To use host binaries, run `chroot /host`
+Pod IP: 10.241.65.6
+If you don't see a command prompt, try pressing enter.
+sh-5.1# chroot /host
+sh-5.1# /usr/local/bin/cluster-backup.sh /home/core/assets/backup
+Certificate /etc/kubernetes/static-pod-certs/configmaps/etcd-serving-ca/ca-bundle.crt is missing. Checking in different directory
+Certificate /etc/kubernetes/static-pod-resources/etcd-certs/configmaps/etcd-serving-ca/ca-bundle.crt found!
+found latest kube-apiserver: /etc/kubernetes/static-pod-resources/kube-apiserver-pod-17
+found latest kube-controller-manager: /etc/kubernetes/static-pod-resources/kube-controller-manager-pod-8
+found latest kube-scheduler: /etc/kubernetes/static-pod-resources/kube-scheduler-pod-6
+found latest etcd: /etc/kubernetes/static-pod-resources/etcd-pod-8
+8989eeaf5bb83edde422e29146f41679b3c2ad7a78218b709f452c628be26329
+etcdctl version: 3.5.13
+API version: 3.5
+{"level":"info","ts":"2024-08-06T13:00:53.898175Z","caller":"snapshot/v3_snapshot.go:65","msg":"created temporary db file","path":"/home/core/assets/backup/snapshot_2024-08-06_130049.db.part"}
+{"level":"info","ts":"2024-08-06T13:00:53.906951Z","logger":"client","caller":"v3@v3.5.13/maintenance.go:212","msg":"opened snapshot stream; downloading"}
+{"level":"info","ts":"2024-08-06T13:00:53.907584Z","caller":"snapshot/v3_snapshot.go:73","msg":"fetching snapshot","endpoint":"https://10.241.65.6:2379"}
+{"level":"info","ts":"2024-08-06T13:00:56.534473Z","logger":"client","caller":"v3@v3.5.13/maintenance.go:220","msg":"completed snapshot read; closing"}
+{"level":"info","ts":"2024-08-06T13:01:00.790377Z","caller":"snapshot/v3_snapshot.go:88","msg":"fetched snapshot","endpoint":"https://10.241.65.6:2379","size":"258 MB","took":"6 seconds ago"}
+{"level":"info","ts":"2024-08-06T13:01:00.790799Z","caller":"snapshot/v3_snapshot.go:97","msg":"saved","path":"/home/core/assets/backup/snapshot_2024-08-06_130049.db"}
+Snapshot saved at /home/core/assets/backup/snapshot_2024-08-06_130049.db
+{"hash":272814568,"revision":20014900,"totalKey":17744,"totalSize":257507328}
+snapshot db and kube resources are successfully saved to /home/core/assets/backup
+sh-5.1# ls -lrt /home/core/assets/backup/
+total 251560
+-rw-------. 1 root root     84401 Aug  6 13:00 static_kuberesources_2024-08-06_130049.tar.gz
+-rw-------. 1 root root 257507360 Aug  6 13:00 snapshot_2024-08-06_130049.db
+sh-5.1#
+========================
+[root@wdc-416-vm-bastion-0 ~]# oc debug node/rdr-ca-wdc-s2hjr-master-2
+Starting pod/rdr-ca-wdc-s2hjr-master-2-debug-5wbj5 ...
+To use host binaries, run `chroot /host`
+Pod IP: 10.241.129.4
+If you don't see a command prompt, try pressing enter.
+sh-5.1# chroot /host
+sh-5.1# /usr/local/bin/cluster-backup.sh /home/core/assets/backup
+Certificate /etc/kubernetes/static-pod-certs/configmaps/etcd-serving-ca/ca-bundle.crt is missing. Checking in different directory
+Certificate /etc/kubernetes/static-pod-resources/etcd-certs/configmaps/etcd-serving-ca/ca-bundle.crt found!
+found latest kube-apiserver: /etc/kubernetes/static-pod-resources/kube-apiserver-pod-17
+found latest kube-controller-manager: /etc/kubernetes/static-pod-resources/kube-controller-manager-pod-8
+found latest kube-scheduler: /etc/kubernetes/static-pod-resources/kube-scheduler-pod-6
+found latest etcd: /etc/kubernetes/static-pod-resources/etcd-pod-8
+f801341ec65b4f20677ee06a011fa2734f96424528960eefc9d4accf35dd2581
+etcdctl version: 3.5.13
+API version: 3.5
+{"level":"info","ts":"2024-08-06T13:02:37.368521Z","caller":"snapshot/v3_snapshot.go:65","msg":"created temporary db file","path":"/home/core/assets/backup/snapshot_2024-08-06_130232.db.part"}
+{"level":"info","ts":"2024-08-06T13:02:37.380335Z","logger":"client","caller":"v3@v3.5.13/maintenance.go:212","msg":"opened snapshot stream; downloading"}
+{"level":"info","ts":"2024-08-06T13:02:37.380403Z","caller":"snapshot/v3_snapshot.go:73","msg":"fetching snapshot","endpoint":"https://10.241.129.4:2379"}
+{"level":"info","ts":"2024-08-06T13:02:40.118496Z","logger":"client","caller":"v3@v3.5.13/maintenance.go:220","msg":"completed snapshot read; closing"}
+{"level":"info","ts":"2024-08-06T13:02:44.397536Z","caller":"snapshot/v3_snapshot.go:88","msg":"fetched snapshot","endpoint":"https://10.241.129.4:2379","size":"258 MB","took":"7 seconds ago"}
+{"level":"info","ts":"2024-08-06T13:02:44.397674Z","caller":"snapshot/v3_snapshot.go:97","msg":"saved","path":"/home/core/assets/backup/snapshot_2024-08-06_130232.db"}
+Snapshot saved at /home/core/assets/backup/snapshot_2024-08-06_130232.db
+{"hash":1072527377,"revision":20015988,"totalKey":18870,"totalSize":257761280}
+snapshot db and kube resources are successfully saved to /home/core/assets/backup
+sh-5.1#  ls -lrt /home/core/assets/backup/
+total 251808
+-rw-------. 1 root root     84821 Aug  6 13:02 static_kuberesources_2024-08-06_130232.tar.gz
+-rw-------. 1 root root 257761312 Aug  6 13:02 snapshot_2024-08-06_130232.db
+sh-5.1#
+
+
+
+
+
