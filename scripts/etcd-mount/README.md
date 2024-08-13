@@ -20,7 +20,7 @@ MachineConfig.yaml : etcd-mc.yaml
 Steps to run Automation:
   1. CI/CD will take care of backing up the existing etcd data.
   2. CI/CD will add the MachineConfig Yaml file into the OCP Cluster and the MachineConfig CR will move the etcd to the attached block volume.
-
+  3. If the logs show an exit code of 77, then a failure moving the etcd data in /etc/find-secondary-device happened.
   
 Please refer the article for more details:
 https://docs.openshift.com/container-platform/4.16/scalability_and_performance/recommended-performance-scale-practices/recommended-etcd-practices.html#move-etcd-different-disk_recommended-etcd-practices
