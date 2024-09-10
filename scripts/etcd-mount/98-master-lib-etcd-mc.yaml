@@ -11,9 +11,9 @@ spec:
     storage:
       files:
         - path: /etc/find-secondary-device
-          mode: 0755
+          mode: 493
           contents:
-            source: data:text/plain;charset=utf-8;base64,IyEvYmluL2Jhc2gKc2V0IC11byBwaXBlZmFpbAoKZm9yIGRldmljZSBpbiAvZGV2L3ZkKjsgZG8gCi91c3Ivc2Jpbi9ibGtpZCAkZGV2aWNlICY+IC9kZXYvbnVsbArCoGlmIFsgJD8gPT0gMiDCoF07IHRoZW4KwqAgwqAgZWNobyAic2Vjb25kYXJ5IGRldmljZSBmb3VuZCAkZGV2aWNlIgrCoCDCoCBlY2hvICJjcmVhdGluZyBmaWxlc3lzdGVtIGZvciBldGNkIG1vdW50IgrCoCDCoCBta2ZzLnhmcyAtTCB2YXItbGliLWV0Y2QgLWYgJGRldmljZSAmPiAvZGV2L251bGwKwqAgwqAgdWRldmFkbSBzZXR0bGUKwqAgwqAgdG91Y2ggL2V0Yy92YXItbGliLWV0Y2QtbW91bnQKwqAgwqAgZXhpdArCoGZpCmRvbmUKZWNobyAiQ291bGRuJ3QgZmluZCBzZWNvbmRhcnkgYmxvY2sgZGV2aWNlISIgPiYyCmV4aXQgNzcK 
+            source: data:text/plain;charset=utf-8;base64,IyEvYmluL2Jhc2gKc2V0IC11byBwaXBlZmFpbAoKZm9yIGRldmljZSBpbiAvZGV2L3ZkKjsgZG8KL3Vzci9zYmluL2Jsa2lkICRkZXZpY2UgJj4gL2Rldi9udWxsCmlmIFsgJD8gPT0gMiBdOyB0aGVuCiAgZWNobyAic2Vjb25kYXJ5IGRldmljZSBmb3VuZCAkZGV2aWNlIgogIGVjaG8gImNyZWF0aW5nIGZpbGVzeXN0ZW0gZm9yIGV0Y2QgbW91bnQiCiAgbWtmcy54ZnMgLUwgdmFyLWxpYi1ldGNkIC1mICRkZXZpY2UgJj4gL2Rldi9udWxsCiAgdWRldmFkbSBzZXR0bGUKICB0b3VjaCAvZXRjL3Zhci1saWItZXRjZC1tb3VudAogIGV4aXQKZmkKZG9uZQplY2hvICJDb3VsZG4ndCBmaW5kIHNlY29uZGFyeSBibG9jayBkZXZpY2UhIiA+JjIKZXhpdCA3Nwo=
     systemd:
       units:
         - name: find-secondary-device.service

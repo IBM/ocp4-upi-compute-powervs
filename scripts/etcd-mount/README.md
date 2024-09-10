@@ -14,8 +14,15 @@ Hence the script mentions /dev/vd*.
 Please refer article for other options of external drives.(SCSI/SATA/NVM)
 
 Artifacts: 
-Script : mount_etcd_to_ext_vol.sh 
-MachineConfig.yaml : etcd-mc.yaml 
+Script : mount_etcd_ext_volume.sh 
+MachineConfig.yaml : 98-master-lib-etcd-mc.yaml 
+
+Input Parameters:
+Tier : Can be either "10iops-tier" or "5iops-tier"
+Resource group: Will be specific to Customer(ocp-dev-resource-group in our case)
+Tag : Optional
+VPC Prefix : Used by the Customer
+
 
 Steps to run Automation:
   1. CI/CD will take care of backing up the existing etcd data.
