@@ -100,3 +100,5 @@ for count in 0 1 2; do
    fi
    i=$((i+3))
 done
+
+echo "Done Mounting"
