@@ -1,1 +1,1 @@
-oc login -s https://api.rdr-ca-wdc.powervs-openshift-ipi.cis.ibm.net:6443 -u kubeadmin -p Jtu5R-oJGF4-RhjJJ-tvCSR
+oc login -s https://api.<domain>:6443 -u kubeadmin -p <Password>
