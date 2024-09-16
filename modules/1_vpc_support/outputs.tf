@@ -15,6 +15,10 @@ output "vpc_crn" {
   value = data.ibm_is_vpc.vpc.crn
 }
 
+output "vpc_resource_group" {
+  value = data.ibm_is_vpc.vpc.resource_group
+}
+
 output "transit_gateway_id" {
   value = var.setup_transit_gateway ? module.transit_gateway[0].new_tg : module.existing_gateway[0].existing_tg
 }

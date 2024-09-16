@@ -23,3 +23,6 @@ variable "cicd" {}
 variable "openshift_api_url" {}
 variable "openshift_user" {}
 variable "openshift_pass" {}
+
+variable "vpc_name" {}
+variable "vpc_resource_group" {}
