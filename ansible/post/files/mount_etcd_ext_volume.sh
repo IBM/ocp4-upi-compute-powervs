@@ -13,12 +13,11 @@ function ic() {
   ibmcloud "$@"
 }
 
-#var_tier="10iops-tier"
-#var_rg="ocp-dev-resource-group"
-#var_rg="${ENV_RESOURCE_GROUP:-ocp-dev-resource-group}"
-#var_tag="rdr-multi-arch-etcd"
+var_tier="5iops-tier"
+var_rg="${2}"
+var_tag="rdr-multi-arch-etcd"
 var_rand_id=$(echo "$(openssl rand -hex 4)");
-#var_vpc_prefix=rdr-mac-mkul18
+var_vpc_prefix="${1}"
 vsi_out=$(ic is instances | grep ${var_vpc_prefix} | grep master | awk -vOFS=":" '{print $1,$2,$9}');
 
 arr=( $(sed 's/:/ /g' <<<"$vsi_out") )
@@ -28,7 +27,7 @@ for count in 0 1 2; do
   name=${arr[i+1]};
   region=${arr[i+2]};
   vol_create_command="ic is volume-create auto-etcd-vol-${var_rand_id}-${count} ${var_tier} ${region} --capacity 20 --resource-group-name ${var_rg} --output JSON --tags ${var_tag}"
-#  echo ${vol_create_command};
+
   VOLUME_ID=$(ic is volume-create auto-etcd-vol-${var_rand_id}-${count} ${var_tier} ${region} --capacity 20 --resource-group-name ${var_rg} --output JSON --tags ${var_tag} | jq .id | tr -d "'\"")
   VOL_STATUS=$( ic is volumes | grep ${VOLUME_ID} | awk '{print $3}' );
   while [ "$VOL_STATUS" != "available" ]
