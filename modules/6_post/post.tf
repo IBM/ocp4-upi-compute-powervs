@@ -226,7 +226,7 @@ oc login \
   "${self.triggers.openshift_api_url}" -u "${self.triggers.openshift_user}" -p "${self.triggers.openshift_pass}" --insecure-skip-tls-verify=true
 
 cd ${self.triggers.ansible_post_path}
-bash files/add-etcd-worker.sh "${var.vpc_name}" "${var.vpc_resource_group}"
+bash files/mount_etcd_ext_volume.sh "${var.vpc_name}" "${var.vpc_resource_group}"
 EOF
     ]
   }
