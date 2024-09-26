@@ -1,11 +1,7 @@
 ################################################################
-# Copyright 2023 - IBM Corporation. All rights reserved
+# Copyright 2024 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
-
-output "vpc_check_key" {
-  value = module.keys.vpc_check_key
-}
 
 output "vpc_support_server_ip" {
   value = module.vsi.vpc_support_server_ip

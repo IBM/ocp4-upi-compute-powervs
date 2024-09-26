@@ -16,11 +16,6 @@ output "vpc_support_server_ip" {
   value       = module.vpc_support.vpc_support_server_ip
 }
 
-output "vpc_check_key" {
-  description = "The VPC SSH Key that was added/checked against existing keys"
-  value       = module.vpc_support.vpc_check_key
-}
-
 output "transit_gateway_name" {
   description = "The name of the Transit Gateway"
   value       = module.vpc_support.transit_gateway_name
