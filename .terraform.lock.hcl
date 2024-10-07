@@ -82,15 +82,15 @@ provider "registry.terraform.io/hashicorp/time" {
 }
 
 provider "registry.terraform.io/ibm-cloud/ibm" {
-  version     = "1.69.2"
-  constraints = "~> 1.69.2"
+  version     = "1.70.0"
+  constraints = "~> 1.70.0"
   hashes = [
-    "h1:QYpGKKF8J0xMFxY1t2LDLp3Db+TKRZVC5fMTspDNVQE=",
-    "zh:46883f2c84e0f43a4c65e5d46b5e25c074039981e55928f1172094001f3f5f34",
-    "zh:51c426998ed444d11d3e92ad6890a6d5bd5f74ab6ffeaf2626d253a23ace2672",
-    "zh:c0ea858a432be2c1908ff27c61992675f1b0a723eb2b0db5c7f74f0647327f1e",
-    "zh:d33e1650f01ffbfe5b8819f99fd8734431aa1612c0659fe9424204af45115f1d",
-    "zh:da2c0a4bb6b66c460c676e28c10a8ac928ad67c1cb343fb128600d8708a977c2",
-    "zh:fd3466acf7ee5f768ca6647b86a93112ff3455621d130bc53305183691eb9752",
+    "h1:DjJdgHH/45gfHqEPqwPnlW0Xpqj11im5cH34hxy09ig=",
+    "zh:08ec1fa0ba28ee3ea80bc3c99b52a9431a87d3a2bed93c27b3a945c41939c7e7",
+    "zh:0e2ef4524dd9cec156a75f214949f8905d119736b60e06e8368e2198a7cabd49",
+    "zh:5afa9f0f19612ae78b386152957271d433656e3d4e8731c9a628c53b77fbb348",
+    "zh:9f206e7e8e0e273c06ef2389222d482472249e5a47da6c1da1aa929dbc1615f2",
+    "zh:d03743f131c3f5500d1d963b673682f810bac3cc4863e8e263a20be8b026a639",
+    "zh:ea16444662766c6c9da0d31101982bbf310e0317f0ea405f101479f94ff7f3e0",
   ]
 }
