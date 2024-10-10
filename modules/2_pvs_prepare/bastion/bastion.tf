@@ -311,15 +311,15 @@ resource "null_resource" "bastion_fix_up_networks" {
 for IFNAME in $(ip --json link show | jq -r '.[] | select(.ifname != "lo").ifname')
 do
     echo "IFNAME: $${IFNAME}"
-    ip link set $$IFNAME mtu 9000
-    /sbin/ethtool --offload $$IFNAME tx-checksumming off
+    ip link set $${IFNAME} mtu 9000
+    /sbin/ethtool --offload $${IFNAME} tx-checksumming off
+    echo "IFNAME is updated"
 done
 EOF
     ]
   }
 
-  # Identifies the networks, and picks the iface that is on the private networkfor_each
-
+  # Identifies the networks, and picks the iface that is on the private network
   provisioner "remote-exec" {
     inline = [<<EOF
       sudo systemctl unmask NetworkManager
