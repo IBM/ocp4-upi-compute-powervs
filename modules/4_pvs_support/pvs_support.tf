@@ -33,6 +33,7 @@ locals {
   cidrs = {
     cidrs_ipv4 = var.cidrs
     gateway    = cidrhost(var.powervs_machine_cidr, 1)
+    subnet     = var.powervs_machine_cidr
   }
 
   cidr_str = split("/", var.powervs_machine_cidr)[0]
@@ -99,16 +100,16 @@ resource "null_resource" "config" {
 
   # Copies the custom route for env3
   provisioner "file" {
-    content     = templatefile("${path.module}/templates/route-env3.tpl", local.cidrs)
-    destination = "/etc/sysconfig/network-scripts/route-env3"
+    content     = templatefile("${path.module}/templates/route-env.sh.tpl", local.cidrs)
+    destination = "ocp4-upi-compute-powervs/support/route-env.sh"
   }
 
   # Dev Note: need to move the route script to the right location
   provisioner "remote-exec" {
     inline = [<<EOF
 cd ocp4-upi-compute-powervs/support
-chmod +x files/setup_route.sh
-files/setup_route.sh "${local.cidr_str}"
+chmod +x ./route-env.sh
+./route-env.sh 
 
 echo 'Running ocp4-upi-compute-powervs playbook...'
 mkdir -p /root/.openshift
