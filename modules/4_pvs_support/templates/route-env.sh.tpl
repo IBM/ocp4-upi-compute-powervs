@@ -4,8 +4,7 @@
 ################################################################
 
 # sets up the interface routes
-INT_IFACE=""
-ip -o -f inet addr show | grep ${subnet} | awk '{print $$2}' | while read IFACE
+ip route show | grep ${subnet} | grep -v via | awk '{print $3}' | uniq | while read IFACE
 do
 echo "$${IFACE} found"
 cat << EOF | nmcli connection edit "$${IFACE}"
@@ -19,5 +18,4 @@ EOF
 
 nmcli connection up "$${IFACE}"
 break
-fi
 done
