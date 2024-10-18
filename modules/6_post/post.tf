@@ -192,9 +192,7 @@ EOF
   }
 }
 
-# Dev Note: Only Dev only
-# Adds a 3kiops secondary disk.
-resource "null_resource" "add_etcd_secondary_disk" {
+resource "null_resource" "cicd_login" {
   count      = var.cicd ? 1 : 0
   depends_on = [null_resource.post_ansible, null_resource.debug_and_remove_taints, null_resource.remove_workers]
 
@@ -203,9 +201,6 @@ resource "null_resource" "add_etcd_secondary_disk" {
     private_key           = sensitive(file(var.private_key_file))
     host                  = var.bastion_public_ip[0]
     agent                 = var.ssh_agent
-    nfs_namespace         = local.nfs_namespace
-    nfs_deployment        = local.nfs_deployment
-    ansible_post_path     = local.ansible_post_path
     openshift_api_url     = sensitive(var.openshift_api_url)
     openshift_user        = sensitive(var.openshift_user)
     openshift_pass        = sensitive(var.openshift_pass)
@@ -224,7 +219,42 @@ resource "null_resource" "add_etcd_secondary_disk" {
 export HTTPS_PROXY="http://${self.triggers.vpc_support_server_ip}:3128"
 oc login \
   "${self.triggers.openshift_api_url}" -u "${self.triggers.openshift_user}" -p "${self.triggers.openshift_pass}" --insecure-skip-tls-verify=true
+EOF
+    ]
+  }
+}
 
+# Dev Note: Only Dev only
+# Adds a 3kiops secondary disk.
+resource "null_resource" "add_etcd_secondary_disk" {
+  count      = var.cicd ? 1 : 0
+  depends_on = [null_resource.cicd_login]
+
+  triggers = {
+    vpc_support_server_ip = "${var.nfs_server}"
+    private_key           = sensitive(file(var.private_key_file))
+    host                  = var.bastion_public_ip[0]
+    agent                 = var.ssh_agent
+    ansible_post_path     = local.ansible_post_path
+    openshift_api_url     = sensitive(var.openshift_api_url)
+    openshift_user        = sensitive(var.openshift_user)
+    openshift_pass        = sensitive(var.openshift_pass)
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "root"
+    private_key = self.triggers.private_key
+    host        = self.triggers.host
+    agent       = self.triggers.agent
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
 cd ${self.triggers.ansible_post_path}
 bash files/mount_etcd_ext_volume.sh "${var.vpc_name}" "${var.vpc_resource_group}"
 EOF
