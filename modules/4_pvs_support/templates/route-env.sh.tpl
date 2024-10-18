@@ -7,7 +7,7 @@
 ip route show | grep ${subnet} | grep -v via | awk '{print $3}' | uniq | while read IFACE
 do
 echo "$${IFACE} found"
-cat << EOF | nmcli connection edit "$${IFACE}"
+cat << EOF | nmcli connection edit "$(nmcli -f Name connection | grep --color=never $${IFACE})"
 goto ipv4
 %{ for cidr in cidrs_ipv4 ~}
 set routes ${cidr} ${gateway}
