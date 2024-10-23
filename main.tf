@@ -205,7 +205,8 @@ module "post" {
   openshift_api_url     = var.openshift_api_url
   openshift_user        = var.openshift_user
   openshift_pass        = var.openshift_pass
-
-  vpc_resource_group = module.vpc_support.vpc_resource_group
-  vpc_name           = var.vpc_name
+  ibmcloud_api_key      = var.ibmcloud_api_key
+  vpc_resource_group    = module.vpc_support.vpc_resource_group
+  vpc_name              = var.vpc_name
+  vpc_region            = var.vpc_region
 }

@@ -204,6 +204,9 @@ resource "null_resource" "cicd_login" {
     openshift_api_url     = sensitive(var.openshift_api_url)
     openshift_user        = sensitive(var.openshift_user)
     openshift_pass        = sensitive(var.openshift_pass)
+    api_key               = sensitive(var.ibmcloud_api_key)
+    vpc_region            = sensitive(var.vpc_region)
+    resource_group        = sensitive(var.vpc_resource_group)
   }
 
   connection {
@@ -217,6 +220,14 @@ resource "null_resource" "cicd_login" {
   provisioner "remote-exec" {
     inline = [<<EOF
 export HTTPS_PROXY="http://${self.triggers.vpc_support_server_ip}:3128"
+
+echo "[INSTALL ibmcloud]"
+curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+ibmcloud plugin install is -f
+
+echo "Login to the IBM Cloud"
+ibmcloud login --apikey "${self.triggers.api_key}" -r "${self.triggers.vpc_region}" -g "${self.triggers.resource_group}"
+
 oc login \
   "${self.triggers.openshift_api_url}" -u "${self.triggers.openshift_user}" -p "${self.triggers.openshift_pass}" --insecure-skip-tls-verify=true
 EOF
