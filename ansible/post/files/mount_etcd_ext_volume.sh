@@ -43,7 +43,7 @@ for count in 0 1 2; do
   sleep 10
   chk_query="ic is instance-volume-attachments ${name}"
   echo ${chk_query}
-  if [ -z "$(ibmcloud is instance-volume-attachments ${name} --output json | jq -r '.[] | select(.status != "attached")')" ]
+  if [ -z "$(ic is instance-volume-attachments ${name} --output json | jq -r '.[] | select(.status != "attached")')" ]
      then
          echo "Delaying as not all volumes are finished attaching to instance"
          sleep 60
