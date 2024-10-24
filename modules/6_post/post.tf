@@ -206,7 +206,7 @@ resource "null_resource" "cicd_login" {
     openshift_pass        = sensitive(var.openshift_pass)
     api_key               = sensitive(var.ibmcloud_api_key)
     vpc_region            = sensitive(var.vpc_region)
-    resource_group        = sensitive(var.vpc_resource_group)
+    resource_group        = sensitive(var.vpc_rg)
   }
 
   connection {
@@ -226,7 +226,10 @@ curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
 ibmcloud plugin install is -f
 
 echo "Login to the IBM Cloud"
-ibmcloud login --apikey "${self.triggers.api_key}" -r "${self.triggers.vpc_region}" -g "${self.triggers.resource_group}"
+ibmcloud login --apikey "${self.triggers.api_key}" -r "${self.triggers.vpc_region}"
+
+echo "Targetting the Resource Group"
+ibmcloud target -g $(ibmcloud resource groups --output json | jq --arg rg "${self.triggers.resource_group}" -r '.[] | select(.id == $rg)')
 
 oc login \
   "${self.triggers.openshift_api_url}" -u "${self.triggers.openshift_user}" -p "${self.triggers.openshift_pass}" --insecure-skip-tls-verify=true
@@ -264,7 +267,7 @@ resource "null_resource" "add_etcd_secondary_disk" {
   provisioner "remote-exec" {
     inline = [<<EOF
 cd ${self.triggers.ansible_post_path}
-bash files/mount_etcd_ext_volume.sh "${var.vpc_name}" "${var.vpc_resource_group}"
+bash files/mount_etcd_ext_volume.sh "${var.vpc_name}" "${var.vpc_rg}"
 EOF
     ]
   }
