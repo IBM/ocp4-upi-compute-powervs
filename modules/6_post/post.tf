@@ -246,7 +246,7 @@ resource "null_resource" "add_etcd_secondary_disk" {
 
   triggers = {
     vpc_support_server_ip = "${var.nfs_server}"
-    private_key           = sensitive(file(var.private_key_file))
+    private_key           = file(var.private_key_file)
     host                  = var.bastion_public_ip[0]
     agent                 = var.ssh_agent
     ansible_post_path     = local.ansible_post_path
