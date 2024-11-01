@@ -80,11 +80,11 @@ done
 #Volume Attachment done. Time for etcd migration
 sleep 30s
 echo "Going for mc-update-file"
-oc apply -f 98-master-lib-etcd-mc.yaml --kubeconfig=auth/kubeconfig
+oc apply -f 98-master-lib-etcd-mc.yaml
 # adding a sleep 30 here is not harmful or causing unnecessary delays.
 sleep 30
 echo "Waiting on the mcp/master to update"
-oc wait --for=condition=updated mcp/master --timeout=50m --kubeconfig=auth/kubeconfig
+oc wait --for=condition=updated mcp/master --timeout=50m
 
 echo "etcd migration done successfully."
 #etcd migration done Verification start
