@@ -534,6 +534,13 @@ variable "cicd_disable_defrag" {
   # User needs to manually remove the config map to restore the settings
 }
 
+variable "cicd_etcd_secondary_disk" {
+  type        = bool
+  description = "moves etcd disk to secondary devices"
+  default     = false
+  # not for customer, cicd-only
+}
+
 ################################################################
 # Overrides the dhcp network, transit gateway creation from a 
 # PowerVS perspective.

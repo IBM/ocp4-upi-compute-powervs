@@ -192,8 +192,9 @@ EOF
   }
 }
 
-resource "null_resource" "cicd_login" {
-  count      = var.cicd ? 1 : 0
+# sensitive operations are included in a single resource
+resource "null_resource" "cicd_etcd_login" {
+  count      = var.cicd_etcd_secondary_disk ? 1 : 0
   depends_on = [null_resource.post_ansible, null_resource.debug_and_remove_taints, null_resource.remove_workers]
 
   triggers = {
@@ -240,9 +241,9 @@ EOF
 
 # Dev Note: Only Dev only
 # Adds a 3kiops secondary disk.
-resource "null_resource" "add_etcd_secondary_disk" {
-  count      = var.cicd ? 1 : 0
-  depends_on = [null_resource.cicd_login]
+resource "null_resource" "cicd_etcd_add_secondary_disk" {
+  count      = var.cicd_etcd_secondary_disk ? 1 : 0
+  depends_on = [null_resource.cicd_etcd_login]
 
   triggers = {
     vpc_support_server_ip = "${var.nfs_server}"

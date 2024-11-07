@@ -209,4 +209,5 @@ module "post" {
   vpc_rg                = module.vpc_support.vpc_resource_group
   vpc_name              = var.vpc_name
   vpc_region            = var.vpc_region
+  cicd_etcd_secondary_disk             = var.cicd_etcd_secondary_disk
 }
