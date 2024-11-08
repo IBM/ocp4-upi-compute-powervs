@@ -261,10 +261,6 @@ resource "null_resource" "cicd_etcd_add_secondary_disk" {
     agent       = self.triggers.agent
   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
-
   provisioner "remote-exec" {
     inline = [<<EOF
 cd ${self.triggers.ansible_post_path}

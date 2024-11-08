@@ -9,16 +9,12 @@
 set -o errexit
 set -uo pipefail
 
-function ic() {
-  ibmcloud "$@"
-}
-
 var_tier="5iops-tier"
 var_rg="${2}"
 var_tag="rdr-multi-arch-etcd"
 var_rand_id=$(echo "$(openssl rand -hex 4)");
 var_vpc_prefix="${1}"
-vsi_out=$(ic is instances | grep ${var_vpc_prefix} | grep master | awk -vOFS=":" '{print $1,$2,$9}');
+vsi_out=$(ibmcloud is instances | grep ${var_vpc_prefix} | grep master | awk -vOFS=":" '{print $1,$2,$9}');
 
 arr=( $(sed 's/:/ /g' <<<"$vsi_out") )
 i=0;
@@ -26,24 +22,24 @@ for count in 0 1 2; do
   id=${arr[i]};
   name=${arr[i+1]};
   region=${arr[i+2]};
-  vol_create_command="ic is volume-create auto-etcd-vol-${var_rand_id}-${count} ${var_tier} ${region} --capacity 20 --resource-group-name ${var_rg} --output JSON --tags ${var_tag}"
+  vol_create_command="ibmcloud is volume-create auto-etcd-vol-${var_rand_id}-${count} ${var_tier} ${region} --capacity 20 --resource-group-id ${var_rg} --output JSON --tags ${var_tag}"
 
-  VOLUME_ID=$(ic is volume-create auto-etcd-vol-${var_rand_id}-${count} ${var_tier} ${region} --capacity 20 --resource-group-name ${var_rg} --output JSON --tags ${var_tag} | jq .id | tr -d "'\"")
-  VOL_STATUS=$( ic is volumes | grep ${VOLUME_ID} | awk '{print $3}' );
+  VOLUME_ID=$(ibmcloud is volume-create auto-etcd-vol-${var_rand_id}-${count} ${var_tier} ${region} --capacity 20 --resource-group-id ${var_rg} --output JSON --tags ${var_tag} | jq .id | tr -d "'\"")
+  VOL_STATUS=$(ibmcloud is volumes | grep ${VOLUME_ID} | awk '{print $3}' );
   while [ "$VOL_STATUS" != "available" ]
   do
-        VOL_STATUS=$(ic is volumes | grep ${VOLUME_ID} | awk '{print $3}' );
+        VOL_STATUS=$(ibmcloud is volumes | grep ${VOLUME_ID} | awk '{print $3}' );
   done
 
-  vol_attach_command="ic is instance-volume-attachment-add auto-attach-vol${count} ${id} ${VOLUME_ID} --auto-delete true --output JSON --tags ${var_tag}"
+  vol_attach_command="ibmcloud is instance-volume-attachment-add auto-attach-vol${count} ${id} ${VOLUME_ID} --auto-delete true --output JSON --tags ${var_tag}"
   echo ${vol_attach_command};
-  ATTACH_COMMAND=$(ic is instance-volume-attachment-add auto-attach-vol${count} ${id} ${VOLUME_ID} --auto-delete true --output JSON --tags ${var_tag});
+  ATTACH_COMMAND=$(ibmcloud is instance-volume-attachment-add auto-attach-vol${count} ${id} ${VOLUME_ID} --auto-delete true --output JSON --tags ${var_tag});
   echo "Volume Attached Successfully to the Master Node : ${name}"
   echo "Waiting while the attachment is activated"
   sleep 10
-  chk_query="ic is instance-volume-attachments ${name}"
+  chk_query="ibmcloud is instance-volume-attachments ${name}"
   echo ${chk_query}
-  if [ -z "$(ic is instance-volume-attachments ${name} --output json | jq -r '.[] | select(.status != "attached")')" ]
+  if [ -z "$(ibmcloud is instance-volume-attachments ${name} --output json | jq -r '.[] | select(.status != "attached")')" ]
      then
          echo "Delaying as not all volumes are finished attaching to instance"
          sleep 60
