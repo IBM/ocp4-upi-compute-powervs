@@ -4,6 +4,7 @@
 #################################################################
 
 # Adds the etcd mounts inline
+# CI uses a fixed number of Control Plane nodes.
 
 #!/bin/bash
 set -o errexit
