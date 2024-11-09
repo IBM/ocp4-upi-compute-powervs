@@ -205,8 +205,10 @@ mac_tags = [ "mac-cicd-${CLEAN_VERSION}" ]
 
 cicd = true
 cicd_disable_defrag = true
+cicd_etcd_secondary_disk=true
+
 skip_vpc_key = true
-setup_transit_gateway = true
+setup_transit_gateway = false
 EOFXEOF
 }
 
