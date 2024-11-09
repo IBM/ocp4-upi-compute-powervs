@@ -66,12 +66,14 @@ echo "etcd migration done successfully."
 
 #etcd migration done Verification start
 i=0;
-for count in 0 1 2; do
+for count in 0 1 2
+do
    name=${arr[i+1]}
    echo "Logging inside Node : ${name}"
    mount_out=$(oc debug --as-root=true node/$name -- chroot /host grep -w  "/var/lib/etcd" /proc/mounts)
-   echo "Mountpoint : ${mount_out} "
-   if [[ ${mount_out} = "" ]]; then
+   echo "Mount Point: ${mount_out} "
+   if [ -z "${mount_out}" ]
+   then
      echo "etcd mount fail for : ${name}"
      exit 0
    fi
