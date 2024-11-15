@@ -16,7 +16,7 @@ for (const line of lines) {
 		ibmcloud = false
 		//Modify this line
 		const idx = line.indexOf("\"");
-		console.log(line.substring(0, idx) + "\"~> 1.71.1\"");
+		console.log(line.substring(0, idx) + "\"~> 1.71.2\"");
 	} else {
 		if (line.includes("IBM-Cloud/ibm")) {
 			ibmcloud = true
