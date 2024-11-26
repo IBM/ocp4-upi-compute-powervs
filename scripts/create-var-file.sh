@@ -209,6 +209,7 @@ cicd_etcd_secondary_disk=true
 
 skip_vpc_key = true
 setup_transit_gateway = false
+transit_gateway_name = "multi-arch-comp-${POWERVS_ZONE}-1-tg"
 EOFXEOF
 }
 
