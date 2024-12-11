@@ -201,7 +201,7 @@ bastion               = { memory = "16", processors = "1", "count" = 1 }
 worker                = { memory = "16", processors = "1", "count" = ${EXPECTED_NODES} }
 override_region_check=true
 
-mac_tags = [ "mac-cicd-${CLEAN_VERSION}" ]
+mac_tags = [ "multi-arch-x-px-cicd-${CLEAN_VERSION}" ]
 
 cicd = true
 cicd_disable_defrag = true
@@ -209,7 +209,7 @@ cicd_etcd_secondary_disk=true
 
 skip_vpc_key = true
 setup_transit_gateway = false
-transit_gateway_name = "multi-arch-comp-${POWERVS_ZONE}-1-tg"
+transit_gateway_name = "multi-arch-x-px-${POWERVS_ZONE}-1-tg"
 EOFXEOF
 }
 
