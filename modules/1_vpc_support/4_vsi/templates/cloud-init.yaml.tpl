@@ -3,10 +3,7 @@
 packages:
   - bind
   - bind-utils
-  - httpd
-  - mod_ssl
   - nfs-utils
-  - squid
 write_files:
 - path: /tmp/named-conf-edit.sed
   permissions: '0640'
@@ -21,18 +18,7 @@ write_files:
   permissions: '0640'
   content: |
     /export *(rw)
-- path: /etc/squid/squid.conf
-  permissions: '0640'
-  content: |
-    acl localnet src 10.0.0.0/8
-    acl localnet src 172.16.0.0/12
-    acl localnet src 192.168.0.0/16
-    http_access deny !localnet
-    http_port 3128
-    coredump_dir /var/spool/squid
 runcmd:
   - export MYIP=`hostname -I`; sed -i.bak "s/MYIP/$MYIP/" /tmp/named-conf-edit.sed
   - sed -i.orig -f /tmp/named-conf-edit.sed /etc/named.conf
-  - systemctl enable named.service nfs-server squid
-  - systemctl start named.service nfs-server squid
   - mkdir -p /export && chmod -R 777 /export

@@ -16,7 +16,7 @@ POWER_COUNT="${2}"
 IDX=0
 while [ "$IDX" -lt "121" ]
 do
-    export HTTPS_PROXY="http://${PROXY_SERVER}:3128"
+    #export HTTPS_PROXY="http://${PROXY_SERVER}:3128"
 
     echo "Try number: ${IDX}"
     echo "List of Power Workers: "
