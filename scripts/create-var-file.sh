@@ -162,7 +162,7 @@ ${IBMCLOUD} is key-create cicd-key @data/id_rsa.pub  || true
 # Set the Machine Type
 if [[ "${POWERVS_REGION}" == "wdc06" ]]
 then
-    MACHINE_TYPE="s922"
+    MACHINE_TYPE="s1022"
 else
     MACHINE_TYPE="s1022"
 fi
