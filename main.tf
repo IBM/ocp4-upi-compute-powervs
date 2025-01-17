@@ -168,7 +168,6 @@ module "worker" {
   name_prefix                 = local.name_prefix
   powervs_service_instance_id = var.powervs_service_instance_id
   powervs_dhcp_network_id     = module.pvs_prepare.powervs_dhcp_network_id
-  powervs_dhcp_network_name   = module.pvs_prepare.powervs_dhcp_network_name
   powervs_bastion_name        = module.pvs_prepare.powervs_bastion_name
   processor_type              = var.processor_type
   rhcos_image_id              = module.pvs_prepare.rhcos_image_id

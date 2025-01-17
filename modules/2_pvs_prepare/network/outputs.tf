@@ -20,10 +20,6 @@ output "powervs_dhcp_network_id" {
   value = ibm_pi_dhcp.new_dhcp_service.network_id
 }
 
-output "powervs_dhcp_network_name" {
-  value = ibm_pi_dhcp.new_dhcp_service.network_name
-}
-
 output "powervs_dhcp_service" {
   value = ibm_pi_dhcp.new_dhcp_service
 }

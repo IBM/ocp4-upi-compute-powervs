@@ -19,10 +19,6 @@ output "powervs_dhcp_network_id" {
   value = local.server.network_id
 }
 
-output "powervs_dhcp_network_name" {
-  value = local.server.network_name
-}
-
 output "powervs_dhcp_service" {
   value = local.server
 }
