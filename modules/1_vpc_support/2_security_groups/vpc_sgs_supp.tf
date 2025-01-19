@@ -36,19 +36,6 @@ resource "ibm_is_security_group_rule" "supp_vm_sg_ssh_all" {
   }
 }
 
-# Dev Note: The rules apply to powervs instances to connect to the api-int
-# allow all incoming network traffic on port 3128
-resource "ibm_is_security_group_rule" "squid_vm_sg_ssh_all" {
-  group     = ibm_is_security_group.supp_vm_sg.id
-  direction = "inbound"
-  remote    = var.powervs_machine_cidr
-
-  tcp {
-    port_min = 3128
-    port_max = 3128
-  }
-}
-
 # allow all incoming network traffic on port 53
 resource "ibm_is_security_group_rule" "supp_vm_sg_supp_all" {
   group     = ibm_is_security_group.supp_vm_sg.id
