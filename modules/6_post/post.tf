@@ -65,7 +65,6 @@ resource "null_resource" "remove_workers" {
     when       = destroy
     on_failure = continue
     inline = [<<EOF
-export HTTPS_PROXY="http://${self.triggers.vpc_support_server_ip}:3128"
 oc login \
   "${self.triggers.openshift_api_url}" -u "${self.triggers.openshift_user}" -p "${self.triggers.openshift_pass}" --insecure-skip-tls-verify=true
 
@@ -136,7 +135,6 @@ resource "null_resource" "debug_and_remove_taints" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-export HTTPS_PROXY="http://${var.nfs_server}:3128"
 echo "[All Nodes]"
 oc get nodes -owide
 echo ""
@@ -181,7 +179,6 @@ resource "null_resource" "remove_nfs_deployment" {
     when       = destroy
     on_failure = continue
     inline = [<<EOF
-export HTTPS_PROXY="http://${self.triggers.vpc_support_server_ip}:3128"
 oc login \
   "${self.triggers.openshift_api_url}" -u "${self.triggers.openshift_user}" -p "${self.triggers.openshift_pass}" --insecure-skip-tls-verify=true
 
@@ -220,8 +217,6 @@ resource "null_resource" "cicd_etcd_login" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-export HTTPS_PROXY="http://${self.triggers.vpc_support_server_ip}:3128"
-
 echo "[INSTALL ibmcloud]"
 curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
 ibmcloud plugin install is -f

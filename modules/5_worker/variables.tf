@@ -9,7 +9,6 @@ variable "key_name" {}
 variable "name_prefix" {}
 variable "powervs_service_instance_id" {}
 variable "powervs_dhcp_network_id" {}
-variable "powervs_dhcp_network_name" {}
 variable "powervs_dhcp_service" {}
 variable "powervs_bastion_name" {}
 variable "processor_type" {}
