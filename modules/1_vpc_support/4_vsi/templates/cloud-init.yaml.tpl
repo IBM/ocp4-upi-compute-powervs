@@ -21,4 +21,6 @@ write_files:
 runcmd:
   - export MYIP=`hostname -I`; sed -i.bak "s/MYIP/$MYIP/" /tmp/named-conf-edit.sed
   - sed -i.orig -f /tmp/named-conf-edit.sed /etc/named.conf
+  - systemctl enable named.service nfs-server
+  - systemctl start named.service nfs-server
   - mkdir -p /export && chmod -R 777 /export

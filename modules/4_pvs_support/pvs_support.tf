@@ -134,7 +134,6 @@ resource "null_resource" "config_login" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-#export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc login \
   "${var.openshift_api_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
 EOF
@@ -157,7 +156,6 @@ resource "null_resource" "disable_etcd_defrag" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-#export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 outval=$(oc get configmap etcd-disable-defrag -n openshift-etcd-operator)
 if [ -z "$outval" ]
 then
@@ -209,7 +207,6 @@ resource "null_resource" "config_csi" {
   # scheduler.alpha.kubernetes.io/node-selector: kubernetes.io/arch=amd64
   provisioner "remote-exec" {
     inline = [<<EOF
-#export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc annotate --kubeconfig /root/.kube/config ns openshift-cluster-csi-drivers \
   scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
 EOF
@@ -232,8 +229,6 @@ resource "null_resource" "adjust_mtu" {
   # we previously supported OpenShiftSDN since it's deprecation we have removed it from automation.
   provisioner "remote-exec" {
     inline = [<<EOF
-#export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
-
 EXISTING_MTU=$(oc get network cluster -o json | jq -r .status.clusterNetworkMTU)
 
 if [ $EXISTING_MTU != ${var.cluster_network_mtu} ]
@@ -265,7 +260,6 @@ resource "null_resource" "keep_dns_on_vpc" {
   # Dev Note: put the dns nodes on the VPC machines
   provisioner "remote-exec" {
     inline = [<<EOF
-#export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc patch dns.operator/default -p '{ "spec" : {"nodePlacement": {"nodeSelector": {"kubernetes.io/arch" : "amd64"}}}}' --type merge
 EOF
     ]
@@ -286,7 +280,6 @@ resource "null_resource" "keep_imagepruner_on_vpc" {
   # Dev Note: put the image pruner nodes on the VPC machines
   provisioner "remote-exec" {
     inline = [<<EOF
-#export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc patch imagepruner/cluster -p '{ "spec" : {"nodeSelector": {"kubernetes.io/arch" : "amd64"}}}' --type merge -v=1
 EOF
     ]
@@ -308,7 +301,6 @@ resource "null_resource" "set_routing_via_host" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-#export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 if [ "$(oc get Network.config cluster -o jsonpath='{.status.networkType}')" == "OVNKubernetes" ]
 then
 oc patch network.operator/cluster --type merge -p \
@@ -333,8 +325,6 @@ resource "null_resource" "wait_on_mcp" {
   # Dev Note: added hardening to the MTU wait, we wait for the condition and then fail
   provisioner "remote-exec" {
     inline = [<<EOF
-#export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
-
 echo "-diagnostics-"
 oc get network cluster -o yaml | grep -i mtu
 oc get mcp

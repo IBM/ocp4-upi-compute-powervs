@@ -55,7 +55,7 @@ Note, the `destroy` command removes the Node resource, removes the NFS deploymen
 
 There are some important points to mention:
 
-1. The Power Bastion node uses a https proxy to forward requests to the Cluster's internal api load balancer. This setting is configured in /etc/environment on the Power Bastion.
+1. The Power Bastion no longer uses an https proxy to forward requests to the Cluster's internal api load balancer. This setting is removed.
 2. NFS is used as the storage provider across nodes.
 
 ## Running Automation from another IBMCloud VPC

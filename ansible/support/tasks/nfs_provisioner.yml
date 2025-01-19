@@ -39,4 +39,3 @@
   - name: Remove the block storage as the default.
     shell: |
       oc patch storageclass ibmc-vpc-block-10iops-tier -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
-

@@ -15,14 +15,6 @@
         - kubernetes
         - openshift
 
-  - name: Populate /etc/environment
-    lineinfile:
-      path: "/etc/environment"
-      state: present
-      regexp: "^HTTPS_PROXY="
-      line: "HTTPS_PROXY=http://{{ nfs_server }}:3128"
-    become: yes
-
   - name: Fetch the list of projects
     shell: "oc get projects"
     register: projects_list

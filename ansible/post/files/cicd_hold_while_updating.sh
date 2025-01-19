@@ -14,7 +14,6 @@ echo "Cluster Operator is: "
 oc get co
 
 echo "$(date -u --rfc-3339=seconds) - Waiting for clusteroperators to complete"
-#export HTTPS_PROXY="http://${PROXY_SERVER}:3128"
 
 oc wait clusteroperator.config.openshift.io \
     --for=condition=Available=True \
