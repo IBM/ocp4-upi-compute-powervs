@@ -22,7 +22,7 @@
 # - Path to id_rsa / id_rsa.pub
 # - Command: openshift-install
 # - Command: ibmcloud
-# - Command: yq
+# - Command: yq-v4
 # - Command: jq
 EXPECTED_NODES=$2
 if [ -z "${EXPECTED_NODES}" ]
@@ -70,10 +70,10 @@ then
     echo "ERROR: missing install-config.yaml"
     return
 else
-    VPC_REGION=$(yq -r '.platform.ibmcloud.region' ${INSTALL_CONFIG_FILE})
-    VPC_ZONE=$(yq -r '.controlPlane.platform.ibmcloud.zones[0]' ${INSTALL_CONFIG_FILE})
+    VPC_REGION=$(yq-v4 -r '.platform.ibmcloud.region' ${INSTALL_CONFIG_FILE})
+    VPC_ZONE=$(yq-v4 -r '.controlPlane.platform.ibmcloud.zones[0]' ${INSTALL_CONFIG_FILE})
 
-    VPC_NAME_PREFIX=$(yq -r '.metadata.name' ${INSTALL_CONFIG_FILE})
+    VPC_NAME_PREFIX=$(yq-v4 -r '.metadata.name' ${INSTALL_CONFIG_FILE})
     VPC_NAME=$(${IBMCLOUD} is vpcs --output json | jq -r '.[] | select(.name | contains("'${VPC_NAME_PREFIX}'")).name')
 fi
 
@@ -117,7 +117,7 @@ then
     echo "ERROR: kubeconfig is not set"
     return
 else
-    OPENSHIFT_API_URL=$(cat "${KUBECONFIG}" | yq -r '.clusters[].cluster.server')
+    OPENSHIFT_API_URL=$(cat "${KUBECONFIG}" | yq-v4 -r '.clusters[].cluster.server')
     cp "${KUBECONFIG}" data/kubeconfig
 fi
 
