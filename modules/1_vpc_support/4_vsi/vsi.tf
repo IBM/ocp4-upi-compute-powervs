@@ -19,7 +19,7 @@ resource "ibm_is_instance" "supp_vm_vsi" {
   zone    = var.zone
   keys    = [var.key_id]
   image   = data.ibm_is_image.supp_vm_image[0].id
-  profile = "cx2d-8x16"
+  profile = "cx2d-4x8"
   # Profiles: https://cloud.ibm.com/docs/vpc?topic=vpc-profiles&interface=ui
   # Originally used cx2-2x4, however 8x16 includes 300G storage.
 
