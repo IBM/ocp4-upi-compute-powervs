@@ -136,7 +136,7 @@ resource "null_resource" "config_login" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-echo "Update hosts file with Oauth Details"
+echo "Update hosts file with OAuth Details"
 if !(grep -q "${local.oauth_ip}" /etc/hosts); then
         echo "${local.oauth_ip} ${local.oauth_hostname} oauth-openshift" >> /etc/hosts
 fi
