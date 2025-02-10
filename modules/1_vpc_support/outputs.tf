@@ -26,3 +26,8 @@ output "transit_gateway_name" {
 output "transit_gateway_status" {
   value = !var.setup_transit_gateway ? module.existing_gateway[0].existing_tg_status : module.transit_gateway[0].new_tg_status
 }
+
+// Output could be more than one
+output "load_balancer_ips" {
+  value = local.load_balancer_ips[0]
+}

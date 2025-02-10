@@ -16,6 +16,8 @@ locals {
   ])
 
   openshift_machine_config_url = replace(replace(var.openshift_api_url, ":6443", ""), "://api.", "://api-int.")
+  oauth_hostname = replace(replace(local.openshift_machine_config_url, "://api-int." , "oauth-openshift.apps."), "https", "")
+  oauth_ip = var.lbs_ips
 
   # you must use the api-int url so the bastion routes over the correct interface.
   helpernode_vars = {
@@ -134,8 +136,12 @@ resource "null_resource" "config_login" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
+echo "Update hosts file with Oauth Details"
+if !(grep -q "${local.oauth_ip}" /etc/hosts); then
+        echo "${local.oauth_ip} ${local.oauth_hostname} oauth-openshift" >> /etc/hosts
+fi
 oc login \
-  "${var.openshift_api_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
+  "${local.openshift_machine_config_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
 EOF
     ]
   }
