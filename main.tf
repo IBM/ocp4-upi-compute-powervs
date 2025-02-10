@@ -155,6 +155,7 @@ module "support" {
   cluster_network_mtu      = var.cluster_network_mtu
   cicd                     = var.cicd
   cicd_disable_defrag      = var.cicd_disable_defrag
+  lbs_ips                  = module.vpc_support.load_balancer_ips
 }
 
 module "worker" {

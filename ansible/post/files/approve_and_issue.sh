@@ -28,8 +28,6 @@ fi
 
 # Setting values for variables
 IDX=0
-export HTTPS_PROXY="http://${PROXY_SERVER}:3128"
-echo "HTTPS_PROXY is set to $HTTPS_PROXY"
 
 READY_COUNT=$(oc get nodes -l kubernetes.io/arch=ppc64le | grep "${MACHINE_PREFIX}" | grep -v NotReady | grep -c Ready)
 

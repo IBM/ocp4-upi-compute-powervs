@@ -15,5 +15,4 @@ PROXY_SERVER="${2}"
 NFS_NAMESPACE="${3}"
 
 echo "Removing the Deployment for the NFS storage class. Please ensure that you have taken backup of NFS server."
-export HTTPS_PROXY="http://${PROXY_SERVER}:3128"
 oc delete deployment ${NFS_DEPLOYMENT} -n ${NFS_NAMESPACE}
