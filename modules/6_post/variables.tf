@@ -23,3 +23,10 @@ variable "cicd" {}
 variable "openshift_api_url" {}
 variable "openshift_user" {}
 variable "openshift_pass" {}
+
+variable "vpc_name" {}
+variable "vpc_rg" {}
+variable "vpc_region" {}
+variable "ibmcloud_api_key" {}
+
+variable "cicd_etcd_secondary_disk" {}

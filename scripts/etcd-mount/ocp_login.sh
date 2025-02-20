@@ -1,0 +1,1 @@
+oc login -s https://api.<domain>:6443 -u kubeadmin -p <Password>

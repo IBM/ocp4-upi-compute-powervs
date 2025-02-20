@@ -9,6 +9,13 @@
             ]
         }
     },
+    "systemd": {
+        "units": [{
+            "name": "afterburn-hostname.service",
+            "enabled": true,
+            "contents": "[Unit]\nDescription=Afterburn Hostname\nBefore=network-online.target\nAfter=NetworkManager-wait-online.service\nBefore=node-valid-hostname.service\n[Service]\nExecStart=/usr/bin/afterburn --provider powervs --hostname=/etc/hostname\nType=oneshot\n[Install]\nWantedBy=network-online.target"
+        }]
+    },
     "storage": {
         "files": [
             {

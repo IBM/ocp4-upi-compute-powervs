@@ -16,6 +16,8 @@ locals {
   ])
 
   openshift_machine_config_url = replace(replace(var.openshift_api_url, ":6443", ""), "://api.", "://api-int.")
+  oauth_hostname               = replace(replace(local.openshift_machine_config_url, "://api-int.", "oauth-openshift.apps."), "https", "")
+  oauth_ip                     = var.lbs_ips
 
   # you must use the api-int url so the bastion routes over the correct interface.
   helpernode_vars = {
@@ -33,6 +35,7 @@ locals {
   cidrs = {
     cidrs_ipv4 = var.cidrs
     gateway    = cidrhost(var.powervs_machine_cidr, 1)
+    subnet     = var.powervs_machine_cidr
   }
 
   cidr_str = split("/", var.powervs_machine_cidr)[0]
@@ -99,16 +102,16 @@ resource "null_resource" "config" {
 
   # Copies the custom route for env3
   provisioner "file" {
-    content     = templatefile("${path.module}/templates/route-env3.tpl", local.cidrs)
-    destination = "/etc/sysconfig/network-scripts/route-env3"
+    content     = templatefile("${path.module}/templates/route-env.sh.tpl", local.cidrs)
+    destination = "ocp4-upi-compute-powervs/support/route-env.sh"
   }
 
   # Dev Note: need to move the route script to the right location
   provisioner "remote-exec" {
     inline = [<<EOF
 cd ocp4-upi-compute-powervs/support
-chmod +x files/setup_route.sh
-files/setup_route.sh "${local.cidr_str}"
+chmod +x ./route-env.sh
+./route-env.sh 
 
 echo 'Running ocp4-upi-compute-powervs playbook...'
 mkdir -p /root/.openshift
@@ -133,9 +136,12 @@ resource "null_resource" "config_login" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
+echo "Update hosts file with OAuth Details"
+if !(grep -q "${local.oauth_ip}" /etc/hosts); then
+        echo "${local.oauth_ip} ${local.oauth_hostname} oauth-openshift" >> /etc/hosts
+fi
 oc login \
-  "${var.openshift_api_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
+  "${local.openshift_machine_config_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
 EOF
     ]
   }
@@ -156,7 +162,6 @@ resource "null_resource" "disable_etcd_defrag" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 outval=$(oc get configmap etcd-disable-defrag -n openshift-etcd-operator)
 if [ -z "$outval" ]
 then
@@ -208,7 +213,6 @@ resource "null_resource" "config_csi" {
   # scheduler.alpha.kubernetes.io/node-selector: kubernetes.io/arch=amd64
   provisioner "remote-exec" {
     inline = [<<EOF
-export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc annotate --kubeconfig /root/.kube/config ns openshift-cluster-csi-drivers \
   scheduler.alpha.kubernetes.io/node-selector=kubernetes.io/arch=amd64
 EOF
@@ -231,8 +235,6 @@ resource "null_resource" "adjust_mtu" {
   # we previously supported OpenShiftSDN since it's deprecation we have removed it from automation.
   provisioner "remote-exec" {
     inline = [<<EOF
-export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
-
 EXISTING_MTU=$(oc get network cluster -o json | jq -r .status.clusterNetworkMTU)
 
 if [ $EXISTING_MTU != ${var.cluster_network_mtu} ]
@@ -264,7 +266,6 @@ resource "null_resource" "keep_dns_on_vpc" {
   # Dev Note: put the dns nodes on the VPC machines
   provisioner "remote-exec" {
     inline = [<<EOF
-export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc patch dns.operator/default -p '{ "spec" : {"nodePlacement": {"nodeSelector": {"kubernetes.io/arch" : "amd64"}}}}' --type merge
 EOF
     ]
@@ -285,7 +286,6 @@ resource "null_resource" "keep_imagepruner_on_vpc" {
   # Dev Note: put the image pruner nodes on the VPC machines
   provisioner "remote-exec" {
     inline = [<<EOF
-export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 oc patch imagepruner/cluster -p '{ "spec" : {"nodeSelector": {"kubernetes.io/arch" : "amd64"}}}' --type merge -v=1
 EOF
     ]
@@ -307,7 +307,6 @@ resource "null_resource" "set_routing_via_host" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
 if [ "$(oc get Network.config cluster -o jsonpath='{.status.networkType}')" == "OVNKubernetes" ]
 then
 oc patch network.operator/cluster --type merge -p \
@@ -332,8 +331,6 @@ resource "null_resource" "wait_on_mcp" {
   # Dev Note: added hardening to the MTU wait, we wait for the condition and then fail
   provisioner "remote-exec" {
     inline = [<<EOF
-export HTTPS_PROXY="http://${var.vpc_support_server_ip}:3128"
-
 echo "-diagnostics-"
 oc get network cluster -o yaml | grep -i mtu
 oc get mcp

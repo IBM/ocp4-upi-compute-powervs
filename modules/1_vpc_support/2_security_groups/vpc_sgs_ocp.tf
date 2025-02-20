@@ -144,9 +144,9 @@ resource "ibm_is_security_group_rule" "cp_internal_sg_r2" {
 }
 
 # sg-kube-api-lb
-# TCP (IN) 	22623 	192.168.200.0/24
+# TCP (IN)  	22623 	192.168.200.0/24
 # TCP (Out) 	22623 	192.168.200.0/24
-# TCP (Out) 	6443 	192.168.200.0/24
+# TCP (IN)  	6443 	192.168.200.0/24
 # TCP (Out) 	80 	192.168.200.0/24
 # TCP (Out) 	443 	192.168.200.0/24
 
@@ -176,7 +176,7 @@ resource "ibm_is_security_group_rule" "kube_api_lb_sg_mc_out" {
 
 resource "ibm_is_security_group_rule" "kube_api_lb_sg_api_out" {
   group     = local.kube_api_lb_sg[0].id
-  direction = "outbound"
+  direction = "inbound"
   remote    = var.powervs_machine_cidr
   tcp {
     port_min = 6443

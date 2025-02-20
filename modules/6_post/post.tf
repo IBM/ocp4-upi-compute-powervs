@@ -65,7 +65,6 @@ resource "null_resource" "remove_workers" {
     when       = destroy
     on_failure = continue
     inline = [<<EOF
-export HTTPS_PROXY="http://${self.triggers.vpc_support_server_ip}:3128"
 oc login \
   "${self.triggers.openshift_api_url}" -u "${self.triggers.openshift_user}" -p "${self.triggers.openshift_pass}" --insecure-skip-tls-verify=true
 
@@ -136,7 +135,6 @@ resource "null_resource" "debug_and_remove_taints" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-export HTTPS_PROXY="http://${var.nfs_server}:3128"
 echo "[All Nodes]"
 oc get nodes -owide
 echo ""
@@ -181,12 +179,87 @@ resource "null_resource" "remove_nfs_deployment" {
     when       = destroy
     on_failure = continue
     inline = [<<EOF
-export HTTPS_PROXY="http://${self.triggers.vpc_support_server_ip}:3128"
 oc login \
   "${self.triggers.openshift_api_url}" -u "${self.triggers.openshift_user}" -p "${self.triggers.openshift_pass}" --insecure-skip-tls-verify=true
 
 cd ${self.triggers.ansible_post_path}
 bash files/destroy-nfs-deployment.sh "${self.triggers.nfs_deployment}" "${self.triggers.vpc_support_server_ip}" "${self.triggers.nfs_namespace}"
+EOF
+    ]
+  }
+}
+
+# sensitive operations are included in a single resource
+resource "null_resource" "cicd_etcd_login" {
+  count      = var.cicd_etcd_secondary_disk ? 1 : 0
+  depends_on = [null_resource.post_ansible, null_resource.debug_and_remove_taints, null_resource.remove_workers]
+
+  triggers = {
+    vpc_support_server_ip = "${var.nfs_server}"
+    private_key           = sensitive(file(var.private_key_file))
+    host                  = var.bastion_public_ip[0]
+    agent                 = var.ssh_agent
+    openshift_api_url     = sensitive(var.openshift_api_url)
+    openshift_user        = sensitive(var.openshift_user)
+    openshift_pass        = sensitive(var.openshift_pass)
+    api_key               = sensitive(var.ibmcloud_api_key)
+    vpc_region            = sensitive(var.vpc_region)
+    resource_group        = sensitive(var.vpc_rg)
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "root"
+    private_key = self.triggers.private_key
+    host        = self.triggers.host
+    agent       = self.triggers.agent
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+echo "[INSTALL ibmcloud]"
+curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+ibmcloud plugin install is -f
+
+echo "Login to the IBM Cloud"
+ibmcloud login --apikey "${self.triggers.api_key}" -r "${self.triggers.vpc_region}"
+
+echo "Targetting the Resource Group"
+ibmcloud target -g $(ibmcloud resource groups --output json | jq --arg rg "${self.triggers.resource_group}" -r '.[] | select(.id == $rg)')
+
+oc login \
+  "${self.triggers.openshift_api_url}" -u "${self.triggers.openshift_user}" -p "${self.triggers.openshift_pass}" --insecure-skip-tls-verify=true
+EOF
+    ]
+  }
+}
+
+# Dev Note: Only Dev only
+# Adds a 3kiops secondary disk.
+resource "null_resource" "cicd_etcd_add_secondary_disk" {
+  count      = var.cicd_etcd_secondary_disk ? 1 : 0
+  depends_on = [null_resource.cicd_etcd_login]
+
+  triggers = {
+    vpc_support_server_ip = "${var.nfs_server}"
+    private_key           = sensitive(file(var.private_key_file))
+    host                  = var.bastion_public_ip[0]
+    agent                 = var.ssh_agent
+    ansible_post_path     = local.ansible_post_path
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "root"
+    private_key = self.triggers.private_key
+    host        = self.triggers.host
+    agent       = self.triggers.agent
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+cd ${self.triggers.ansible_post_path}
+bash files/mount_etcd_ext_volume.sh "${var.vpc_name}" "${var.vpc_rg}"
 EOF
     ]
   }

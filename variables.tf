@@ -137,11 +137,11 @@ variable "bastion_health_status" {
   }
 }
 
-# Centos default is Centos-Stream-9
+# Centos default is CentOS-Stream-9
 variable "rhel_image_name" {
   type        = string
   description = "Name of the RHEL or Centos image that you want to use for the bastion node"
-  default     = "Centos-Stream-9"
+  default     = "CentOS-Stream-9"
 }
 
 variable "rhel_username" {
@@ -532,6 +532,13 @@ variable "cicd_disable_defrag" {
   description = "Creates a config map 'etcd-disable-defrag' to disable the etcd defragmentation"
   default     = false
   # User needs to manually remove the config map to restore the settings
+}
+
+variable "cicd_etcd_secondary_disk" {
+  type        = bool
+  description = "moves etcd disk to secondary devices"
+  default     = false
+  # not for customer, cicd-only
 }
 
 ################################################################

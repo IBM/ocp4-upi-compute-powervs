@@ -4,7 +4,7 @@
 ################################################################
 
 # Ref: VPC Regions https://cloud.ibm.com/docs/overview?topic=overview-locations
-# Ref: PowerVS Regions https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-creating-power-virtual-server
+# Ref: PowerVS Regions https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-ibm-cloud-reg
 # Ref: https://cluster-api-ibmcloud.sigs.k8s.io/reference/regions-zones-mapping.html
 
 # If the PowerVS Region or Zone is empty, the code auto-populates the zone/region information
@@ -40,7 +40,7 @@ locals {
     },
     eu-es = {
       region = "mad",
-      zone   = "mad02"
+      zone   = "mad04"
     },
     au-syd = {
       region = "syd",
@@ -53,6 +53,10 @@ locals {
     jp-osa = {
       region = "osa",
       zone   = "osa21"
+    },
+    che01 = {
+      region = "che01",
+      zone   = "che01"
     }
   }
   # Certain regions don't have a good mapping

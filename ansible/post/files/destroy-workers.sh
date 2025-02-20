@@ -23,7 +23,6 @@ IDX=0
 while [ "$IDX" -lt "$COUNT" ]
 do
     echo "Removing the Worker: ${NAME_PREFIX}-worker-${IDX}"
-    export HTTPS_PROXY="http://${PROXY_SERVER}:3128"
     oc delete node ${NAME_PREFIX}-worker-${IDX} || true
     IDX=$(($IDX + 1))
 done

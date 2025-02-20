@@ -11,8 +11,3 @@
 data "ibm_tg_gateway" "existing_tg" {
   name = var.transit_gateway_name
 }
-
-resource "ibm_resource_tag" "tag" {
-  resource_id = data.ibm_tg_gateway.existing_tg.crn
-  tags        = var.mac_tags
-}

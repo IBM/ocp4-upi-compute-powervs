@@ -22,7 +22,7 @@
 # - Path to id_rsa / id_rsa.pub
 # - Command: openshift-install
 # - Command: ibmcloud
-# - Command: yq
+# - Command: yq-v4
 # - Command: jq
 EXPECTED_NODES=$2
 if [ -z "${EXPECTED_NODES}" ]
@@ -70,10 +70,10 @@ then
     echo "ERROR: missing install-config.yaml"
     return
 else
-    VPC_REGION=$(yq -r '.platform.ibmcloud.region' ${INSTALL_CONFIG_FILE})
-    VPC_ZONE=$(yq -r '.controlPlane.platform.ibmcloud.zones[0]' ${INSTALL_CONFIG_FILE})
+    VPC_REGION=$(yq-v4 -r '.platform.ibmcloud.region' ${INSTALL_CONFIG_FILE})
+    VPC_ZONE=$(yq-v4 -r '.controlPlane.platform.ibmcloud.zones[0]' ${INSTALL_CONFIG_FILE})
 
-    VPC_NAME_PREFIX=$(yq -r '.metadata.name' ${INSTALL_CONFIG_FILE})
+    VPC_NAME_PREFIX=$(yq-v4 -r '.metadata.name' ${INSTALL_CONFIG_FILE})
     VPC_NAME=$(${IBMCLOUD} is vpcs --output json | jq -r '.[] | select(.name | contains("'${VPC_NAME_PREFIX}'")).name')
 fi
 
@@ -117,7 +117,7 @@ then
     echo "ERROR: kubeconfig is not set"
     return
 else
-    OPENSHIFT_API_URL=$(cat "${KUBECONFIG}" | yq -r '.clusters[].cluster.server')
+    OPENSHIFT_API_URL=$(cat "${KUBECONFIG}" | yq-v4 -r '.clusters[].cluster.server')
     cp "${KUBECONFIG}" data/kubeconfig
 fi
 
@@ -149,25 +149,34 @@ COREOS_NAME=$(echo ${COREOS_FILE} | sed 's|\.ova\.gz||' | tr '.' '-' | sed 's|-0
 # RHEL_IMAGE_NAME
 if [ -z "${RHEL_IMAGE_NAME}" ]
 then
-    echo "WARNING: RHEL_IMAGE_NAME is not set, defaulting to 'Centos-Stream-9'"
-    RHEL_IMAGE_NAME="Centos-Stream-9"
+    echo "WARNING: RHEL_IMAGE_NAME is not set, defaulting to 'CentOS-Stream-9'"
+    RHEL_IMAGE_NAME="CentOS-Stream-9"
 fi
 
 OVERRIDE_PREFIX=$(${IBMCLOUD} pi workspace list 2>&1 | grep $POWERVS_SERVICE_INSTANCE_ID | awk '{print $NF}')
 
 # SKIP_VPC_KEY is conditionally switched
-${IBMCLOUD} pi ssh-key create cicd-key-$(date +%s) --key "$(<data/id_rsa.pub)" || true
-${IBMCLOUD} is key-create cicd-key @data/id_rsa.pub  || true
+${IBMCLOUD} pi ssh-key create cicd-key --key "$(<data/id_rsa.pub)" || true
+${IBMCLOUD} is key-create cicd-key @data/id_rsa.pub || true
 
 # Set the Machine Type
 if [[ "${POWERVS_REGION}" == "wdc06" ]]
 then
-    MACHINE_TYPE="s922"
+    MACHINE_TYPE="s1022"
 else
-    # Default (original s1022)
-    MACHINE_TYPE="s922"
+    MACHINE_TYPE="s1022"
 fi
 echo "MACHINE_TYPE=${MACHINE_TYPE}"
+
+# OVERRIDE_NETWORK_NAME is set when a dhcp network already exists
+O_NET_NAME="$(ibmcloud pi subnet ls --json | jq -r '.networks[] | select(.dhcpManaged?) | .name')"
+FOUND_OVERRIDE="$(echo ${O_NET_NAME} | wc -l | awk '{print $1}')"
+if [[ "${FOUND_OVERRIDE}" == "0" ]]
+then
+    echo "No override found"
+else
+    export OVERRIDE_NETWORK_NAME="${O_NET_NAME}"
+fi
 
 # creates the var file
 cat << EOFXEOF > data/var.tfvars
@@ -201,12 +210,17 @@ bastion               = { memory = "16", processors = "1", "count" = 1 }
 worker                = { memory = "16", processors = "1", "count" = ${EXPECTED_NODES} }
 override_region_check=true
 
-mac_tags = [ "mac-cicd-${CLEAN_VERSION}" ]
+mac_tags = [ "multi-arch-x-px-cicd-${CLEAN_VERSION}" ]
 
 cicd = true
 cicd_disable_defrag = true
+cicd_etcd_secondary_disk=true
+
 skip_vpc_key = true
 setup_transit_gateway = true
+transit_gateway_name = "multi-arch-x-px-${POWERVS_ZONE}-1-tg"
+
+override_network_name="${OVERRIDE_NETWORK_NAME}"
 EOFXEOF
 }
 

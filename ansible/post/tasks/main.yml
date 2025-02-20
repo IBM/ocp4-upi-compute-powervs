@@ -15,16 +15,8 @@
         - kubernetes
         - openshift
 
-  - name: Populate /etc/environment
-    lineinfile:
-      path: "/etc/environment"
-      state: present
-      regexp: "^HTTPS_PROXY="
-      line: "HTTPS_PROXY=http://{{ nfs_server }}:3128"
-    become: yes
-
   - name: Fetch the list of projects
-    shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get projects"
+    shell: "oc get projects"
     register: projects_list
     until: projects_list.stdout.find("openshift-kube-apiserver") != -1
     retries: 20
@@ -33,13 +25,11 @@
   - name: Create powervm-rmc project
     when: projects_list.stdout.find(project_name) == -1
     shell: |
-      export HTTPS_PROXY=http://{{ nfs_server }}:3128
       oc apply -f ../files/rmc-ns.yml
 
   - name: Create powervm-rmc serviceaccount
     kubernetes.core.k8s:
       state: present
-      proxy: "http://{{ nfs_server }}:3128"
       definition:
         api_version: v1
         kind: ServiceAccount
@@ -48,16 +38,15 @@
           namespace: "{{ project_name }}"
 
   - name: Add privileged scc to powervm-rmc serviceaccount
-    shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc adm policy add-scc-to-user -z {{ rmc_name }} privileged -n {{ project_name }}"
+    shell: "oc adm policy add-scc-to-user -z {{ rmc_name }} privileged -n {{ project_name }}"
 
   - name: Deploy powervm-rmc DaemonSet
     kubernetes.core.k8s:
       state: present
-      proxy: "http://{{ nfs_server }}:3128"
       definition: "{{ lookup('template', '../templates/rsct-daemonset.yml.j2') }}"
 
   - name: Get Nodes with ppc64le architecture
-    shell: "export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc get nodes -l kubernetes.io/arch=ppc64le | awk '(NR>1) { print $1 }'"
+    shell: "oc get nodes -l kubernetes.io/arch=ppc64le | awk '(NR>1) { print $1 }'"
     register: node_names
 
   - name: Print Node names with ppc64le architecture
@@ -67,7 +56,6 @@
   - name: Add labels defined in node_labels to ppc64le Nodes
     kubernetes.core.k8s:
       state: present
-      proxy: "http://{{ nfs_server }}:3128"
       kind: Node
       name: "{{ item }}"
       definition:
@@ -78,4 +66,4 @@
   - name: Cleanup events in openshift-etcd for cicd
     when: cicd == "true"
     shell: |
-      export HTTPS_PROXY=http://{{ nfs_server }}:3128 && oc delete events --all=true -n openshift-etcd
+      oc delete events --all=true -n openshift-etcd
