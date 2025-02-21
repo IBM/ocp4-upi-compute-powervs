@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-# (C) Copyright IBM Corp. 2024.
+# (C) Copyright IBM Corp. 2025.
+
 #!/usr/bin/env python -W ignore
 """
-Cleans up VPC records older than 2 days old
+Audits the resources in a current account/resource group that were deployed by Multi-Arch Compute.
 
 python3 -m venv .
 source bin/activate
@@ -75,62 +76,59 @@ for route in vpc_routes:
 print("\nList Subnets")
 try:
     subnets = service.list_subnets().get_result()['subnets']
+    for subnet in subnets:
+        print(subnet['id'], "\t",  subnet['name'], "\t" , subnet['created_at'] )
 except ApiException as e:
   print("List subnets failed with status code " + str(e.code) + ": " + e.message)
-for subnet in subnets:
-    print(subnet['id'], "\t",  subnet['name'], "\t" , subnet['created_at'] )
+
 
 # Listing Security Groups
 print("\nList Security Groups")
 try:
     sgs = service.list_security_groups().get_result()['security_groups']    
+    for sg in sgs:
+        print(sg['id'], "\t",  sg['name'], "\t", sg['created_at'])
 except ApiException as e:
   print("List Security Groups failed with status code " + str(e.code) + ": " + e.message)
-for sg in sgs:
-    print(sg['id'], "\t",  sg['name'], "\t", sg['created_at'])
 
 # Listing keys
 
 print("\nList Keys")
 try:
     keys = service.list_keys().get_result()['keys']
+    for key in keys:
+        if(key['name'].startswith(user_prefix)):
+            print(key['id'], "\t",  key['name'], "\t", key['created_at'])
 except ApiException as e:
   print("List Keys failed with status code " + str(e.code) + ": " + e.message)
-for key in keys:
-    if(key['name'].startswith(user_prefix)):
-        print(key['id'], "\t",  key['name'], "\t", key['created_at'])
 
 # Listing Images
 print("\nList Images")
 try:
     images = service.list_images().get_result()['images']
+    for image in images:
+        if(image['owner_type'] == 'user'):
+            print(image['id'], "\t",  image['name'] , "\t", image['created_at'])
 except ApiException as e:
   print("List images failed with status code " + str(e.code) + ": " + e.message)
-for image in images:
-    if(image['owner_type'] == 'user'):
-        print(image['id'], "\t",  image['name'] , "\t", image['created_at'])
-    
-
 
 # Listing Load Balancers
 print("\nList Load Balancers")
 try:
     lbs = service.list_load_balancers().get_result()['load_balancers']
+    for lb in lbs:
+        print(lb['id'], "\t",  lb['name'], "\t", lb['created_at'])
 except ApiException as e:
   print("List Load Balancers failed with status code " + str(e.code) + ": " + e.message)
-for lb in lbs:
-    print(lb['id'], "\t",  lb['name'], "\t", lb['created_at'])
-
 
 # Listing Instances
 print("\nList Instances")
 try:
     instances = service.list_instances().get_result()['instances']
+    for instance in instances:
+        print(instance['id'], "\t",  instance['name'], "\t", instance['created_at'])
 except ApiException as e:
   print("List Instances failed with status code " + str(e.code) + ": " + e.message)
-for instance in instances:
-    print(instance['id'], "\t",  instance['name'], "\t", instance['created_at'])
-
 
 resource_manager_service = ibm_platform_services.ResourceManagerV2(authenticator=authenticator)
 response = resource_manager_service.list_resource_groups(
@@ -147,28 +145,7 @@ for resource_group in resource_group_list:
     if resource_group["name"] == resource_group_name:
         resource_group_id = resource_group["id"]
         print("resource_group_id is: " + resource_group_id)
-print("")
 
 resource_controller_url = 'https://resource-controller.cloud.ibm.com'
 controller = ResourceControllerV2(authenticator=authenticator)
 controller.set_service_url(resource_controller_url)
-
-print("[VPCs] - [STARTED CLEANING]")
-
-print("Found the following cos instances in the resource group:")
-for resource in vpcs:
-    if vpc['resource_group']['id'] == resource_group_id:
-        print(resource["created_at"] + " " + resource["name"] + " " + resource["crn"])
-print("")
-
-# Prune time is 2 day
-delta = timedelta(hours=48)
-prune_time = datetime.datetime.now(datetime.timezone.utc) - timedelta(seconds=172800)
-
-# Filter through the COS buckets to find the multi-arch-compute ones
-for resource in vpcs:
-    if vpc['resource_group']['id'] == resource_group_id:
-        print(resource["created_at"] + " " + resource["name"] + " " + resource["crn"])
-
-
-print("[VPCs] - [FINISHED CLEANING]")
