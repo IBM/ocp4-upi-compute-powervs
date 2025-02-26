@@ -71,14 +71,15 @@ prune_time = datetime.datetime.now(datetime.timezone.utc) - timedelta(seconds=17
 
 print("")
 
-print("Deleting records older than 2 days:")
+print("Pruning records older than 2 days:")
 for record in records:
     if "sergio-ocp" in record['name']:
         print("auto skipping")
 
     if string_to_datetime(record['created_on']) < prune_time:
         print(record['created_on'] + " = " + record['name'])
-
-        dnszone.delete_dns_record(dnsrecord_identifier=record["id"])
+        print(record)
+        d_record = dnszone.delete_dns_record(dnsrecord_identifier=record["id"])
+        print(d_record)
 
 print("[CIS] - [FINISHED CLEANING]")
