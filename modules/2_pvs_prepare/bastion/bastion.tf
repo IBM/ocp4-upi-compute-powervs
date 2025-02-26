@@ -335,6 +335,8 @@ EOF
       sed -i "s|IPADDR=.*|IPADDR=${local.int_ip}|g" /etc/sysconfig/network-scripts/ifcfg-$${DEV_NAME}
       sed -i "s|BOOTPROTO=.*|BOOTPROTO=static|g" /etc/sysconfig/network-scripts/ifcfg-$${DEV_NAME}
       nmcli dev up $${DEV_NAME}
+
+      echo $${DEV_NAME} > /root/interface-name
   EOF
     ]
   }
