@@ -214,7 +214,7 @@ mac_tags = [ "multi-arch-x-px-cicd-${CLEAN_VERSION}" ]
 
 cicd = true
 cicd_disable_defrag = true
-cicd_etcd_secondary_disk=true
+cicd_etcd_secondary_disk=false
 
 skip_vpc_key = true
 setup_transit_gateway = true
