@@ -1,0 +1,5 @@
+ibm-cloud-sdk-core
+ibm-cloud-networking-services
+ibm-platform-services
+ibm-cos-sdk
+ibm-vpc>=0.23.0
