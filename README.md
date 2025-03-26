@@ -107,4 +107,4 @@ If you would like to see the detailed LICENSE click [here](LICENSE).
 # Support
 Is this a Red Hat or IBM supported solution?
 
-Multi-Arch Compute with an Intel Control Plane and Intel/Power compute is supported.
+Multi-Arch Compute with an Intel Control Plane and Intel/Power compute is not supported - Installer-Provisioned Infrastructure and User Provisioned nodes are not supported.
