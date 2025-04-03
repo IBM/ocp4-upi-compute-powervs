@@ -175,7 +175,7 @@ if [[ "${FOUND_OVERRIDE}" == "0" ]]
 then
     echo "No override found"
 else
-    export OVERRIDE_NETWORK_NAME="${O_NET_NAME}"
+    export OVERRIDE_NETWORK_NAME="override_network_name=\"${O_NET_NAME}\""
 fi
 
 # creates the var file
@@ -220,7 +220,7 @@ skip_vpc_key = true
 setup_transit_gateway = true
 transit_gateway_name = "multi-arch-x-px-${POWERVS_ZONE}-1-tg"
 
-override_network_name="${OVERRIDE_NETWORK_NAME}"
+${OVERRIDE_NETWORK_NAME}
 EOFXEOF
 }
 
