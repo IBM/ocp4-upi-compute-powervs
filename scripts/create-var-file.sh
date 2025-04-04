@@ -217,7 +217,7 @@ cicd_disable_defrag = true
 cicd_etcd_secondary_disk=false
 
 skip_vpc_key = true
-setup_transit_gateway = true
+setup_transit_gateway = false
 transit_gateway_name = "multi-arch-x-px-${POWERVS_ZONE}-1-tg"
 
 ${OVERRIDE_NETWORK_NAME}
