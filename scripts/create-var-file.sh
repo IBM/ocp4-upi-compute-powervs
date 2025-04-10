@@ -194,14 +194,17 @@ openshift_api_url        = "${OPENSHIFT_API_URL}"
 
 openshift_client_tarball = "${OPENSHIFT_CLIENT_TARBALL}"
 rhel_image_name  = "${RHEL_IMAGE_NAME}"
-rhcos_image_name = "${COREOS_NAME}"
+
+# Using the oldest image to support importing.
+# rhcos_image_name = "${COREOS_NAME}"
+rhcos_image_name = "rhel-coreos"
 public_key_file  = "data/id_rsa.pub"
 private_key_file = "data/id_rsa"
 
 # Example file name: rhcos-414-92-202307050443-0-ppc64le-powervs.ova.gz
-rhcos_import_image                 = true
-rhcos_import_image_filename        = "${COREOS_NAME}-0-ppc64le-powervs.ova.gz"
-rhcos_import_image_region_override = "us-east"
+rhcos_import_image                 = false
+# rhcos_import_image_filename        = "${COREOS_NAME}-0-ppc64le-powervs.ova.gz"
+# rhcos_import_image_region_override = "us-east"
 
 processor_type = "shared"
 system_type    = "${MACHINE_TYPE}"
