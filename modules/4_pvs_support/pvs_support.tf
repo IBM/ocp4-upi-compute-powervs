@@ -15,8 +15,9 @@ locals {
     ]
   ])
 
-  openshift_machine_config_url = replace(replace(var.openshift_api_url, ":6443", ""), "://api.", "://api-int.")
-  oauth_hostname               = replace(replace(local.openshift_machine_config_url, "://api-int.", "oauth-openshift.apps."), "https", "")
+  # Routing issues - we removed api-int and left the logic inplace so we can switch back
+  openshift_machine_config_url = replace(replace(var.openshift_api_url, ":6443", ""), "://api.", "://api.")
+  oauth_hostname               = replace(replace(local.openshift_machine_config_url, "://api.", "oauth-openshift.apps."), "https", "")
   oauth_ip                     = var.lbs_ips
 
   # you must use the api-int url so the bastion routes over the correct interface.
@@ -60,7 +61,8 @@ resource "null_resource" "kubeconfig" {
 
   # Copies the kubeconfig to specific folder and replace api 
   provisioner "file" {
-    content     = replace(file(var.kubeconfig_file), "://api.", "://api-int.")
+    // Change to api. - replace is left so we can easily revert
+    content     = replace(file(var.kubeconfig_file), "://api.", "://api.")
     destination = "/root/.kube/config"
   }
 }
