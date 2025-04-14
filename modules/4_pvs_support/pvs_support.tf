@@ -242,7 +242,7 @@ then
   echo "Setting clusterNetworkMTU to ${var.cluster_network_mtu}"
   echo "Patch command output is:"
   oc patch Network.operator.openshift.io cluster --type=merge --patch \
-    '{"spec": { "migration": { "mtu": { "network": { "from": '$EXISTING_MTU', "to": ${var.cluster_network_mtu} } , "machine": { "to" : 9100} } } } }'
+    '{"spec": { "migration": { "mtu": { "network": { "from": '$EXISTING_MTU', "to": ${var.cluster_network_mtu} } , "machine": { "to" : ${var.private_network_mtu}} } } } }'
 else
   echo "clusterNetworkMTU is already set to ${var.cluster_network_mtu}"
 fi
@@ -338,10 +338,10 @@ oc get mcp
 echo 'verifying worker mc'
 start_counter=0
 timeout_counter=10
-mtu_output=`oc get mc 00-worker -o yaml | grep TARGET_MTU=9100`
+mtu_output=`oc get mc 00-worker -o yaml | grep TARGET_MTU=${var.private_network_mtu}`
 echo "(DEBUG) MTU FOUND?: $${mtu_output}"
-# While loop waits for TARGET_MTU=9100 till timeout has not reached 
-while [[ "$(oc get network cluster -o yaml | grep 'to: 9100' | awk '{print $NF}')" != "9100" ]]
+# While loop waits for TARGET_MTU=${var.private_network_mtu} till timeout has not reached 
+while [[ "$(oc get network cluster -o yaml | grep 'to: ${var.private_network_mtu}' | awk '{print $NF}')" != "${var.private_network_mtu}" ]]
 do
   echo "waiting on worker"
   sleep 30
@@ -368,18 +368,18 @@ do
 done
 
 RENDERED_CONFIG=$(oc get mcp/worker -o json | jq -r '.spec.configuration.name')
-CHECK_CONFIG=$(oc get mc $${RENDERED_CONFIG} -ojson 2>&1 | grep TARGET_MTU=9100)
+CHECK_CONFIG=$(oc get mc $${RENDERED_CONFIG} -ojson 2>&1 | grep TARGET_MTU=${var.private_network_mtu})
 while [ -z "$${CHECK_CONFIG}" ]
 do
   echo "waiting on worker"
   sleep 30
   RENDERED_CONFIG=$(oc get mcp/worker -o json | jq -r '.spec.configuration.name')
-  CHECK_CONFIG=$(oc get mc $${RENDERED_CONFIG} -ojson 2>&1 | grep TARGET_MTU=9100)
+  CHECK_CONFIG=$(oc get mc $${RENDERED_CONFIG} -ojson 2>&1 | grep TARGET_MTU=${var.private_network_mtu})
 done
 
 echo '-checking mtu-'
-oc get network cluster -o yaml | grep 'to: 9100' | awk '{print $NF}'
-[[ "$(oc get network cluster -o yaml | grep 'to: 9100' | awk '{print $NF}')" == "9100" ]] || false
+oc get network cluster -o yaml | grep 'to: ${var.private_network_mtu}' | awk '{print $NF}'
+[[ "$(oc get network cluster -o yaml | grep 'to: ${var.private_network_mtu}' | awk '{print $NF}')" == "${var.private_network_mtu}" ]] || false
 echo "success on wait on mtu change"
 EOF
     ]

@@ -9,3 +9,4 @@ variable "powervs_machine_cidr" {}
 variable "vpc_support_server_ip" {}
 variable "enable_snat" {}
 variable "cluster_id" {}
+variable "public_network_mtu" {}

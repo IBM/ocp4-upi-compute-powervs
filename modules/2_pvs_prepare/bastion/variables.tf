@@ -15,6 +15,7 @@ variable "public_key" {}
 variable "ssh_agent" {}
 variable "connection_timeout" {}
 variable "cluster_domain" {}
+variable "public_network_mtu" {}
 variable "private_network_mtu" {}
 variable "rhel_username" {}
 variable "rhel_smt" {}

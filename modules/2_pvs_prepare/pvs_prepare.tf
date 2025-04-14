@@ -41,6 +41,7 @@ module "existing_network" {
   powervs_service_instance_id = var.powervs_service_instance_id
   name_prefix                 = var.name_prefix
   override_network_name       = var.override_network_name
+  public_network_mtu          = var.public_network_mtu
 }
 
 module "network" {
@@ -53,6 +54,7 @@ module "network" {
   powervs_service_instance_id = var.powervs_service_instance_id
   name_prefix                 = var.name_prefix
   powervs_machine_cidr        = var.powervs_machine_cidr
+  public_network_mtu          = var.public_network_mtu
   vpc_support_server_ip       = var.vpc_support_server_ip
   enable_snat                 = var.enable_snat
   cluster_id                  = var.cluster_id
@@ -85,6 +87,7 @@ module "bastion" {
   ssh_agent                       = var.ssh_agent
   connection_timeout              = var.connection_timeout
   cluster_domain                  = var.cluster_domain
+  public_network_mtu              = var.public_network_mtu
   private_network_mtu             = var.private_network_mtu
   rhel_smt                        = var.rhel_smt
   rhel_username                   = var.rhel_username
