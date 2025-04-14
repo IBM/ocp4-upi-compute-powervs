@@ -76,7 +76,6 @@ module "pvs_prepare" {
   depends_on = [module.vpc_support]
   source     = "./modules/2_pvs_prepare"
 
-  ansible_repo_name                  = var.ansible_repo_name
   bastion                            = var.bastion
   bastion_health_status              = var.bastion_health_status
   cluster_domain                     = var.cluster_domain

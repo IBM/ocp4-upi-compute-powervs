@@ -86,7 +86,6 @@ module "bastion" {
   connection_timeout              = var.connection_timeout
   cluster_domain                  = var.cluster_domain
   private_network_mtu             = var.private_network_mtu
-  ansible_repo_name               = var.ansible_repo_name
   rhel_smt                        = var.rhel_smt
   rhel_username                   = var.rhel_username
   rhel_subscription_org           = var.rhel_subscription_org

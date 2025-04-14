@@ -209,17 +209,8 @@ then
   timeout 300 bash -c -- 'until ping -c 1 mirrormanager.fedoraproject.org; do sleep 30; printf ".";done'
   sudo yum install -y epel-release
 else
-  os_ver=$(cat /etc/os-release | egrep "^VERSION_ID=" | awk -F'"' '{print $2}')
-  if [[ $os_ver != "9"* ]]
-  then
-    if which subscription-manager
-    then
-      sudo subscription-manager repos --enable ${var.ansible_repo_name}
-    fi
-  else
-    timeout 300 bash -c -- 'until ping -c 1 dl.fedoraproject.org; do sleep 30; printf ".";done'
-    sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
-  fi
+  timeout 300 bash -c -- 'until ping -c 1 dl.fedoraproject.org; do sleep 30; printf ".";done'
+  sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 fi
 EOF
     ]

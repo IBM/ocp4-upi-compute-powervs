@@ -4,7 +4,6 @@
 ################################################################
 
 variable "cluster_id" {}
-variable "ansible_repo_name" {}
 variable "bastion" {}
 variable "bastion_health_status" {}
 variable "cluster_domain" {}

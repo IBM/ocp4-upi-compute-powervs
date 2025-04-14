@@ -16,7 +16,6 @@ variable "ssh_agent" {}
 variable "connection_timeout" {}
 variable "cluster_domain" {}
 variable "private_network_mtu" {}
-variable "ansible_repo_name" {}
 variable "rhel_username" {}
 variable "rhel_smt" {}
 variable "rhel_subscription_org" {}

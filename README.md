@@ -13,6 +13,8 @@ The [`ocp4-upi-compute-powervs` project](https://github.com/ibm/ocp4-upi-compute
 5. Optional: An CentOS Stream 9 Image loaded to the PowerVS Service
 6. An Existing OpenShift Container Platform Cluster installed on IBMCloud VPC with Intel architecture.
 
+The bastion must be RHEL9 equivalent or higher.
+
 ## Important Notes
 1. The DHCP network that the automation creates is going to have the Gateway on the first IP and use the 5th IP for the bastion's Internal IP.
 2. The Automation Supports OVN-Kube networks only.
