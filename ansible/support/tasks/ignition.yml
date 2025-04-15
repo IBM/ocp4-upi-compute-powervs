@@ -44,7 +44,7 @@
       register: result
       retries: 120
       delay: 10
-      until: 'result.status in [200] and "TARGET_MTU=9100" in result.content'
+      until: 'result.status in [200] and "TARGET_MTU={{ target_mtu }}" in result.content'
 
     - name: Downloading the ignition file
       get_url:

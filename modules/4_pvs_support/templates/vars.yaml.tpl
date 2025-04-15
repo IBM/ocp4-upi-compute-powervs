@@ -26,3 +26,5 @@ power_worker_count: ${power_worker_count}
 nfs_server: "${nfs_server}"
 nfs_path: "${nfs_path}"
 nfs_provisioner_image: "registry.k8s.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2"
+
+target_mtu: "${target_mtu}"
