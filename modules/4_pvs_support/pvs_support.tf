@@ -31,7 +31,6 @@ locals {
     nfs_server                   = var.nfs_server
     nfs_path                     = var.nfs_path
     cicd                         = var.cicd
-    target_mtu                   = var.cluster_network_mtu
   }
 
   cidrs = {
