@@ -26,8 +26,6 @@ locals {
     openshift_machine_config_url = local.openshift_machine_config_url
     vpc_support_server_ip        = var.vpc_support_server_ip
     power_worker_count           = var.worker["count"]
-    start_host                   = join(",", local.worker_hosts)
-    gateway                      = cidrhost(var.powervs_machine_cidr, 1)
     nfs_server                   = var.nfs_server
     nfs_path                     = var.nfs_path
     cicd                         = var.cicd
