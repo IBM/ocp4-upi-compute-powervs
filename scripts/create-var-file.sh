@@ -156,8 +156,8 @@ fi
 OVERRIDE_PREFIX=$(${IBMCLOUD} pi workspace list 2>&1 | grep $POWERVS_SERVICE_INSTANCE_ID | awk '{print $NF}')
 
 # SKIP_VPC_KEY is conditionally switched
-${IBMCLOUD} pi ssh-key create cicd-key --key "$(<data/id_rsa.pub)" || true
-${IBMCLOUD} is key-create cicd-key @data/id_rsa.pub || true
+${IBMCLOUD} pi ssh-key create cicd-key --key "$(<data/id_rsa.pub)" > /dev/null 2> /dev/null || true 
+${IBMCLOUD} is key-create cicd-key @data/id_rsa.pub > /dev/null 2> /dev/null || true 
 
 # Set the Machine Type
 if [[ "${POWERVS_REGION}" == "wdc06" ]]
@@ -175,7 +175,7 @@ if [[ "${FOUND_OVERRIDE}" == "0" ]]
 then
     echo "No override found"
 else
-    export OVERRIDE_NETWORK_NAME="${O_NET_NAME}"
+    export OVERRIDE_NETWORK_NAME="override_network_name=\"${O_NET_NAME}\""
 fi
 
 # creates the var file
@@ -194,14 +194,17 @@ openshift_api_url        = "${OPENSHIFT_API_URL}"
 
 openshift_client_tarball = "${OPENSHIFT_CLIENT_TARBALL}"
 rhel_image_name  = "${RHEL_IMAGE_NAME}"
-rhcos_image_name = "${COREOS_NAME}"
+
+# Using the oldest image to support importing.
+# rhcos_image_name = "${COREOS_NAME}"
+rhcos_image_name = "rhel-coreos"
 public_key_file  = "data/id_rsa.pub"
 private_key_file = "data/id_rsa"
 
 # Example file name: rhcos-414-92-202307050443-0-ppc64le-powervs.ova.gz
-rhcos_import_image                 = true
-rhcos_import_image_filename        = "${COREOS_NAME}-0-ppc64le-powervs.ova.gz"
-rhcos_import_image_region_override = "us-east"
+rhcos_import_image                 = false
+# rhcos_import_image_filename        = "${COREOS_NAME}-0-ppc64le-powervs.ova.gz"
+# rhcos_import_image_region_override = "us-east"
 
 processor_type = "shared"
 system_type    = "${MACHINE_TYPE}"
@@ -214,13 +217,13 @@ mac_tags = [ "multi-arch-x-px-cicd-${CLEAN_VERSION}" ]
 
 cicd = true
 cicd_disable_defrag = true
-cicd_etcd_secondary_disk=true
+cicd_etcd_secondary_disk=false
 
 skip_vpc_key = true
-setup_transit_gateway = true
+setup_transit_gateway = false
 transit_gateway_name = "multi-arch-x-px-${POWERVS_ZONE}-1-tg"
 
-override_network_name="${OVERRIDE_NETWORK_NAME}"
+${OVERRIDE_NETWORK_NAME}
 EOFXEOF
 }
 

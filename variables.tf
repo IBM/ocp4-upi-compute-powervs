@@ -370,14 +370,16 @@ variable "ansible_extra_options" {
   default     = "-v"
 }
 
-variable "ansible_repo_name" {
-  default = "ansible-2.9-for-rhel-8-ppc64le-rpms"
+variable "public_network_mtu" {
+  type        = number
+  description = "MTU value for the private network interface on RHEL and RHCOS nodes"
+  default     = 1450
 }
 
 variable "private_network_mtu" {
   type        = number
   description = "MTU value for the private network interface on RHEL and RHCOS nodes"
-  default     = 1500
+  default     = 1450
 }
 
 variable "installer_log_level" {

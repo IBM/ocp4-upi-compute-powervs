@@ -76,7 +76,6 @@ module "pvs_prepare" {
   depends_on = [module.vpc_support]
   source     = "./modules/2_pvs_prepare"
 
-  ansible_repo_name                  = var.ansible_repo_name
   bastion                            = var.bastion
   bastion_health_status              = var.bastion_health_status
   cluster_domain                     = var.cluster_domain
@@ -90,6 +89,7 @@ module "pvs_prepare" {
   powervs_service_instance_id        = var.powervs_service_instance_id
   private_key_file                   = var.private_key_file
   public_key_file                    = var.public_key_file
+  public_network_mtu                 = var.public_network_mtu
   private_network_mtu                = var.private_network_mtu
   processor_type                     = var.processor_type
   powervs_dns_forwarders             = var.powervs_dns_forwarders == "" ? [] : [for dns in split(";", var.powervs_dns_forwarders) : trimspace(dns)]
@@ -153,6 +153,7 @@ module "support" {
   nfs_server               = module.vpc_support.vpc_support_server_ip
   nfs_path                 = var.nfs_path
   cluster_network_mtu      = var.cluster_network_mtu
+  private_network_mtu      = var.private_network_mtu
   cicd                     = var.cicd
   cicd_disable_defrag      = var.cicd_disable_defrag
   lbs_ips                  = module.vpc_support.load_balancer_ips

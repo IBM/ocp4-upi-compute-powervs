@@ -4,7 +4,6 @@
 ################################################################
 
 variable "cluster_id" {}
-variable "ansible_repo_name" {}
 variable "bastion" {}
 variable "bastion_health_status" {}
 variable "cluster_domain" {}
@@ -16,6 +15,7 @@ variable "powervs_region" {}
 variable "powervs_zone" {}
 variable "powervs_service_instance_id" {}
 variable "private_key_file" {}
+variable "public_network_mtu" {}
 variable "private_network_mtu" {}
 variable "processor_type" {}
 variable "powervs_dns_forwarders" {}

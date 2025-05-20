@@ -15,9 +15,8 @@ resource "ibm_pi_instance" "bastion" {
   pi_key_pair_name     = var.key_name
   pi_sys_type          = var.system_type
   pi_health_status     = var.bastion_health_status
-  # Dev Note: PER Network enablement, we chose to use tier1 only.
-  pi_storage_type = "tier1"
-  #pi_storage_pool = var.bastion_storage_pool
+  # Tier0 ensures we have 25iops per gig (120 x 25 = 3000Kiops)
+  pi_storage_type = "tier0"
 
   pi_network {
     network_id = var.bastion_public_network_id
@@ -204,22 +203,12 @@ resource "null_resource" "enable_repos" {
 # Additional repo for installing ansible package
 if ( [[ -z "${var.rhel_subscription_username}" ]] || [[ "${var.rhel_subscription_username}" == "<subscription-id>" ]] ) && [[ -z "${var.rhel_subscription_org}" ]]
 then
-  # Centos8 is end-of-life and does not use mirrorlist.centos.org
   # Centos9 uses https://mirrormanager.fedoraproject.org/mirrors/CentOS
   timeout 300 bash -c -- 'until ping -c 1 mirrormanager.fedoraproject.org; do sleep 30; printf ".";done'
   sudo yum install -y epel-release
 else
-  os_ver=$(cat /etc/os-release | egrep "^VERSION_ID=" | awk -F'"' '{print $2}')
-  if [[ $os_ver != "9"* ]]
-  then
-    if which subscription-manager
-    then
-      sudo subscription-manager repos --enable ${var.ansible_repo_name}
-    fi
-  else
-    timeout 300 bash -c -- 'until ping -c 1 dl.fedoraproject.org; do sleep 30; printf ".";done'
-    sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
-  fi
+  timeout 300 bash -c -- 'until ping -c 1 dl.fedoraproject.org; do sleep 30; printf ".";done'
+  sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 fi
 EOF
     ]
@@ -303,15 +292,13 @@ resource "null_resource" "bastion_fix_up_networks" {
     timeout     = "${var.connection_timeout}m"
   }
 
-  # dev-note: mtu is set to 9000 on the external interface/pubnet
-  # also turning off tx-checksum
-  # ip link set env2 mtu 9000
+  # dev-note: turning off tx-checksum we're not setting mtu
+  # just in case - `ip link set $${IFNAME} mtu 9000`
   provisioner "remote-exec" {
     inline = [<<EOF
 for IFNAME in $(ip --json link show | jq -r '.[] | select(.ifname != "lo").ifname')
 do
     echo "IFNAME: $${IFNAME}"
-    ip link set $${IFNAME} mtu 9000
     /sbin/ethtool --offload $${IFNAME} tx-checksumming off
     echo "IFNAME is updated"
 done
@@ -331,10 +318,12 @@ EOF
         ipv4.dns "${var.vpc_support_server_ip}" \
         ipv4.method manual \
         connection.autoconnect yes \
-        802-3-ethernet.mtu 9000
+        802-3-ethernet.mtu ${var.private_network_mtu}
       sed -i "s|IPADDR=.*|IPADDR=${local.int_ip}|g" /etc/sysconfig/network-scripts/ifcfg-$${DEV_NAME}
       sed -i "s|BOOTPROTO=.*|BOOTPROTO=static|g" /etc/sysconfig/network-scripts/ifcfg-$${DEV_NAME}
       nmcli dev up $${DEV_NAME}
+
+      echo $${DEV_NAME} > /root/interface-name
   EOF
     ]
   }
