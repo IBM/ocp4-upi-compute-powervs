@@ -22,14 +22,14 @@ resource "ibm_pi_network" "bastion_public_network" {
 
 # Dev Note: injects a delay the network create/destroy.
 # Othweriwse, this message comes up: One or more ports have an IP allocation from this subnet.
-resource "time_sleep" "wait_dhcp" {
+resource "time_sleep" {
   depends_on       = [ibm_pi_network.bastion_public_network]
   destroy_duration = "120s"
 }
 
 # The 3rd IP in this new network will be reserved for the bastion, and fixed.
-resource "ibm_pi_dhcp" "new_dhcp_service" {
-  depends_on           = [time_sleep.wait_dhcp]
+resource "ibm_pi_dhcp" {
+  depends_on           = [time_sleep]
   pi_cloud_instance_id = var.powervs_service_instance_id
   pi_cidr              = var.powervs_machine_cidr
   pi_dns_server        = var.vpc_support_server_ip
@@ -44,7 +44,7 @@ resource "ibm_pi_dhcp" "new_dhcp_service" {
 
 # Dev Note: injects a delay the dhcp_service/destroy.
 # Othweriwse, this message comes up: Error: failed to perform Delete DHCP Operation for dhcp id
-resource "time_sleep" "wait_dhcp_service_destroy" {
-  depends_on       = [ibm_pi_dhcp.new_dhcp_service]
+resource "time_sleep" {
+  depends_on       = [ibm_pi_dhcp]
   destroy_duration = "120s"
 }
