@@ -5,17 +5,7 @@ provider "registry.terraform.io/hashicorp/http" {
   version     = "3.5.0"
   constraints = "3.5.0"
   hashes = [
-    "h1:5HOqHWmyXbKnU2H5xmsOJFUaQODCDKyxQZ4mBV/NEhc=",
-    "h1:8bUoPwS4hahOvzCBj6b04ObLVFXCEmEN8T/5eOHmWOM=",
-    "h1:AW5AUlPPG8wmIRpxowGHzfvwBiXoVUI6FoOf78NaxH0=",
-    "h1:BsSHnNWCRHDj1o1WxbMuxMbbHDVNRqiv2VFjMPtKhkY=",
-    "h1:IrOiyfvoCSfuB5NYJ2gpLvlEDyis/L1H6Yq+w+udHoU=",
-    "h1:KsglDyFg9a9CIlOKxSSl8gDi+SAKfY+uvIZO1+SpeAc=",
-    "h1:MAWWGNvepa09m3Gy55OBAPk3dhCv6HnjywnKuD70ZBE=",
-    "h1:MAqaIgcLItXUc+g7Ip4SQaone8d4G8RCxd9jbcFP7oY=",
     "h1:dl73+8wzQR++HFGoJgDqY3mj3pm14HUuH/CekVyOj5s=",
-    "h1:i7v9eKMMBZlqcvW+v5MA5WwppcGBIERKAx6pZopHNq8=",
-    "h1:l3cdBtpCIMmhWUFadQ/90Gk6VMF91WMf5AIJSkcLwRg=",
     "zh:047c5b4920751b13425efe0d011b3a23a3be97d02d9c0e3c60985521c9c456b7",
     "zh:157866f700470207561f6d032d344916b82268ecd0cf8174fb11c0674c8d0736",
     "zh:1973eb9383b0d83dd4fd5e662f0f16de837d072b64a6b7cd703410d730499476",
@@ -75,17 +65,7 @@ provider "registry.terraform.io/hashicorp/time" {
   version     = "0.13.1"
   constraints = "0.13.1"
   hashes = [
-    "h1:+W+DMrVoVnoXo3f3M4W+OpZbkCrUn6PnqDF33D2Cuf0=",
-    "h1:5l8PAnxPdoUPqNPuv1dAr3efcCCtSCnY+Vj2nSGkQmw=",
-    "h1:EMoUhUVTJdXtIVXFbDGFU5G3t55PJoF0A8SLs/P4+Yk=",
-    "h1:P9h9GNlrWPECzIvIFjHOhF+HVzpxk0eCcdy1G0fWSHw=",
     "h1:ZT5ppCNIModqk3iOkVt5my8b8yBHmDpl663JtXAIRqM=",
-    "h1:eSX+RgYfeumojmeJ9Y5CbnkH2NkBC+9vUEolqdQVtGw=",
-    "h1:ifqDO2xwJP5UzMBSov/JYN0lOfscrD8kWRByzhpfE+E=",
-    "h1:juot9P/u2X5KZbw55axVYON3R8nyzFi+z12/FQQpiNI=",
-    "h1:oLW841xeTX9/f1aGI2cYUfBOANOXcg2IWUxDDSBNuLQ=",
-    "h1:pDZgFDwXeN9EbqFguWA7SG4JoBBh2LSVmzl6rqvQpm4=",
-    "h1:ugKMG/6JzIMkD7MCFDGAxq41wBopfNOs6LlRGJO66Gc=",
     "zh:02cb9aab1002f0f2a94a4f85acec8893297dc75915f7404c165983f720a54b74",
     "zh:04429b2b31a492d19e5ecf999b116d396dac0b24bba0d0fb19ecaefe193fdb8f",
     "zh:26f8e51bb7c275c404ba6028c1b530312066009194db721a8427a7bc5cdbc83a",
@@ -105,16 +85,7 @@ provider "registry.terraform.io/ibm-cloud/ibm" {
   version     = "1.78.4"
   constraints = "~> 1.78.0"
   hashes = [
-<<<<<<< HEAD
-    "h1:2kpfcvJjvCgd4PlNlNJRB2XIAe8zUW8pKkp3HoCdmtk=",
-    "h1:6UczGRPni9aiGLZM5I/TPj5J7rRo4zRdw1WN/HTQtJ8=",
-    "h1:9FIlRvjaLMnItuBwt0GNmBofyyT/nsNewhaLlGSo7c0=",
-    "h1:cKuQ+4aSnRNymxFMSSPl14lA55JK7SMadixCGlWAArM=",
     "h1:p0FyzJkN8HxNQaYgqo8xVAL8vH1ryHeeYqytS22U434=",
-    "h1:r93AqMd2oLdIUH8nkHoQi5HzfE6a17lF3t5xGO3dDsc=",
-=======
-    "h1:p0FyzJkN8HxNQaYgqo8xVAL8vH1ryHeeYqytS22U434=",
->>>>>>> 51cad05 (OpenShiftP-347: removes the pi dhcp network components)
     "zh:0951ec6627ffb8c798bec26b70f8c1aa0e519479c52cd4e42ec0e324e4bde6d7",
     "zh:671e31ddb710e6e526a83994978cfb89abddc0b918d50be76e80e9ef145df064",
     "zh:9d5321c20d2612587b9d6b81c8388a99679826f9b6379dcc10ff681f78b3700d",
