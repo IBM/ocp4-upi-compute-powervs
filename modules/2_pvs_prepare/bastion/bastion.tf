@@ -22,7 +22,7 @@ resource "ibm_pi_instance" "bastion" {
     network_id = var.bastion_public_network_id
   }
 
-  # Dev Note: this dhcp network ip does not always register with the cloud api
+  # Dev Note: This is the network id.
   pi_network {
     network_id = var.powervs_network_id
   }

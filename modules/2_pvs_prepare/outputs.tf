@@ -18,23 +18,13 @@ output "pvs_pubkey_name" {
   value      = module.keys.pvs_pubkey_name
 }
 
-output "powervs_dhcp_network_id" {
-  depends_on = [module.network]
-  value      = var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_network_id : module.network[0].powervs_dhcp_network_id
-}
-
-output "powervs_dhcp_network_name" {
-  depends_on = [module.network]
-  value      = var.override_network_name != "" ? var.override_network_name : module.network[0].powervs_dhcp_network_name
+output "powervs_network_id" {
+  value = data.ibm_pi_network.private_network.id
 }
 
 output "rhcos_image_id" {
   depends_on = [module.images]
   value      = module.images.rhcos_image_id
-}
-
-output "powervs_dhcp_service" {
-  value = var.override_network_name != "" ? module.existing_network[0].powervs_dhcp_service.dhcp_id : module.network[0].powervs_dhcp_service.dhcp_id
 }
 
 output "powervs_bastion_name" {

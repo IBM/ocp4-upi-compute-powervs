@@ -168,16 +168,6 @@ else
 fi
 echo "MACHINE_TYPE=${MACHINE_TYPE}"
 
-# OVERRIDE_NETWORK_NAME is set when a dhcp network already exists
-O_NET_NAME="$(ibmcloud pi subnet ls --json | jq -r '.networks[] | select(.dhcpManaged?) | .name')"
-FOUND_OVERRIDE="$(echo ${O_NET_NAME} | wc -l | awk '{print $1}')"
-if [[ "${FOUND_OVERRIDE}" == "0" ]]
-then
-    echo "No override found"
-else
-    export OVERRIDE_NETWORK_NAME="override_network_name=\"${O_NET_NAME}\""
-fi
-
 # creates the var file
 cat << EOFXEOF > data/var.tfvars
 ibmcloud_api_key = "${IC_API_KEY}"
@@ -222,8 +212,6 @@ cicd_etcd_secondary_disk=false
 skip_vpc_key = true
 setup_transit_gateway = false
 transit_gateway_name = "multi-arch-x-px-${POWERVS_ZONE}-1-tg"
-
-${OVERRIDE_NETWORK_NAME}
 EOFXEOF
 }
 
