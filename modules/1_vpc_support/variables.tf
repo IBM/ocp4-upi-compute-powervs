@@ -30,7 +30,7 @@ variable "vpc_zone" {
 variable "supp_vm_image_name" {
   type        = string
   description = "The image name for the support VM."
-  default     = "ibm-centos-stream-9-amd64-8"
+  default     = "ibm-centos-stream-9-amd64-10"
 }
 
 variable "public_key_file" {
