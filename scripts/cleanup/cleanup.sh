@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ################################################################
-# Copyright 2023 - IBM Corporation. All rights reserved
+# Copyright 2025 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
@@ -61,21 +61,11 @@ function cleanup_multi_arch_compute() {
       sleep 60
     done
 
-    if [ -n "$(ibmcloud pi network ls 2>&1| grep DHCP)" ]
-    then
-      curl -L -o pvsadm "https://github.com/ppc64le-cloud/pvsadm/releases/download/v0.1.12/pvsadm-darwin-amd64"
-      chmod +x pvsadm
-
-      IC_API_KEY="${api_key}" ./bin/pvsadm dhcpserver list --instance-id ${service_instance_id}
-      IC_API_KEY="${api_key}" ./bin/pvsadm dhcpserver delete --instance-id ${service_instance_id} --id "$(ibmcloud pi nets 2>&1| grep DHCP | awk '{print $1}')"
-      sleep 60
-    fi
-
     echo "Deleting the Network"
     for NETWORK_ID in $(ibmcloud pi network ls 2>&1| awk '{print $1}')
     do
       echo "Deleting network ${NETWORK_ID}"
-      ibmcloud pi network delete "${NETWORK_ID}"
+      for NETWORK_ID in $(ibmcloud pi network ls 2>&1 | grep -v ocp-net | awk '{print $1}')
       sleep 60
     done
 
