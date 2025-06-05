@@ -291,6 +291,42 @@ resource "null_resource" "bastion_fix_up_networks" {
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"
   }
+  
+  # Configure the dnsmasq server
+  provisioner "remote-exec" {
+    inline = [
+      "sudo dnf install dnsmasq -y"
+    ]
+  }
+
+  # Populate /etc/dnsmasq.conf 
+  provisioner "remote-exec" {
+    inline = [cat <<EOF > /etc/dnsmasq.conf
+  interface=env2
+  except-interface=lo
+  bind-dynamic
+  log-dhcp
+
+  dhcp-range=192.168.200.10,192.168.200.200,24
+  dhcp-option=baremetal,121,0.0.0.0/0,192.168.200.2,${local.ext_ip},192.168.200.2
+  dhcp-hostsfile=/var/lib/dnsmasq/dnsmasq.hostsfile
+    ]
+  }
+
+  # TODO : Populate /var/lib/dnsmasq/dnsmasq.hostsfile 
+  
+  # Start and enable dnsmasq service. Set up firewall
+  provisioner "remote-exec" {
+    inline = [
+      "systemctl start dnsmasq"
+      "systemctl enable dnsmasq"
+      "firewall-cmd --add-port 53/udp --permanent"
+      "firewall-cmd --add-port 67/udp --permanent"
+      "firewall-cmd --change-zone=provisioning --zone=external --permanent"
+      "firewall-cmd --reload"
+    ]
+  }
+
 
   # dev-note: turning off tx-checksum we're not setting mtu
   # just in case - `ip link set $${IFNAME} mtu 9000`
