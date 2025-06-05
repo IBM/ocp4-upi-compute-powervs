@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ################################################################
-# Copyright 2023 - IBM Corporation. All rights reserved
+# Copyright 2025 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
@@ -80,18 +80,9 @@ echo "Import image status is: $?"
 # This CRN is useful when manually destroying.
 echo "PowerVS Service CRN: ${CRN}"
 
-# 6. Create Cloud Connection
-# 7. Attach Cloud Connection
-ibmcloud pi cloud-connection create ${WORKSPACE_NAME}-conn --transit-enabled \
-    --global-routing --speed 1000
+# 6/7 Setup Transit Gateway and Transit Gateway Connections
 
-# 8. Create DHCP Network
-POWERVS_SERVICE_INSTANCE_ID=$(echo "${CRN}" | sed 's|:| |g' | awk '{print $NF}')
-bin/pvsadm dhcpserver create --instance-id ${POWERVS_SERVICE_INSTANCE_ID} \
-    --cidr '192.168.200.0/24' \
-    --dns-server 9.9.9.9 \
-    --name mac-dhcp-${REGION} \
-    --snat true
+# 8. Create Network `ocp-net`
 
 # 9. Create Transit Gateway
 ibmcloud tg gateway-create \

@@ -36,4 +36,4 @@ variable "rhel_subscription_activationkey" {}
 variable "ssh_agent" {}
 variable "system_type" {}
 variable "vpc_support_server_ip" {}
-variable "override_network_name" {}
+variable "powervs_network_name" {}
