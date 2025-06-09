@@ -102,20 +102,20 @@ provider "registry.terraform.io/hashicorp/time" {
 }
 
 provider "registry.terraform.io/ibm-cloud/ibm" {
-  version     = "1.78.4"
-  constraints = "~> 1.78.0"
+  version     = "1.79.0"
+  constraints = "~> 1.79.0"
   hashes = [
-    "h1:2kpfcvJjvCgd4PlNlNJRB2XIAe8zUW8pKkp3HoCdmtk=",
-    "h1:6UczGRPni9aiGLZM5I/TPj5J7rRo4zRdw1WN/HTQtJ8=",
-    "h1:9FIlRvjaLMnItuBwt0GNmBofyyT/nsNewhaLlGSo7c0=",
-    "h1:cKuQ+4aSnRNymxFMSSPl14lA55JK7SMadixCGlWAArM=",
-    "h1:p0FyzJkN8HxNQaYgqo8xVAL8vH1ryHeeYqytS22U434=",
-    "h1:r93AqMd2oLdIUH8nkHoQi5HzfE6a17lF3t5xGO3dDsc=",
-    "zh:0951ec6627ffb8c798bec26b70f8c1aa0e519479c52cd4e42ec0e324e4bde6d7",
-    "zh:671e31ddb710e6e526a83994978cfb89abddc0b918d50be76e80e9ef145df064",
-    "zh:9d5321c20d2612587b9d6b81c8388a99679826f9b6379dcc10ff681f78b3700d",
-    "zh:a2d7936047909581ed5de8ef9db69defa2ccdb3630516057f41dd30f015e2103",
-    "zh:f465cb3be47d8f17a7587e2f8f8953015b06288a536717e2cc026d8fbb71983a",
-    "zh:feed98078ebe8d6fc892a419dc8568441aba0a506d15ba73e5959a7f0fa2011c",
+    "h1:3hS5o+Fw8G098O68JiSWFMzvdLxFj5vAXOYBgqonfLk=",
+    "h1:L89z256GBoqa+3EUi12HNk5T8wY0y0wQIOGDiSGj5as=",
+    "h1:c7a/5UQUCGz+afkhwt1UcwPK/K2tDhMKCSrX/Kxe+ws=",
+    "h1:cRHppQs6Kj20VbxyJ9ExUf9vJz66NVWEQz9Ts9WbOlo=",
+    "h1:h0eVcie8E0HC7EQ3TZByp1UITYwYHjuFTOxL/STMuPA=",
+    "h1:hsY0AqWjgsItbOVxC4Fwwe3Aakt6QM/HVIfCRBKdIA8=",
+    "zh:093db8976932b215af609d087f884c62bf15fa41937b53b90067ff9bb11baa9b",
+    "zh:9a9fd59f60e0ceae09acd416392da55093e718658de8281e6044c1e691eaef2d",
+    "zh:9cf41c04976591c413a3c17c4cf85af2eea889918e3facf74eb9cc55c53ed26a",
+    "zh:b6985098b9185182d2b5c5b79283d2ffdfe34f3441beba7171013ef81d98365a",
+    "zh:c21c51a1fa248c833a0653169e742f94678cf1cebd738247e88b6721e0b422ba",
+    "zh:cee098b782a78fe90b7e413d1438770590f2689179fce56ebedd8438066b285b",
   ]
 }
