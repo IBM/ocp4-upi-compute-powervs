@@ -210,4 +210,5 @@ module "post" {
   vpc_name                 = var.vpc_name
   vpc_region               = var.vpc_region
   cicd_etcd_secondary_disk = var.cicd_etcd_secondary_disk
+  worker_objects           = module.worker.worker_objects
 }

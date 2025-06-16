@@ -22,7 +22,7 @@ resource "ibm_pi_instance" "bastion" {
     network_id = var.bastion_public_network_id
   }
 
-# Dev Note: This is the network id.
+  # Dev Note: This is the network id.
   pi_network {
     network_id = var.powervs_network_id
   }
@@ -273,10 +273,21 @@ EOF
 }
 
 locals {
-  cidr   = split("/", var.powervs_network_cidr)[0]
-  gw     = cidrhost(var.powervs_network_cidr, 1)
-  int_ip = cidrhost(var.powervs_network_cidr, 3)
-  mask   = split("/", var.powervs_network_cidr)[1]
+  cidr           = split("/", var.powervs_network_cidr)[0]
+  gw             = cidrhost(var.powervs_network_cidr, 1)
+  int_ip         = cidrhost(var.powervs_network_cidr, 3)
+  range_start_ip = cidrhost(var.powervs_network_cidr, 10)
+  range_end_ip   = cidrhost(var.powervs_network_cidr, 200)
+  mask           = split("/", var.powervs_network_cidr)[1]
+  ext_ip         = ibm_pi_instance.bastion.pi_network[0].external_ip
+
+  dnsmasq_details = {
+    range_start_ip = local.range_start_ip
+    range_end_ip   = local.range_end_ip
+    mask           = local.mask
+    ext_ip         = local.ext_ip
+    int_ip         = local.int_ip
+  }
 }
 
 resource "null_resource" "bastion_fix_up_networks" {
@@ -291,7 +302,7 @@ resource "null_resource" "bastion_fix_up_networks" {
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"
   }
-  
+
   # Configure the dnsmasq server
   provisioner "remote-exec" {
     inline = [
@@ -299,31 +310,22 @@ resource "null_resource" "bastion_fix_up_networks" {
     ]
   }
 
-  # Populate /etc/dnsmasq.conf 
-  provisioner "remote-exec" {
-    inline = [cat <<EOF > /etc/dnsmasq.conf
-  interface=env2
-  except-interface=lo
-  bind-dynamic
-  log-dhcp
-
-  dhcp-range=192.168.200.10,192.168.200.200,24
-  dhcp-option=baremetal,121,0.0.0.0/0,192.168.200.2,${local.ext_ip},192.168.200.2
-  dhcp-hostsfile=/var/lib/dnsmasq/dnsmasq.hostsfile
-    ]
+  # Populate `dnsmasq` configuration
+  provisioner "file" {
+    content     = templatefile("${path.module}/templates/dnsmasq.conf.tpl", local.dnsmasq_details)
+    destination = "/etc/dnsmasq.conf"
   }
 
-  # TODO : Populate /var/lib/dnsmasq/dnsmasq.hostsfile 
-  
   # Start and enable dnsmasq service. Set up firewall
   provisioner "remote-exec" {
-    inline = [
-      "systemctl start dnsmasq"
-      "systemctl enable dnsmasq"
-      "firewall-cmd --add-port 53/udp --permanent"
-      "firewall-cmd --add-port 67/udp --permanent"
-      "firewall-cmd --change-zone=provisioning --zone=external --permanent"
-      "firewall-cmd --reload"
+    inline = [<<EOF
+systemctl start dnsmasq
+systemctl enable dnsmasq
+firewall-cmd --add-port 53/udp --permanent
+firewall-cmd --add-port 67/udp --permanent
+firewall-cmd --change-zone=provisioning --zone=external --permanent
+firewall-cmd --reload
+EOF
     ]
   }
 

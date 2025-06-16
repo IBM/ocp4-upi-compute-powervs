@@ -34,6 +34,19 @@ resource "null_resource" "post_setup" {
     source      = "ansible/post"
     destination = "${local.ansible_post_path}/"
   }
+
+  # Populate `dnsmasq` configuration
+  provisioner "file" {
+    content     = templatefile("${path.module}/templates/dnsmasq.hostsfile.tpl", var.worker_objects)
+    destination = "/var/lib/dnsmasq/dnsmasq.hostsfile"
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+systemctl restart dnsmasq
+EOF
+    ]
+  }
 }
 
 # Dev Note: only on destroy - remove the workers, and leave it at the top after post_setup
