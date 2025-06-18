@@ -3,6 +3,6 @@ except-interface=lo
 bind-dynamic
 log-dhcp
 
-dhcp-range=${local.range_start_ip},${local.range_end_ip},${local.mask}
-dhcp-option=baremetal,121,0.0.0.0/0,${local.ext_ip},${local.int_ip},${local.ext_ip}
+dhcp-range=${range_start_ip},${range_end_ip},${mask}
+dhcp-option=baremetal,121,0.0.0.0/0,${ext_ip},${int_ip},${ext_ip}
 dhcp-hostsfile=/var/lib/dnsmasq/dnsmasq.hostsfile

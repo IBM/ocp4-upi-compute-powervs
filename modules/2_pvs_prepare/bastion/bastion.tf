@@ -53,10 +53,6 @@ data "ibm_pi_instance_ip" "bastion_public_ip" {
   pi_cloud_instance_id = var.powervs_service_instance_id
 }
 
-locals {
-  ext_ip = data.ibm_pi_instance_ip.bastion_public_ip[0].external_ip
-}
-
 resource "null_resource" "bastion_nop" {
   count      = 1
   depends_on = [data.ibm_pi_instance_ip.bastion_public_ip, time_sleep.wait_bastion, ibm_pi_instance_action.restart_bastion]
@@ -279,7 +275,7 @@ locals {
   range_start_ip = cidrhost(var.powervs_network_cidr, 10)
   range_end_ip   = cidrhost(var.powervs_network_cidr, 200)
   mask           = split("/", var.powervs_network_cidr)[1]
-  ext_ip         = ibm_pi_instance.bastion.pi_network[0].external_ip
+  ext_ip         = data.ibm_pi_instance_ip.bastion_public_ip[0].external_ip
 
   dnsmasq_details = {
     range_start_ip = local.range_start_ip
@@ -321,10 +317,6 @@ resource "null_resource" "bastion_fix_up_networks" {
     inline = [<<EOF
 systemctl start dnsmasq
 systemctl enable dnsmasq
-firewall-cmd --add-port 53/udp --permanent
-firewall-cmd --add-port 67/udp --permanent
-firewall-cmd --change-zone=provisioning --zone=external --permanent
-firewall-cmd --reload
 EOF
     ]
   }

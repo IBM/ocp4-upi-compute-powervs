@@ -47,7 +47,7 @@ module "bastion" {
   bastion_image_id                = module.images.bastion_image_id
   bastion_storage_pool            = module.images.bastion_storage_pool
   key_name                        = module.keys.pvs_pubkey_name
-  bastion_public_network_id       = ibm_pi_network.bastion_public_network.id
+  bastion_public_network_id       = ibm_pi_network.bastion_public_network.network_id
   bastion_public_network_cidr     = ibm_pi_network.bastion_public_network.pi_cidr
   bastion_public_network_name     = ibm_pi_network.bastion_public_network.pi_network_name
   powervs_network_id              = data.ibm_pi_network.private_network.id
