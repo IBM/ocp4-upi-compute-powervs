@@ -1,5 +1,5 @@
 ################################################################
-# Copyright 2023 - IBM Corporation. All rights reserved
+# Copyright 2025 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
@@ -22,7 +22,7 @@ resource "ibm_pi_instance" "bastion" {
     network_id = var.bastion_public_network_id
   }
 
-  # Dev Note: this dhcp network ip does not always register with the cloud api
+  # Dev Note: This is the network id
   pi_network {
     network_id = var.powervs_network_id
   }
@@ -51,10 +51,6 @@ data "ibm_pi_instance_ip" "bastion_public_ip" {
   pi_instance_name     = ibm_pi_instance.bastion[count.index].pi_instance_name
   pi_network_name      = var.bastion_public_network_name
   pi_cloud_instance_id = var.powervs_service_instance_id
-}
-
-locals {
-  ext_ip = data.ibm_pi_instance_ip.bastion_public_ip[0].external_ip
 }
 
 resource "null_resource" "bastion_nop" {
@@ -273,10 +269,21 @@ EOF
 }
 
 locals {
-  cidr   = split("/", var.powervs_network_cidr)[0]
-  gw     = cidrhost(var.powervs_network_cidr, 1)
-  int_ip = cidrhost(var.powervs_network_cidr, 3)
-  mask   = split("/", var.powervs_network_cidr)[1]
+  cidr           = split("/", var.powervs_network_cidr)[0]
+  gw             = cidrhost(var.powervs_network_cidr, 1)
+  int_ip         = cidrhost(var.powervs_network_cidr, 3)
+  range_start_ip = cidrhost(var.powervs_network_cidr, 10)
+  range_end_ip   = cidrhost(var.powervs_network_cidr, 200)
+  mask           = split("/", var.powervs_network_cidr)[1]
+  ext_ip         = data.ibm_pi_instance_ip.bastion_public_ip[0].external_ip
+
+  dnsmasq_details = {
+    range_start_ip = local.range_start_ip
+    range_end_ip   = local.range_end_ip
+    mask           = local.mask
+    ext_ip         = local.ext_ip
+    int_ip         = local.int_ip
+  }
 }
 
 resource "null_resource" "bastion_fix_up_networks" {
@@ -290,6 +297,28 @@ resource "null_resource" "bastion_fix_up_networks" {
     private_key = file(var.private_key_file)
     agent       = var.ssh_agent
     timeout     = "${var.connection_timeout}m"
+  }
+
+  # Configure the dnsmasq server
+  provisioner "remote-exec" {
+    inline = [
+      "sudo dnf install dnsmasq -y"
+    ]
+  }
+
+  # Populate `dnsmasq` configuration
+  provisioner "file" {
+    content     = templatefile("${path.module}/templates/dnsmasq.conf.tpl", local.dnsmasq_details)
+    destination = "/etc/dnsmasq.conf"
+  }
+
+  # Start and enable dnsmasq service. Set up firewall
+  provisioner "remote-exec" {
+    inline = [<<EOF
+  systemctl start dnsmasq
+  systemctl enable dnsmasq
+  EOF
+    ]
   }
 
   # dev-note: turning off tx-checksum we're not setting mtu

@@ -1,0 +1,8 @@
+interface=env2
+except-interface=lo
+bind-dynamic
+log-dhcp
+
+dhcp-range=${range_start_ip},${range_end_ip},${mask}
+dhcp-option=baremetal,121,0.0.0.0/0,${ext_ip},${int_ip},${ext_ip}
+dhcp-hostsfile=/var/lib/dnsmasq/dnsmasq.hostsfile

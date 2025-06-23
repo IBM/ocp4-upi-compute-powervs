@@ -1,5 +1,5 @@
 ################################################################
-# Copyright 2023 - IBM Corporation. All rights reserved
+# Copyright 2025 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
@@ -36,4 +36,4 @@ variable "rhel_subscription_activationkey" {}
 variable "ssh_agent" {}
 variable "system_type" {}
 variable "vpc_support_server_ip" {}
-variable "override_network_name" {}
+variable "powervs_network_name" {}

@@ -1,5 +1,5 @@
 ################################################################
-# Copyright 2023 - IBM Corporation. All rights reserved
+# Copyright 2025 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
@@ -18,6 +18,9 @@ locals {
 
   nfs_namespace  = "nfs-provisioner"
   nfs_deployment = "nfs-client-provisioner"
+  worker_details = [for worker in var.worker_objects :
+    { mac_address = worker.pi_network[0].mac_address, ip_address = worker.pi_network[0].ip_address }
+  ]
 }
 
 resource "null_resource" "post_setup" {
@@ -34,8 +37,20 @@ resource "null_resource" "post_setup" {
     source      = "ansible/post"
     destination = "${local.ansible_post_path}/"
   }
-}
 
+  # Populate `dnsmasq` configuration
+  provisioner "file" {
+    content     = templatefile("${path.module}/templates/dnsmasq.hostsfile.tftpl", local.worker_details)
+    destination = "/var/lib/dnsmasq/dnsmasq.hostsfile"
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+systemctl restart dnsmasq
+EOF
+    ]
+  }
+}
 # Dev Note: only on destroy - remove the workers, and leave it at the top after post_setup
 resource "null_resource" "remove_workers" {
   depends_on = [null_resource.post_setup]
