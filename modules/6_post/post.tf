@@ -20,10 +20,10 @@ locals {
   nfs_deployment = "nfs-client-provisioner"
   worker_details = {
     details = [for worker in var.worker_objects :
-        { 
-            mac_address = worker.pi_network[0].mac_address, 
-            ip_address = worker.pi_network[0].ip_address
-        }
+      {
+        mac_address = worker.pi_network[0].mac_address,
+        ip_address  = worker.pi_network[0].ip_address
+      }
     ]
   }
 }
