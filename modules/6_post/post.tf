@@ -113,7 +113,7 @@ resource "null_resource" "post_ansible" {
 
   #create ansible_post_vars.json file on bastion (with desired variables to be passed to Ansible from Terraform)
   provisioner "file" {
-    content     = templatefile("${path.module}/templates/ansible_post_vars.json.tpl", local.ansible_vars)
+    content     = templatefile("${path.module}/templates/ansible_post_vars.json.tftpl", local.ansible_vars)
     destination = "${local.ansible_post_path}/ansible_post_vars.json"
   }
 
