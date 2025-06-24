@@ -311,11 +311,10 @@ resource "null_resource" "wait_on_mcp" {
   # Dev Note: added hardening to the MTU wait, we wait for the condition and then fail
   provisioner "remote-exec" {
     inline = [<<EOF
-echo "-diagnostics-"
-oc get network cluster -o json | jq -r '.status | .clusterNetworkMTU, .migration'
+echo "-start - diagnostics for network and mtu-"
+oc get network cluster -o json | jq -r '.status | .clusterNetworkMTU, .migration?'
 oc get mcp
-
-
+echo "-done - diagnostics for network and mtu-"
 EOF
     ]
   }
