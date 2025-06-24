@@ -17,7 +17,7 @@ locals {
 
   # Routing issues - we removed api-int and left the logic inplace so we can switch back
   openshift_machine_config_url = replace(replace(var.openshift_api_url, ":6443", ""), "://api.", "://api-int.")
-  oauth_hostname               = replace(replace(local.openshift_machine_config_url, "://api.", "oauth-openshift.apps."), "https", "")
+  oauth_hostname               = replace(replace(local.openshift_machine_config_url, "://api-int.", "oauth-openshift.apps."), "https", "")
   oauth_ip                     = var.lbs_ips
 
   # you must use the api-int url so the bastion routes over the correct interface.
