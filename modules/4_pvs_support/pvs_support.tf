@@ -91,18 +91,18 @@ resource "null_resource" "config" {
   }
 
   provisioner "file" {
-    content     = templatefile("${path.module}/templates/inventory.tpl", local.helpernode_inventory)
+    content     = templatefile("${path.module}/templates/inventory.tftpl", local.helpernode_inventory)
     destination = "ocp4-upi-compute-powervs/support/inventory"
   }
 
   provisioner "file" {
-    content     = templatefile("${path.module}/templates/vars.yaml.tpl", local.helpernode_vars)
+    content     = templatefile("${path.module}/templates/vars.yaml.tftpl", local.helpernode_vars)
     destination = "ocp4-upi-compute-powervs/support/vars/vars.yaml"
   }
 
   # Copies the custom route for env3
   provisioner "file" {
-    content     = templatefile("${path.module}/templates/route-env.sh.tpl", local.cidrs)
+    content     = templatefile("${path.module}/templates/route-env.sh.tftpl", local.cidrs)
     destination = "ocp4-upi-compute-powervs/support/route-env.sh"
   }
 

@@ -308,7 +308,7 @@ resource "null_resource" "bastion_fix_up_networks" {
 
   # Populate `dnsmasq` configuration
   provisioner "file" {
-    content     = templatefile("${path.module}/templates/dnsmasq.conf.tpl", local.dnsmasq_details)
+    content     = templatefile("${path.module}/templates/dnsmasq.conf.tftpl", local.dnsmasq_details)
     destination = "/etc/dnsmasq.conf"
   }
 
