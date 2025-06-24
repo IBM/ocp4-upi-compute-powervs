@@ -18,9 +18,14 @@ locals {
 
   nfs_namespace  = "nfs-provisioner"
   nfs_deployment = "nfs-client-provisioner"
-  worker_details = [for worker in var.worker_objects :
-    { mac_address = worker.pi_network[0].mac_address, ip_address = worker.pi_network[0].ip_address }
-  ]
+  worker_details = {
+    details = [for worker in var.worker_objects :
+        { 
+            mac_address = worker.pi_network[0].mac_address, 
+            ip_address = worker.pi_network[0].ip_address
+        }
+    ]
+  }
 }
 
 resource "null_resource" "post_setup" {
