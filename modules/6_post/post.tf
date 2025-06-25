@@ -51,6 +51,7 @@ resource "null_resource" "post_setup" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
+chown dnsmasq:dnsmasq /var/lib/dnsmasq/dnsmasq.hostsfile
 systemctl restart dnsmasq
 EOF
     ]
