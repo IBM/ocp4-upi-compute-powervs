@@ -272,7 +272,7 @@ locals {
   cidr           = split("/", var.powervs_network_cidr)[0]
   gw             = cidrhost(var.powervs_network_cidr, 1)
   int_ip         = cidrhost(var.powervs_network_cidr, 3)
-  range_start_ip = cidrhost(var.powervs_network_cidr, 10)
+  range_start_ip = cidrhost(var.powervs_network_cidr, 4)
   range_end_ip   = cidrhost(var.powervs_network_cidr, 200)
   mask           = split("/", var.powervs_network_cidr)[1]
   ext_ip         = data.ibm_pi_instance_ip.bastion_public_ip[0].external_ip
