@@ -312,7 +312,7 @@ resource "null_resource" "bastion_fix_up_networks" {
     destination = "/etc/dnsmasq.conf"
   }
 
-  # Start and enable dnsmasq service. Set up firewall
+  # Start and enable dnsmasq service.
   provisioner "remote-exec" {
     inline = [<<EOF
   systemctl start dnsmasq
