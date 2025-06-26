@@ -97,7 +97,7 @@ resource "null_resource" "config" {
     destination = "ocp4-upi-compute-powervs/support/vars/vars.yaml"
   }
 
-  # Copies the custom route for env3
+  # Copies the custom route script
   provisioner "file" {
     content     = templatefile("${path.module}/templates/route-env.sh.tftpl", local.cidrs)
     destination = "ocp4-upi-compute-powervs/support/route-env.sh"
@@ -334,7 +334,6 @@ resource "null_resource" "latest_ignition" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-nmcli device up env3
 echo 'Running ocp4-upi-compute-powervs playbook for ignition...'
 cd ocp4-upi-compute-powervs/support
 ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support.log ansible-playbook -e @vars/vars.yaml tasks/ignition.yml --become
