@@ -283,6 +283,7 @@ locals {
     mask           = local.mask
     ext_ip         = local.ext_ip
     int_ip         = local.int_ip
+    gw             = local.gw
   }
 }
 
