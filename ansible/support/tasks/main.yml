@@ -28,6 +28,7 @@
       - python3-pip
       - nfs-utils
       - git
+      - dnsmasq
       state: present
 
   - name: Install OpenShift Pre-requisites
@@ -66,6 +67,12 @@
     run_once: true
     with_items:
       - "{{ ports }}"
+
+  - name: Start dnsmasq service
+    systemd:
+      name: dnsmasq
+      state: started
+      enabled: yes
 
   - name: Systemd daemon reload
     systemd:

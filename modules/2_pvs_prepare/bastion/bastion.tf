@@ -299,26 +299,10 @@ resource "null_resource" "bastion_fix_up_networks" {
     timeout     = "${var.connection_timeout}m"
   }
 
-  # Configure the dnsmasq server
-  provisioner "remote-exec" {
-    inline = [
-      "sudo dnf install dnsmasq -y"
-    ]
-  }
-
   # Populate `dnsmasq` configuration
   provisioner "file" {
     content     = templatefile("${path.module}/templates/dnsmasq.conf.tftpl", local.dnsmasq_details)
     destination = "/etc/dnsmasq.conf"
-  }
-
-  # Start and enable dnsmasq service.
-  provisioner "remote-exec" {
-    inline = [<<EOF
-  systemctl start dnsmasq
-  systemctl enable dnsmasq
-  EOF
-    ]
   }
 
   # dev-note: turning off tx-checksum we're not setting mtu
