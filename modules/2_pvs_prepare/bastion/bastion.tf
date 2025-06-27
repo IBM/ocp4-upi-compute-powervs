@@ -320,6 +320,21 @@ EOF
     ]
   }
 
+  # OpenShiftP-347: add
+  provisioner "remote-exec" {
+    inline = [<<EOF
+for IFNAME in $(ip --json link show | jq -r '.[] | select(.ifname != "lo").ifname')
+do
+    echo "IFNAME: $${IFNAME}"
+    nft add table ip nat
+    nft 'add chain ip nat prerouting { type nat hook prerouting priority 0 ; }'
+    nft 'add chain ip nat postrouting { type nat hook postrouting priority 100 ; }'
+    nft 'add rule nat postrouting ip saddr ${local.cidr}/${local.mask} oif eth0 snat to ${local.ext_ip}'
+done
+EOF
+    ]
+  }
+
   # Identifies the networks, and picks the iface that is on the private network
   provisioner "remote-exec" {
     inline = [<<EOF

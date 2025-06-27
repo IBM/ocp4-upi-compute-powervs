@@ -29,7 +29,16 @@
       - nfs-utils
       - git
       - dnsmasq
+      - nftables
       state: present
+
+  # OpenShiftP-347: used for snat
+  - ansible.posix.sysctl:
+      name: net.ipv4.ip_forward
+      value: '1'
+      sysctl_set: true
+      state: present
+      reload: true
 
   - name: Install OpenShift Pre-requisites
     pip:
@@ -55,6 +64,12 @@
   - name: Start firewalld service
     systemd:
       name: firewalld
+      state: started
+      enabled: yes
+
+  - name: Start nftables service
+    systemd:
+      name: nftables
       state: started
       enabled: yes
 
