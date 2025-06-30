@@ -16,8 +16,8 @@ The [`ocp4-upi-compute-powervs` project](https://github.com/ibm/ocp4-upi-compute
 The bastion must be RHEL9 equivalent or higher.
 
 ## Important Notes
-1. The DHCP network that the automation creates is going to have the Gateway on the first IP and use the 5th IP for the bastion's Internal IP.
-2. The Automation Supports OVN-Kube networks only.
+1. The Automation Supports OVN-Kube networks only.
+2. The terraform code deploys a dhcp sever on the bastion node.
 
 ## Commands
 
