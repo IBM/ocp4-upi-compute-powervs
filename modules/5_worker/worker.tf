@@ -1,5 +1,5 @@
 ################################################################
-# Copyright 2023 - IBM Corporation. All rights reserved
+# Copyright 2025 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
@@ -23,7 +23,7 @@ resource "ibm_pi_instance" "worker" {
   pi_image_id   = var.rhcos_image_id
 
   pi_network {
-    network_id = var.powervs_dhcp_network_id
+    network_id = var.powervs_network_id
   }
 
   pi_key_pair_name = var.key_name

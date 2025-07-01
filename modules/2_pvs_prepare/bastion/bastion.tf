@@ -1,5 +1,5 @@
 ################################################################
-# Copyright 2023 - IBM Corporation. All rights reserved
+# Copyright 2025 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
@@ -15,15 +15,14 @@ resource "ibm_pi_instance" "bastion" {
   pi_key_pair_name     = var.key_name
   pi_sys_type          = var.system_type
   pi_health_status     = var.bastion_health_status
-  # Dev Note: PER Network enablement, we chose to use tier1 only.
-  pi_storage_type = "tier1"
-  #pi_storage_pool = var.bastion_storage_pool
+  # Tier0 ensures we have 25iops per gig (120 x 25 = 3000Kiops)
+  pi_storage_type = "tier0"
 
   pi_network {
     network_id = var.bastion_public_network_id
   }
 
-  # Dev Note: this dhcp network ip does not always register with the cloud api
+  # Dev Note: This is the network id
   pi_network {
     network_id = var.powervs_network_id
   }
@@ -52,10 +51,6 @@ data "ibm_pi_instance_ip" "bastion_public_ip" {
   pi_instance_name     = ibm_pi_instance.bastion[count.index].pi_instance_name
   pi_network_name      = var.bastion_public_network_name
   pi_cloud_instance_id = var.powervs_service_instance_id
-}
-
-locals {
-  ext_ip = data.ibm_pi_instance_ip.bastion_public_ip[0].external_ip
 }
 
 resource "null_resource" "bastion_nop" {
@@ -204,22 +199,12 @@ resource "null_resource" "enable_repos" {
 # Additional repo for installing ansible package
 if ( [[ -z "${var.rhel_subscription_username}" ]] || [[ "${var.rhel_subscription_username}" == "<subscription-id>" ]] ) && [[ -z "${var.rhel_subscription_org}" ]]
 then
-  # Centos8 is end-of-life and does not use mirrorlist.centos.org
   # Centos9 uses https://mirrormanager.fedoraproject.org/mirrors/CentOS
   timeout 300 bash -c -- 'until ping -c 1 mirrormanager.fedoraproject.org; do sleep 30; printf ".";done'
   sudo yum install -y epel-release
 else
-  os_ver=$(cat /etc/os-release | egrep "^VERSION_ID=" | awk -F'"' '{print $2}')
-  if [[ $os_ver != "9"* ]]
-  then
-    if which subscription-manager
-    then
-      sudo subscription-manager repos --enable ${var.ansible_repo_name}
-    fi
-  else
-    timeout 300 bash -c -- 'until ping -c 1 dl.fedoraproject.org; do sleep 30; printf ".";done'
-    sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
-  fi
+  timeout 300 bash -c -- 'until ping -c 1 dl.fedoraproject.org; do sleep 30; printf ".";done'
+  sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 fi
 EOF
     ]
@@ -284,10 +269,22 @@ EOF
 }
 
 locals {
-  cidr   = split("/", var.powervs_network_cidr)[0]
-  gw     = cidrhost(var.powervs_network_cidr, 1)
-  int_ip = cidrhost(var.powervs_network_cidr, 3)
-  mask   = split("/", var.powervs_network_cidr)[1]
+  cidr           = split("/", var.powervs_network_cidr)[0]
+  gw             = cidrhost(var.powervs_network_cidr, 1)
+  int_ip         = cidrhost(var.powervs_network_cidr, 3)
+  range_start_ip = cidrhost(var.powervs_network_cidr, 4)
+  range_end_ip   = cidrhost(var.powervs_network_cidr, 200)
+  mask           = split("/", var.powervs_network_cidr)[1]
+  ext_ip         = data.ibm_pi_instance_ip.bastion_public_ip[0].external_ip
+
+  dnsmasq_details = {
+    range_start_ip = local.range_start_ip
+    range_end_ip   = local.range_end_ip
+    mask           = local.mask
+    ext_ip         = local.ext_ip
+    int_ip         = local.int_ip
+    gw             = local.gw
+  }
 }
 
 resource "null_resource" "bastion_fix_up_networks" {
@@ -303,17 +300,36 @@ resource "null_resource" "bastion_fix_up_networks" {
     timeout     = "${var.connection_timeout}m"
   }
 
-  # dev-note: mtu is set to 9000 on the external interface/pubnet
-  # also turning off tx-checksum
-  # ip link set env2 mtu 9000
+  # Populate `dnsmasq` configuration
+  provisioner "file" {
+    content     = templatefile("${path.module}/templates/dnsmasq.conf.tftpl", local.dnsmasq_details)
+    destination = "/etc/dnsmasq.conf"
+  }
+
+  # dev-note: turning off tx-checksum we're not setting mtu
+  # just in case - `ip link set $${IFNAME} mtu 9000`
   provisioner "remote-exec" {
     inline = [<<EOF
 for IFNAME in $(ip --json link show | jq -r '.[] | select(.ifname != "lo").ifname')
 do
     echo "IFNAME: $${IFNAME}"
-    ip link set $${IFNAME} mtu 9000
     /sbin/ethtool --offload $${IFNAME} tx-checksumming off
     echo "IFNAME is updated"
+done
+EOF
+    ]
+  }
+
+  # OpenShiftP-347: add
+  provisioner "remote-exec" {
+    inline = [<<EOF
+for IFNAME in $(ip --json link show | jq -r '.[] | select(.ifname != "lo").ifname')
+do
+    echo "IFNAME: $${IFNAME}"
+    nft add table ip nat
+    nft 'add chain ip nat prerouting { type nat hook prerouting priority 0 ; }'
+    nft 'add chain ip nat postrouting { type nat hook postrouting priority 100 ; }'
+    nft 'add rule nat postrouting ip saddr ${local.cidr}/${local.mask} oif eth0 snat to ${local.ext_ip}'
 done
 EOF
     ]
@@ -331,10 +347,12 @@ EOF
         ipv4.dns "${var.vpc_support_server_ip}" \
         ipv4.method manual \
         connection.autoconnect yes \
-        802-3-ethernet.mtu 9000
+        802-3-ethernet.mtu ${var.private_network_mtu}
       sed -i "s|IPADDR=.*|IPADDR=${local.int_ip}|g" /etc/sysconfig/network-scripts/ifcfg-$${DEV_NAME}
       sed -i "s|BOOTPROTO=.*|BOOTPROTO=static|g" /etc/sysconfig/network-scripts/ifcfg-$${DEV_NAME}
       nmcli dev up $${DEV_NAME}
+
+      echo $${DEV_NAME} > /root/interface-name
   EOF
     ]
   }

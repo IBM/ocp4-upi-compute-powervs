@@ -1,5 +1,5 @@
 ################################################################
-# Copyright 2023 - IBM Corporation. All rights reserved
+# Copyright 2025 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
@@ -18,6 +18,14 @@ locals {
 
   nfs_namespace  = "nfs-provisioner"
   nfs_deployment = "nfs-client-provisioner"
+  worker_details = {
+    details = [for worker in var.worker_objects :
+      {
+        mac_address = worker.pi_network[0].mac_address,
+        ip_address  = worker.pi_network[0].ip_address
+      }
+    ]
+  }
 }
 
 resource "null_resource" "post_setup" {
@@ -34,8 +42,21 @@ resource "null_resource" "post_setup" {
     source      = "ansible/post"
     destination = "${local.ansible_post_path}/"
   }
-}
 
+  # Populate `dnsmasq` configuration
+  provisioner "file" {
+    content     = templatefile("${path.module}/templates/dnsmasq.hostsfile.tftpl", local.worker_details)
+    destination = "/var/lib/dnsmasq/dnsmasq.hostsfile"
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+chown dnsmasq:dnsmasq /var/lib/dnsmasq/dnsmasq.hostsfile
+systemctl restart dnsmasq
+EOF
+    ]
+  }
+}
 # Dev Note: only on destroy - remove the workers, and leave it at the top after post_setup
 resource "null_resource" "remove_workers" {
   depends_on = [null_resource.post_setup]
@@ -98,7 +119,7 @@ resource "null_resource" "post_ansible" {
 
   #create ansible_post_vars.json file on bastion (with desired variables to be passed to Ansible from Terraform)
   provisioner "file" {
-    content     = templatefile("${path.module}/templates/ansible_post_vars.json.tpl", local.ansible_vars)
+    content     = templatefile("${path.module}/templates/ansible_post_vars.json.tftpl", local.ansible_vars)
     destination = "${local.ansible_post_path}/ansible_post_vars.json"
   }
 

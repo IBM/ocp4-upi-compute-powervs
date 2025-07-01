@@ -13,9 +13,11 @@ The [`ocp4-upi-compute-powervs` project](https://github.com/ibm/ocp4-upi-compute
 5. Optional: An CentOS Stream 9 Image loaded to the PowerVS Service
 6. An Existing OpenShift Container Platform Cluster installed on IBMCloud VPC with Intel architecture.
 
+The bastion must be RHEL9 equivalent or higher.
+
 ## Important Notes
-1. The DHCP network that the automation creates is going to have the Gateway on the first IP and use the 5th IP for the bastion's Internal IP.
-2. The Automation Supports OVN-Kube networks only.
+1. The Automation Supports OVN-Kube networks only.
+2. The terraform code deploys a dhcp sever on the bastion node.
 
 ## Commands
 
@@ -99,7 +101,7 @@ If you would like to see the detailed LICENSE click [here](LICENSE).
 
 ```text
 #
-# Copyright 2024 - IBM Corporation. All rights reserved
+# Copyright 2025 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 #
 ```
@@ -107,4 +109,4 @@ If you would like to see the detailed LICENSE click [here](LICENSE).
 # Support
 Is this a Red Hat or IBM supported solution?
 
-Multi-Arch Compute with an Intel Control Plane and Intel/Power compute is supported.
+Multi-Arch Compute with an Intel Control Plane and Intel/Power compute is not supported - Installer-Provisioned Infrastructure and User Provisioned nodes are not supported.

@@ -1,10 +1,9 @@
 ################################################################
-# Copyright 2023 - IBM Corporation. All rights reserved
+# Copyright 2025 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
 variable "cluster_id" {}
-variable "ansible_repo_name" {}
 variable "bastion" {}
 variable "bastion_health_status" {}
 variable "cluster_domain" {}
@@ -16,6 +15,7 @@ variable "powervs_region" {}
 variable "powervs_zone" {}
 variable "powervs_service_instance_id" {}
 variable "private_key_file" {}
+variable "public_network_mtu" {}
 variable "private_network_mtu" {}
 variable "processor_type" {}
 variable "powervs_dns_forwarders" {}
@@ -36,4 +36,4 @@ variable "rhel_subscription_activationkey" {}
 variable "ssh_agent" {}
 variable "system_type" {}
 variable "vpc_support_server_ip" {}
-variable "override_network_name" {}
+variable "powervs_network_name" {}

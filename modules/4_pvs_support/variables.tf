@@ -19,6 +19,7 @@ variable "powervs_machine_cidr" {}
 variable "keep_dns" {}
 variable "nfs_server" {}
 variable "nfs_path" {}
+variable "private_network_mtu" {}
 variable "cluster_network_mtu" {}
 variable "cicd" {}
 variable "cicd_disable_defrag" {}

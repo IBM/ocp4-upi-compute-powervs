@@ -5,7 +5,7 @@
 Cleans up COS records older than 2 days old
 
 python3 -m venv .
-source bin/activate
+source bin/activate 
 python3 -m pip install --upgrade ibm-cloud-sdk-core
 python3 -m pip install --upgrade ibm-cloud-networking-services
 python3 -m pip install --upgrade ibm-platform-services
@@ -14,6 +14,7 @@ export RESOURCE_MANAGER_URL=https://resource-controller.cloud.ibm.com
 export RESOURCE_MANAGER_AUTHTYPE=iam
 export RESOURCE_MANAGER_APIKEY=
 export RESOURCE_GROUP_NAME=
+export RESOURCE_CONTROLLER_APIKEY=
 """
 
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
@@ -79,7 +80,9 @@ delta = timedelta(hours=48)
 prune_time = datetime.datetime.now(datetime.timezone.utc) - timedelta(seconds=172800)
 
 # Filter through the COS buckets to find the multi-arch-compute ones
-print("Current COS Buckets: ")
+resource_controller_service = ResourceControllerV2.new_instance()
+
+print("Deleting COS Buckets older than 2 days old: ")
 idx = 0
 cos_results = []
 for resource in all_results:
@@ -89,9 +92,11 @@ for resource in all_results:
                 print(resource["created_at"] + " " + resource["name"] + " " + resource["crn"])
                 idx = idx + 1
                 cos_results.extend(resource)
+                #print(resource)
+                response = resource_controller_service.delete_resource_instance(
+                    id=resource["guid"],
+                    recursive=True
+                )
 print("There were => " + str(idx))
-
-
-
 
 print("[COS] - [FINISHED CLEANING]")

@@ -1,5 +1,5 @@
 ################################################################
-# Copyright 2023 - IBM Corporation. All rights reserved
+# Copyright 2025 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
@@ -76,7 +76,6 @@ module "pvs_prepare" {
   depends_on = [module.vpc_support]
   source     = "./modules/2_pvs_prepare"
 
-  ansible_repo_name                  = var.ansible_repo_name
   bastion                            = var.bastion
   bastion_health_status              = var.bastion_health_status
   cluster_domain                     = var.cluster_domain
@@ -90,6 +89,7 @@ module "pvs_prepare" {
   powervs_service_instance_id        = var.powervs_service_instance_id
   private_key_file                   = var.private_key_file
   public_key_file                    = var.public_key_file
+  public_network_mtu                 = var.public_network_mtu
   private_network_mtu                = var.private_network_mtu
   processor_type                     = var.processor_type
   powervs_dns_forwarders             = var.powervs_dns_forwarders == "" ? [] : [for dns in split(";", var.powervs_dns_forwarders) : trimspace(dns)]
@@ -109,7 +109,7 @@ module "pvs_prepare" {
   ssh_agent                          = var.ssh_agent
   system_type                        = var.system_type
   vpc_support_server_ip              = module.vpc_support.vpc_support_server_ip
-  override_network_name              = var.override_network_name
+  powervs_network_name               = var.powervs_network_name
 }
 
 module "transit_gateway" {
@@ -153,6 +153,7 @@ module "support" {
   nfs_server               = module.vpc_support.vpc_support_server_ip
   nfs_path                 = var.nfs_path
   cluster_network_mtu      = var.cluster_network_mtu
+  private_network_mtu      = var.private_network_mtu
   cicd                     = var.cicd
   cicd_disable_defrag      = var.cicd_disable_defrag
   lbs_ips                  = module.vpc_support.load_balancer_ips
@@ -168,8 +169,7 @@ module "worker" {
   key_name                    = module.pvs_prepare.pvs_pubkey_name
   name_prefix                 = local.name_prefix
   powervs_service_instance_id = var.powervs_service_instance_id
-  powervs_dhcp_network_id     = module.pvs_prepare.powervs_dhcp_network_id
-  powervs_dhcp_network_name   = module.pvs_prepare.powervs_dhcp_network_name
+  powervs_network_id          = module.pvs_prepare.powervs_network_id
   powervs_bastion_name        = module.pvs_prepare.powervs_bastion_name
   processor_type              = var.processor_type
   rhcos_image_id              = module.pvs_prepare.rhcos_image_id
@@ -177,7 +177,6 @@ module "worker" {
   worker                      = var.worker
   ignition_mac                = module.pvs_prepare.bastion_private_mac
   ignition_ip                 = module.worker.bastion_private_ip
-  powervs_dhcp_service        = module.pvs_prepare.powervs_dhcp_service
   # Eventually, this should be a bit more dynamic and include MachineConfigPool
 
   private_key_file     = var.private_key_file
@@ -211,4 +210,5 @@ module "post" {
   vpc_name                 = var.vpc_name
   vpc_region               = var.vpc_region
   cicd_etcd_secondary_disk = var.cicd_etcd_secondary_disk
+  worker_objects           = module.worker.worker_objects
 }
