@@ -323,6 +323,7 @@ EOF
   # OpenShiftP-347: add
   provisioner "remote-exec" {
     inline = [<<EOF
+    dnf install -y nftables
 for IFNAME in $(ip --json link show | jq -r '.[] | select(.ifname != "lo").ifname')
 do
     echo "IFNAME: $${IFNAME}"
