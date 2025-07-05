@@ -42,9 +42,12 @@
           "Accept": "application/vnd.coreos.ignition+json;version=3.2.0"
       ignore_errors: true
       register: result
-      retries: 120
+      retries: 5
       delay: 10
       until: '"Request failed: <urlopen error timed out>" not in result.msg'
+
+    - name: Download the Ignition file via IP
+      ansible.builtin.shell: "oc get nodes -l node-role.kubernetes.io/control-plane -owide --no-headers | awk '{print $6}' | head -n1 | xargs -I xyz curl -k https://xyz:22623/config/worker -H 'Accept: application/vnd.coreos.ignition+json;version=3.2.0' -v -o /var/www/html/ignition/worker.ign"
 
     - name: Verify the ignition file exists
       ansible.builtin.shell: stat /var/www/html/ignition/worker.ign
