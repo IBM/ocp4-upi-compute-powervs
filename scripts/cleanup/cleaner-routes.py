@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # (C) Copyright IBM Corp. 2025.
-
 #!/usr/bin/env python -W ignore
 """
 Deletion Criteria : Delete route having route name "powervs-route-1"
@@ -16,11 +15,14 @@ export RESOURCE_GROUP_NAME=
 export RESOURCE_ROUTE_NAME=
 export RESOURCE_POWERVS_VPC_NAME
 export RESOURCE_POWERVS_ROUTE_NAME
+export RESOURCE_REGION_CODE=
 """
 
 import ibm_platform_services
 import json
 import os
+import region_endpoint_mapping
+from region_endpoint_mapping import getPublicEndpointURL
 from ibm_platform_services.resource_controller_v2 import *
 from ibm_platform_services import ResourceControllerV2
 from ibm_vpc import VpcV1
@@ -31,10 +33,11 @@ api_key = os.getenv("RESOURCE_MANAGER_APIKEY")
 resource_group_name = os.getenv("RESOURCE_GROUP_NAME")
 vpc_name = os.getenv("RESOURCE_POWERVS_VPC_NAME")
 route_name = os.getenv("RESOURCE_POWERVS_ROUTE_NAME")
+serviceEndpointURL = getPublicEndpointURL(os.getenv("RESOURCE_REGION_CODE"))
 # https://cloud.ibm.com/docs/vpc?topic=vpc-service-endpoints-for-vpc
 authenticator = IAMAuthenticator(api_key)
 service = VpcV1(authenticator=authenticator)
-service.set_service_url('https://us-east.iaas.cloud.ibm.com/v1')
+service.set_service_url(str(serviceEndpointURL) + "/v1")
 try:    
     vpcs = service.list_vpcs().get_result()['vpcs']
     for vpc in vpcs:
@@ -63,6 +66,3 @@ except ApiException as e:
 print("[ROUTES] - [START DELETING]")
 
 print("[ROUTES] - [FINISHED CLEANING]")
-
-
-

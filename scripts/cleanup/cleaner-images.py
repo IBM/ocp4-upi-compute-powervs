@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # (C) Copyright IBM Corp. 2025.
-
 #!/usr/bin/env python -W ignore
 """
 Deletion Criteria : Delete images with prefix `p-px` and postfix `-rhcos-img`
@@ -15,11 +14,14 @@ export RESOURCE_MANAGER_APIKEY=
 export RESOURCE_GROUP_NAME=
 export RESOURCE_USER_PREFIX=
 export RESOURCE_USER_POSTFIX=
+export RESOURCE_REGION_CODE=
 """
 
 import ibm_platform_services
 import json
 import os
+import region_endpoint_mapping
+from region_endpoint_mapping import getPublicEndpointURL
 from ibm_platform_services.resource_controller_v2 import *
 from ibm_platform_services import ResourceControllerV2
 from ibm_vpc import VpcV1
@@ -30,13 +32,14 @@ api_key = os.getenv("RESOURCE_MANAGER_APIKEY")
 resource_group_name = os.getenv("RESOURCE_GROUP_NAME")
 user_prefix = os.getenv("RESOURCE_USER_PREFIX")
 user_postfix = os.getenv("RESOURCE_USER_POSTFIX")
+serviceEndpointURL = getPublicEndpointURL(os.getenv("RESOURCE_REGION_CODE"))
 audit_output = {}
 audit_record = {}
 
 # https://cloud.ibm.com/docs/vpc?topic=vpc-service-endpoints-for-vpc
 authenticator = IAMAuthenticator(api_key)
 service = VpcV1(authenticator=authenticator)
-service.set_service_url('https://us-east.iaas.cloud.ibm.com/v1')
+service.set_service_url(str(serviceEndpointURL) + "/v1")
 
 print("[VPC IMAGES] - [START LISTING]")
 # Listing Images
@@ -63,6 +66,3 @@ try:
   print("[VPC IMAGES] - [FINISHED CLEANING]")
 except ApiException as e:
   print("Delete VPC images failed with status code " + str(e.code) + ": " + e.message)
-
-
-
