@@ -50,7 +50,6 @@ try:
     print("SECURITY GROUPS having postfix  as : " , user_postfix )
     for sg in sgs:
       if(sg['name'].endswith(user_postfix)):
-        print(sg)
         #print(sg['id'], "\t",  sg['name'], "\t" , sg['crn'], "\t", sg['created_at'])
         sgts = service.list_security_group_targets(security_group_id=sg['id'])
         #print(sgts)
@@ -68,8 +67,7 @@ try:
           audit_record['created_at'] = sg['created_at']
           audit_output['security_groups'].append(audit_record)
         else:
-          print("Aborting cleanup of Security groups as Targets are attached to Security Group :" , sg['name']) 
-      
+          print("Aborting cleanup of Security groups as Targets are still attached to Security Group :" , sg['name']) 
 except ApiException as e:
   print("List Security Groups failed with status code " + str(e.code) + ": " + e.message)
 
