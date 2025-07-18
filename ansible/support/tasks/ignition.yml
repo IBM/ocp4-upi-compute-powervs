@@ -63,7 +63,7 @@
         verbosity: 1
 
     - name: Download the Ignition file via IP
-      ansible.builtin.shell: "oc get nodes -l node-role.kubernetes.io/control-plane -owide --no-headers | awk '{print $6}' | head -n1 | xargs -I xyz curl -k https://xyz:22623/config/worker -H 'Accept: application/vnd.coreos.ignition+json;version=3.2.0' -v -o /var/www/html/ignition/worker.ign"
+      ansible.builtin.shell: "oc get nodes -l node-role.kubernetes.io/control-plane -owide --no-headers | awk '{print $6}' | head -n1 | timeout 30 xargs -I xyz curl -k https://xyz:22623/config/worker -H 'Accept: application/vnd.coreos.ignition+json;version=3.2.0' -v -o /var/www/html/ignition/worker.ign"
       register: download_result_by_ip
       ignore_errors: true
       when: check_result_by_ip.rc == 0
@@ -76,7 +76,7 @@
     - name: Download the Ignition file via oc
       ansible.builtin.shell: "oc extract -n openshift-machine-api secret/master-user-data --keys=userData --to=- > /var/www/html/ignition/worker.ign"
       ignore_errors: true
-      when: (result.status == -1 or result.rc != 0) and (check_result_by_ip.rc != 0 or download_result_by_ip.status == -1 or download_result_by_ip.rc != 0 )
+      when: (result.status == -1) and (download_result_by_ip.rc != 0)
 
     - name: Verify the ignition file exists
       ansible.builtin.shell: stat /var/www/html/ignition/worker.ign
