@@ -4,5 +4,5 @@
 ################################################################
 
 output "pvs_pubkey_name" {
-  value = ibm_pi_key.key.name
+  value = "${var.name_prefix}-keypair"
 }

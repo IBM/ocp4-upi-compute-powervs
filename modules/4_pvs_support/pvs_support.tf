@@ -15,10 +15,11 @@ locals {
     ]
   ])
 
-  # Routing issues - we removed api-int and left the logic inplace so we can switch back
-  openshift_machine_config_url = replace(replace(var.openshift_api_url, ":6443", ""), "://api.", "://api.")
-  oauth_hostname               = replace(replace(local.openshift_machine_config_url, "://api.", "oauth-openshift.apps."), "https", "")
-  oauth_ip                     = var.lbs_ips
+  openshift_machine_config_url = replace(replace(var.openshift_api_url, ":6443", ""), "://api.", "://api-int.")
+
+  ignition = {
+    openshift_machine_config_url = local.openshift_machine_config_url
+  }
 
   # you must use the api-int url so the bastion routes over the correct interface.
   helpernode_vars = {
@@ -91,19 +92,25 @@ resource "null_resource" "config" {
   }
 
   provisioner "file" {
-    content     = templatefile("${path.module}/templates/inventory.tpl", local.helpernode_inventory)
+    content     = templatefile("${path.module}/templates/inventory.tftpl", local.helpernode_inventory)
     destination = "ocp4-upi-compute-powervs/support/inventory"
   }
 
   provisioner "file" {
-    content     = templatefile("${path.module}/templates/vars.yaml.tpl", local.helpernode_vars)
+    content     = templatefile("${path.module}/templates/vars.yaml.tftpl", local.helpernode_vars)
     destination = "ocp4-upi-compute-powervs/support/vars/vars.yaml"
   }
 
-  # Copies the custom route for env3
+  # Copies the custom route script
   provisioner "file" {
-    content     = templatefile("${path.module}/templates/route-env.sh.tpl", local.cidrs)
+    content     = templatefile("${path.module}/templates/route-env.sh.tftpl", local.cidrs)
     destination = "ocp4-upi-compute-powervs/support/route-env.sh"
+  }
+
+  # Copies the custom route script
+  provisioner "file" {
+    content     = templatefile("${path.module}/templates/ignition.sh.tftpl", local.ignition)
+    destination = "ocp4-upi-compute-powervs/support/ignition.sh"
   }
 
   # Dev Note: need to move the route script to the right location
@@ -111,7 +118,7 @@ resource "null_resource" "config" {
     inline = [<<EOF
 cd ocp4-upi-compute-powervs/support
 chmod +x ./route-env.sh
-./route-env.sh 
+./route-env.sh
 
 echo 'Running ocp4-upi-compute-powervs playbook...'
 mkdir -p /root/.openshift
@@ -136,12 +143,7 @@ resource "null_resource" "config_login" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-echo "Update hosts file with OAuth Details"
-if !(grep -q "${local.oauth_ip}" /etc/hosts); then
-        echo "${local.oauth_ip} ${local.oauth_hostname} oauth-openshift" >> /etc/hosts
-fi
-oc login \
-  "${local.openshift_machine_config_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
+oc login "${var.openshift_api_url}" -u "${var.openshift_user}" -p "${var.openshift_pass}" --insecure-skip-tls-verify=true
 EOF
     ]
   }
@@ -231,21 +233,9 @@ resource "null_resource" "adjust_mtu" {
     timeout     = "${var.connection_timeout}m"
   }
 
-  # The mtu.network.to was originally targetting 9000, and has been moved to ${var.cluster_network_mtu} (Default 1350) based on the VPC/IBM Cloud configurations. User can override it by setting desired value in var.tfvars file
-  # we previously supported OpenShiftSDN since it's deprecation we have removed it from automation.
   provisioner "remote-exec" {
     inline = [<<EOF
-EXISTING_MTU=$(oc get network cluster -o json | jq -r .status.clusterNetworkMTU)
-
-if [ $EXISTING_MTU != ${var.cluster_network_mtu} ]
-then
-  echo "Setting clusterNetworkMTU to ${var.cluster_network_mtu}"
-  echo "Patch command output is:"
-  oc patch Network.operator.openshift.io cluster --type=merge --patch \
-    '{"spec": { "migration": { "mtu": { "network": { "from": '$EXISTING_MTU', "to": ${var.cluster_network_mtu} } , "machine": { "to" : ${var.private_network_mtu}} } } } }'
-else
-  echo "clusterNetworkMTU is already set to ${var.cluster_network_mtu}"
-fi
+echo "Skipping the MTU adjustment"
 EOF
     ]
   }
@@ -331,56 +321,10 @@ resource "null_resource" "wait_on_mcp" {
   # Dev Note: added hardening to the MTU wait, we wait for the condition and then fail
   provisioner "remote-exec" {
     inline = [<<EOF
-echo "-diagnostics-"
-oc get network cluster -o yaml | grep -i mtu
+echo "-start - diagnostics for network and mtu-"
+oc get network cluster -o json | jq -r '.status | .clusterNetworkMTU, .migration?'
 oc get mcp
-
-echo 'verifying worker mc'
-start_counter=0
-timeout_counter=10
-mtu_output=`oc get mc 00-worker -o yaml | grep TARGET_MTU=${var.private_network_mtu}`
-echo "(DEBUG) MTU FOUND?: $${mtu_output}"
-# While loop waits for TARGET_MTU=${var.private_network_mtu} till timeout has not reached 
-while [[ "$(oc get network cluster -o yaml | grep 'to: ${var.private_network_mtu}' | awk '{print $NF}')" != "${var.private_network_mtu}" ]]
-do
-  echo "waiting on worker"
-  sleep 30
-done
-
-# Check clusterNetworkMTU
-cl_network_mtu=$(oc get network cluster -o json | jq -r .status.clusterNetworkMTU)
-echo "(DEBUG) clusterNetworkMTU FOUND?: $${cl_network_mtu}"
-
-# While loop waits for clusterNetworkMTU=var.cluster_network_mtu (Default 1350) till timeout has not reached
-while [[ "$(oc get network cluster -o json | jq -r .status.clusterNetworkMTU)" != "${var.cluster_network_mtu}" ]]
-do
-  echo "waiting for clusterNetworkMTU to be ${var.cluster_network_mtu}"
-  sleep 30
-
-  start_counter=$(expr $start_counter + 1)
-
-  # Break the loop if timeout occurs
-  if [ $start_counter -gt $timeout_counter ]
-  then
-    echo "exceeding the loop timeout: $${start_counter}"
-    break
-  fi
-done
-
-RENDERED_CONFIG=$(oc get mcp/worker -o json | jq -r '.spec.configuration.name')
-CHECK_CONFIG=$(oc get mc $${RENDERED_CONFIG} -ojson 2>&1 | grep TARGET_MTU=${var.private_network_mtu})
-while [ -z "$${CHECK_CONFIG}" ]
-do
-  echo "waiting on worker"
-  sleep 30
-  RENDERED_CONFIG=$(oc get mcp/worker -o json | jq -r '.spec.configuration.name')
-  CHECK_CONFIG=$(oc get mc $${RENDERED_CONFIG} -ojson 2>&1 | grep TARGET_MTU=${var.private_network_mtu})
-done
-
-echo '-checking mtu-'
-oc get network cluster -o yaml | grep 'to: ${var.private_network_mtu}' | awk '{print $NF}'
-[[ "$(oc get network cluster -o yaml | grep 'to: ${var.private_network_mtu}' | awk '{print $NF}')" == "${var.private_network_mtu}" ]] || false
-echo "success on wait on mtu change"
+echo "-done - diagnostics for network and mtu-"
 EOF
     ]
   }
@@ -388,7 +332,7 @@ EOF
 
 # Dev Note: do this as the last step so we get a good worker ignition file downloaded.
 resource "null_resource" "latest_ignition" {
-  depends_on = [null_resource.wait_on_mcp]
+  depends_on = [null_resource.wait_on_mcp, null_resource.config_login]
   connection {
     type        = "ssh"
     user        = var.rhel_username
@@ -400,10 +344,10 @@ resource "null_resource" "latest_ignition" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-nmcli device up env3
 echo 'Running ocp4-upi-compute-powervs playbook for ignition...'
 cd ocp4-upi-compute-powervs/support
-ANSIBLE_LOG_PATH=/root/.openshift/ocp4-upi-compute-powervs-support.log ansible-playbook -e @vars/vars.yaml tasks/ignition.yml --become
+chmod +x ./ignition.sh
+./ignition.sh
 EOF
     ]
   }

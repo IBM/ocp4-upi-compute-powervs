@@ -6,3 +6,7 @@
 output "bastion_private_ip" {
   value = local.ignition_ip
 }
+
+output "worker_objects" {
+  value = ibm_pi_instance.worker
+}

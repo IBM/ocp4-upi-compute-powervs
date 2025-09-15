@@ -107,3 +107,6 @@ then
   echo "Supplied Worker/s with prefix: '${MACHINE_PREFIX}' are Ready."
   oc get nodes -l 'kubernetes.io/arch=ppc64le' --no-headers=true | grep "${MACHINE_PREFIX}"
 fi
+
+echo ": Show the machineconfigpool/worker :"
+oc get mcp worker

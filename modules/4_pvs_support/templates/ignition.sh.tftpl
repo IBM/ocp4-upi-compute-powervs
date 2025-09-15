@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+################################################################
+# Copyright 2025 - IBM Corporation. All rights reserved
+# SPDX-License-Identifier: Apache-2.0
+################################################################
+
+# verify and restore
+verify_and_restore() {
+    echo ":Verify the ignition file exists:"
+    if [ -f /var/www/html/ignition/worker.ign ]
+    then
+        echo ":Make ignition file readable through the www dir:"
+        chown -R apache:apache /var/www || true
+        chmod -R u+rwx,g-rx,o-rx /var/www || true
+        echo ""
+
+        echo ":Best effort SELinux repair - Apache:"
+        restorecon -vR /var/www/html/ignition || true
+        echo ""
+        exit 0
+    fi
+}
+
+echo ":Delete ignition directory:"
+rm -f /var/www/html/ignition || true
+
+echo ":Create Apache directories for installing:"
+mkdir -p /var/www/html/ignition
+chmod -R 755 /var/www/html/ignition
+
+echo ":Disable fcontext:"
+semanage fcontext -a -t httpd_sys_rw_content_t /var/www/html/ignition/worker.ign || true
+
+echo ":Download the Ignition file:"
+for IDX in $(seq 0 4)
+do
+    echo ":Downloading the ignition file:"
+    curl -L -k https://${openshift_machine_config_url}:22623/config/worker \
+        -H "Accept: application/vnd.coreos.ignition+json;version=3.2.0" \
+        -o /var/www/html/ignition/worker.ign
+    verify_and_restore
+
+    echo ":sleeping for 30:"
+    sleep 30
+done
+echo ""
+
+echo ":Check for IPs the Ignition file via IP:"
+oc get nodes -l node-role.kubernetes.io/control-plane -owide --no-headers
+echo ""
+
+echo "Download the Ignition file via IP"
+oc get nodes -l node-role.kubernetes.io/control-plane -owide --no-headers \
+    | awk '{print $6}' \
+    | head -n1 \
+    | timeout 30 xargs -I xyz curl -k https://xyz:22623/config/worker \
+        -H 'Accept: application/vnd.coreos.ignition+json;version=3.2.0' \
+        -v -o /var/www/html/ignition/worker.ign
+echo ""
+verify_and_restore
+
+echo "Download the Ignition file via 'oc'"
+oc extract -n openshift-machine-api secret/master-user-data --keys=userData --to=- \
+    > /var/www/html/ignition/worker.ign
+echo ""
+verify_and_restore

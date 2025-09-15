@@ -1,5 +1,5 @@
 ################################################################
-# Copyright 2023 - IBM Corporation. All rights reserved
+# Copyright 2025 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
 
@@ -249,8 +249,14 @@ variable "rhcos_kernel_options" {
 
 variable "powervs_machine_cidr" {
   type        = string
-  description = "PowerVS DHCP Network cidr eg. 192.168.200.0/24"
+  description = "PowerVS Network cidr eg. 192.168.200.0/24"
   default     = "192.168.200.0/24"
+}
+
+variable "powervs_network_name" {
+  type        = string
+  description = "overrides network creation for a specific network"
+  default     = "ocp-net"
 }
 
 ################################################################
@@ -406,7 +412,7 @@ variable "node_labels" {
 
 variable "enable_snat" {
   type        = bool
-  description = "Enables SNAT on the DHCP service"
+  description = "Enables SNAT on the service"
   default     = true
 }
 
@@ -544,8 +550,7 @@ variable "cicd_etcd_secondary_disk" {
 }
 
 ################################################################
-# Overrides the dhcp network, transit gateway creation from a 
-# PowerVS perspective.
+# Manages transit gateway creation from a PowerVS perspective.
 ################################################################
 
 variable "setup_transit_gateway" {
@@ -557,11 +562,5 @@ variable "setup_transit_gateway" {
 variable "transit_gateway_name" {
   type        = string
   description = "uses an existing transit gateway"
-  default     = ""
-}
-
-variable "override_network_name" {
-  type        = string
-  description = "overrides network creation for a specific dhcp network"
   default     = ""
 }

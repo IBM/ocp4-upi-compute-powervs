@@ -30,7 +30,7 @@ resource "ibm_is_instance" "supp_vm_vsi" {
     security_groups = [var.sg_id, var.cp_internal_sg_id]
   }
 
-  user_data = templatefile("${path.cwd}/modules/1_vpc_support/4_vsi/templates/cloud-init.yaml.tpl", {})
+  user_data = templatefile("${path.cwd}/modules/1_vpc_support/4_vsi/templates/cloud-init.yaml.tftpl", {})
 
   lifecycle {
     ignore_changes = [image]

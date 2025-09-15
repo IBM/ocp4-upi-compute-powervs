@@ -1,0 +1,8 @@
+interface=eth1
+except-interface=lo
+bind-dynamic
+log-dhcp
+
+dhcp-range=${range_start_ip},${range_end_ip},${mask}
+dhcp-option=option:classless-static-route,0.0.0.0/0,${gw}
+dhcp-hostsfile=/var/lib/dnsmasq/dnsmasq.hostsfile
