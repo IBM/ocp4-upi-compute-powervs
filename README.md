@@ -18,6 +18,7 @@ The bastion must be RHEL9 equivalent or higher.
 ## Important Notes
 1. The Automation Supports OVN-Kube networks only.
 2. The terraform code deploys a dhcp sever on the bastion node.
+3. The VPC support system uses `vpcuser` to connect.
 
 ## Commands
 
