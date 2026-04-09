@@ -10,7 +10,7 @@ The [`ocp4-upi-compute-powervs` project](https://github.com/ibm/ocp4-upi-compute
 2. A IBM Cloud Workspace for Power Virtual Server on IBM Cloud that supports [Power Edge Router](https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-per). If your workspace supports s922,s1022,e980,e1080, you'll have to update the var.tfvars to the supported `system_type`.
 3. An RHCOS Image loaded to the PowerVS Service
 4. An IBM Cloud Transit Gateway connecting the IBM Cloud to your IBM Cloud VPC. The connections must be established.
-5. Optional: An CentOS Stream 9 Image loaded to the PowerVS Service
+5. Optional: An CentOS Stream 10 Image loaded to the PowerVS Service
 6. An Existing OpenShift Container Platform Cluster installed on IBMCloud VPC with Intel architecture.
 
 The bastion must be RHEL9 equivalent or higher.

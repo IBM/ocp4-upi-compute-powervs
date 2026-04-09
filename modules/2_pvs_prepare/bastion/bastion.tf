@@ -199,7 +199,7 @@ resource "null_resource" "enable_repos" {
 # Additional repo for installing ansible package
 if ( [[ -z "${var.rhel_subscription_username}" ]] || [[ "${var.rhel_subscription_username}" == "<subscription-id>" ]] ) && [[ -z "${var.rhel_subscription_org}" ]]
 then
-  # Centos9 uses https://mirrormanager.fedoraproject.org/mirrors/CentOS
+  # Centos10 uses https://mirrormanager.fedoraproject.org/mirrors/CentOS
   timeout 300 bash -c -- 'until ping -c 1 mirrormanager.fedoraproject.org; do sleep 30; printf ".";done'
   sudo yum install -y epel-release
 else
