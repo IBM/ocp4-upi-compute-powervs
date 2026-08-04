@@ -21,6 +21,7 @@ resource "ibm_pi_instance" "worker" {
   pi_memory     = var.worker["memory"]
   pi_processors = var.worker["processors"]
   pi_image_id   = var.rhcos_image_id
+  pi_storage_type = "tier0"
 
   pi_network {
     network_id = var.powervs_network_id
