@@ -339,9 +339,12 @@ EOF
   # Identifies the networks, and picks the iface that is on the private network
   provisioner "remote-exec" {
     inline = [<<EOF
+      set +x
       sudo systemctl unmask NetworkManager
       DEV_NAME=$(find /sys/class/net -mindepth 1 -maxdepth 1 ! -name lo ! -name '*bond*' -printf "%P " -execdir cat {}/address \; | \
           grep -v lo | grep -v env2 | awk '{print $1}' | head -n 1)
+
+      echo "DEV_NAME: $${DEV_NAME}"
 
       nmcli dev mod $${DEV_NAME} ipv4.addresses ${local.int_ip}/${local.mask} \
         ipv4.gateway ${local.gw} \
@@ -351,7 +354,8 @@ EOF
         802-3-ethernet.mtu ${var.private_network_mtu}
       sed -i "s|IPADDR=.*|IPADDR=${local.int_ip}|g" /etc/sysconfig/network-scripts/ifcfg-$${DEV_NAME}
       sed -i "s|BOOTPROTO=.*|BOOTPROTO=static|g" /etc/sysconfig/network-scripts/ifcfg-$${DEV_NAME}
-      nmcli dev up $${DEV_NAME}
+
+      systemctl restart NetworkManager
 
       echo $${DEV_NAME} > /root/interface-name
   EOF
