@@ -187,7 +187,7 @@ rhel_image_name  = "${RHEL_IMAGE_NAME}"
 
 # Using the oldest image to support importing.
 # rhcos_image_name = "${COREOS_NAME}"
-rhcos_image_name = "rhel-coreos"
+rhcos_image_name = "RHEL-CoreOS-9"
 public_key_file  = "data/id_rsa.pub"
 private_key_file = "data/id_rsa"
 
