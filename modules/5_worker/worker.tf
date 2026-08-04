@@ -16,11 +16,11 @@ resource "ibm_pi_instance" "worker" {
   pi_cloud_instance_id = var.powervs_service_instance_id
   pi_instance_name     = "${var.name_prefix}-worker-${count.index}"
 
-  pi_sys_type   = var.system_type
-  pi_proc_type  = var.processor_type
-  pi_memory     = var.worker["memory"]
-  pi_processors = var.worker["processors"]
-  pi_image_id   = var.rhcos_image_id
+  pi_sys_type     = var.system_type
+  pi_proc_type    = var.processor_type
+  pi_memory       = var.worker["memory"]
+  pi_processors   = var.worker["processors"]
+  pi_image_id     = var.rhcos_image_id
   pi_storage_type = "tier0"
 
   pi_network {
