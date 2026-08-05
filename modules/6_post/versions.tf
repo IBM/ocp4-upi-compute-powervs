@@ -11,7 +11,7 @@ terraform {
     }
     ibm = {
       source  = "IBM-Cloud/ibm"
-      version = "~> 2.4.0"
+      version = "~> 2.5.0"
     }
   }
   required_version = ">= 1.5.0"
