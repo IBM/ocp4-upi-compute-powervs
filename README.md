@@ -1,26 +1,29 @@
 # ocp4-upi-compute-powervs
 
-The [`ocp4-upi-compute-powervs` project](https://github.com/ibm/ocp4-upi-compute-powervs) provides Terraform based automation code to help with the deployment of OpenShift Container Platform (OCP) 4.x compute workers on [IBM® Power Systems™ Virtual Server on IBM Cloud](https://www.ibm.com/cloud/power-virtual-server).
+The [`ocp4-upi-compute-powervs` project](https://github.com/ibm/ocp4-upi-compute-powervs) provides Terraform based automation code to help with the deployment of OpenShift Container Platform (OCP) compute workers on [IBM® Power Systems™ Virtual Server on IBM Cloud](https://www.ibm.com/cloud/power-virtual-server).
 
-*Warning* Active code updates in progress to make the code base more resilient.
+*Warning* Active code updates in progress to make the code base function more efficiently as part of the Intel Control Plane with Power and Intel workers ci. Consult the documentation for the latest approved versions.
+
+v1 is left for compatibility reasons.
+v2 is the preferred branch.
 
 ## Prerequisites
 
-1. Requires Terraform v1.5.0 to v1.5.5. You may use the alternative [OpenTofu](https://opentofu.org/docs/intro/install/).
-2. A IBM Cloud Workspace for Power Virtual Server on IBM Cloud that supports [Power Edge Router](https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-per). If your workspace supports s922,s1022,e980,e1080, you'll have to update the var.tfvars to the supported `system_type`.
-3. An RHCOS Image loaded to the PowerVS Service
+1. Requires Terraform v1.14 or higher
+2. A IBM Cloud Workspace for Power Virtual Server on IBM Cloud that supports [Power Edge Router](https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-per). If your workspace supports `s1022`, `e1080`, you'll have to update the var.tfvars to the supported `system_type`.
+3. An RHCOS Image loaded to the PowerVS workspace service.
 4. An IBM Cloud Transit Gateway connecting the IBM Cloud to your IBM Cloud VPC. The connections must be established.
-5. Optional: An CentOS Stream 10 Image loaded to the PowerVS Service
-6. An Existing OpenShift Container Platform Cluster installed on IBMCloud VPC with Intel architecture.
-
-The bastion must be RHEL9 equivalent or higher.
+5. An Existing OpenShift Container Platform Cluster installed on IBMCloud VPC with Intel architecture.
 
 ## Important Notes
+
 1. The Automation Supports OVN-Kube networks only.
 2. The terraform code deploys a dhcp sever on the bastion node.
 3. The VPC support system uses `vpcuser` to connect.
 
 ## Commands
+
+Change to the `v2` directory. `v1` is maintained for backwards compatibility.
 
 ### Init 
 
@@ -51,15 +54,6 @@ Note: The PowerVS and IBMCloud VPC regions must be compatible.
 ```
 ❯ terraform destroy -var-file=data/var.tfvars
 ```
-
-Note, the `destroy` command removes the Node resource, removes the NFS deployment, and destroys the virtual servers. Please backup your NFS Server first - it is destroyed.
-
-## Cluster Details
-
-There are some important points to mention:
-
-1. The Power Bastion no longer uses an https proxy to forward requests to the Cluster's internal api load balancer. This setting is removed.
-2. NFS is used as the storage provider across nodes.
 
 ## Running Automation from another IBMCloud VPC
 
@@ -102,12 +96,13 @@ If you would like to see the detailed LICENSE click [here](LICENSE).
 
 ```text
 #
-# Copyright 2025 - IBM Corporation. All rights reserved
+# Copyright 2026 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 #
 ```
 
 # Support
-Is this a Red Hat or IBM supported solution?
 
-Multi-Arch Compute with an Intel Control Plane and Intel/Power compute is not supported - Installer-Provisioned Infrastructure and User Provisioned nodes are not supported.
+*Question: Is this a Red Hat or IBM supported solution?*
+
+Multi-Arch Compute with an Installer Provisioned Infrastructure control plane on IBM Cloud (Intel Control Plane and Intel/Power compute) is not supported with a User-Provisioned Infrastructure worker - Installer-Provisioned Infrastructure and User Provisioned nodes are not supported.

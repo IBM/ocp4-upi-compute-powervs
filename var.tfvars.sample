@@ -1,0 +1,100 @@
+################################################################
+# Copyright 2026 - IBM Corporation. All rights reserved
+# SPDX-License-Identifier: Apache-2.0
+#
+# Sample variable definitions for the v2 standalone worker root.
+# Copy this file to var.tfvars and fill in your values:
+#   terraform init
+#   terraform apply -var-file=var.tfvars
+################################################################
+
+################################################################
+# IBM Cloud authentication
+################################################################
+
+ibmcloud_api_key = "<your-ibmcloud-api-key>"
+
+################################################################
+# PowerVS workspace location
+################################################################
+
+# GUID of the PowerVS workspace (service instance)
+powervs_service_instance_id = "<workspace-guid>"
+
+# Region and zone of the PowerVS workspace
+# Find available regions: https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-regions
+powervs_region = "us-south"
+powervs_zone   = "us-south"
+
+################################################################
+# SSH key and naming
+################################################################
+
+# Name of an SSH key already registered in the PowerVS workspace
+key_name = "<powervs-ssh-key-name>"
+
+# Prefix applied to all resource names (max 32 characters)
+name_prefix = "my-cluster"
+
+################################################################
+# Pre-existing PowerVS network resources
+################################################################
+
+# ID of the existing PowerVS network to attach workers to
+powervs_network_id = "<network-id>"
+
+# Name of the existing bastion instance in the PowerVS workspace
+powervs_bastion_name = "<bastion-instance-name>"
+
+# CIDR of the PowerVS network. Host 3 is used as the ignition server IP.
+powervs_machine_cidr = "192.168.200.0/24"
+
+################################################################
+# Worker instance configuration
+################################################################
+
+# Processor mode: shared or dedicated
+processor_type = "shared"
+
+# PowerVS machine type: s922, e980, s1022, or s1080
+system_type = "s922"
+
+# ID of the RHCOS image already imported into the PowerVS workspace
+rhcos_image_id = "<rhcos-image-id>"
+
+# Worker count, memory (GiB), and processor count
+worker = {
+  count      = 2
+  memory     = "16"
+  processors = "1"
+}
+
+################################################################
+# Ignition / bastion connectivity
+################################################################
+
+# MAC address of the bastion's private network interface
+ignition_mac = "<bastion-private-mac>"
+
+# Bastion private IP used as the ignition server.
+# Leave as "" to automatically derive from powervs_machine_cidr (host 3).
+ignition_ip = ""
+
+# Public IP of the bastion instance
+bastion_public_ip = "<bastion-public-ip>"
+
+################################################################
+# SSH connectivity
+################################################################
+
+# Path to the private SSH key that matches the registered key_name
+private_key_file = "data/id_rsa"
+
+# Set to true to enable SSH agent forwarding
+ssh_agent = false
+
+################################################################
+# CI/CD (leave false for normal use)
+################################################################
+
+cicd = false

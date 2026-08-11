@@ -2,6 +2,8 @@
 _debug
 **/.terraform/*
 _scratch
+data/*
+*.tfvars
 
 # .tfstate files
 *.tfstate

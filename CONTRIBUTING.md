@@ -17,7 +17,7 @@ Please note we have a [code of conduct](https://github.com/IBM/ocp4-upi-compute-
  - Update the README.md or relevant documents with details of changes to the code. This includes variables change, added or updated feature, change in steps, dependencies change, etc.
  - Make use of proper commit message. Mention the issue# which you are planning to address eg: Fixes #38.
  - After creating the pull request ensure you implement all the review comments given if any. Pull request will be merged only when it has at least two approvals from the list of reviewers.
- - Please read [Developer Certificate of Origin](https://github.com/IBM/ocp4-upi-compute-powervs/blob/main/DCO1.1.txt) and sign-off your commit using command `git commit -s`.
+ - Please read [Developer Certificate of Origin](https://github.com/IBM/ocp4-upi-compute-powervs/blob/main/DCO1.1.txt) and sign-off and sign your commit using command `git commit -s -S -m "semantic message"`.
 
 # Spec Formatting Conventions
 Documents in this repository will adhere to the following rules:

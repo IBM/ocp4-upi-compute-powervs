@@ -1,22 +1,12 @@
 ################################################################
-# Copyright 2025 - IBM Corporation. All rights reserved
+# Copyright 2026 - IBM Corporation. All rights reserved
 # SPDX-License-Identifier: Apache-2.0
 ################################################################
-
-# *Design Note*
-# Global variables are prefixed with ibmcloud_
-# PowerVS variables are prefixed with powervs_
-# VPC variables are prefixed with vpc_
 
 variable "ibmcloud_api_key" {
   type        = string
   description = "IBM Cloud API key associated with user's identity"
-  default     = "<key>"
-
-  validation {
-    condition     = var.ibmcloud_api_key != "<key>"
-    error_message = "The api key is empty, check that the -var-file= is set properly"
-  }
+  sensitive   = true
 }
 
 ################################################################
@@ -25,542 +15,139 @@ variable "ibmcloud_api_key" {
 
 variable "powervs_service_instance_id" {
   type        = string
-  description = "The PowerVS service instance ID of your account"
+  description = "The PowerVS service instance ID (workspace GUID)"
   default     = ""
 }
 
 variable "powervs_region" {
   type        = string
-  description = "The IBM Cloud region where you want to create the workers"
+  description = "The IBM Cloud region of the PowerVS workspace (e.g. us-south)"
   default     = ""
 }
 
 variable "powervs_zone" {
   type        = string
-  description = "The zone of an IBM Cloud region where you want to create Power System workers"
+  description = "The zone of the IBM Cloud region for the PowerVS workspace (e.g. us-south)"
   default     = ""
 }
 
 ################################################################
-# Configure the IBM VPC provider
+# SSH key and naming
 ################################################################
 
-variable "vpc_name" {
+variable "key_name" {
   type        = string
-  description = "The name of an IBM Cloud VPC where OCP cluster is running"
-  default     = ""
+  description = "Name of the SSH key already registered in the PowerVS workspace"
 }
 
-variable "vpc_region" {
-  type        = string
-  description = "The region of an IBM Cloud VPC where OCP cluster is running"
-  default     = ""
-}
-
-variable "vpc_zone" {
-  type        = string
-  description = "The zone of an IBM Cloud VPC where OCP cluster is running"
-  default     = ""
-}
-
-################################################################
-# The OpenShift Cluster details
-################################################################
-
-variable "openshift_api_url" {
-  type        = string
-  description = "The API URL of the OpenShift Cluster"
-  default     = "https://api.example.ocp-multiarch.xyz:6443"
-}
-
-variable "openshift_user" {
-  type        = string
-  description = "The user of the OpenShift Cluster"
-  default     = ""
-}
-
-variable "openshift_pass" {
-  type        = string
-  description = "The pass of the OpenShift Cluster"
-  default     = ""
-}
-
-variable "kubeconfig_file" {
-  type        = string
-  description = "Path to kubeconfig file"
-  default     = "data/kubeconfig"
-  # if empty, will default to ${path.cwd}/data/kubeconfig
-}
-
-################################################################
-# The PowerVS Instance configuration settings
-################################################################
-
-variable "processor_type" {
-  type        = string
-  description = "The type of processor mode (shared/dedicated)"
-  default     = "shared"
-}
-
-# Reference https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-about-virtual-server
-# The default is s922.
-variable "system_type" {
-  type        = string
-  description = "The type of system (s922/e980/s1022/s1080)"
-  default     = "s922"
-}
-
-################################################################
-# Configure the PowerVS instance bastion details
-################################################################
-
-variable "bastion" {
-  type = object({ count = number, memory = string, processors = string })
-  default = {
-    count      = 1
-    memory     = "16"
-    processors = "1"
-  }
-  validation {
-    condition     = lookup(var.bastion, "count", 1) >= 1 && lookup(var.bastion, "count", 1) <= 2
-    error_message = "The bastion.count value must be either 1 or 2."
-  }
-}
-
-variable "bastion_health_status" {
-  type        = string
-  description = "Specify if bastion should poll for the Health Status to be OK or WARNING. Default is OK."
-  default     = "WARNING"
-  validation {
-    condition     = contains(["OK", "WARNING"], var.bastion_health_status)
-    error_message = "The bastion_health_status value must be either OK or WARNING."
-  }
-}
-
-# Centos default is CentOS-Stream-10
-variable "rhel_image_name" {
-  type        = string
-  description = "Name of the RHEL or Centos image that you want to use for the bastion node"
-  default     = "CentOS-Stream-10"
-}
-
-variable "rhel_username" {
-  type    = string
-  default = "root"
-}
-
-variable "rhel_subscription_username" {
-  type    = string
-  default = ""
-}
-
-variable "rhel_subscription_password" {
-  type    = string
-  default = ""
-}
-
-variable "rhel_subscription_org" {
-  type    = string
-  default = ""
-}
-
-variable "rhel_subscription_activationkey" {
-  type    = string
-  default = ""
-}
-
-# SMT level is 8 which is the maximum.
-variable "rhel_smt" {
-  type        = number
-  description = "SMT value to set on the bastion node. Eg: on,off,2,4,8"
-  default     = 8
-}
-
-################################################################
-# Configure the PowerVS workers to be added to the compute plane
-################################################################
-
-variable "worker" {
-  default = {
-    count      = 1
-    memory     = "16"
-    processors = "1"
-  }
-  type        = object({ count = number, memory = string, processors = string })
-  description = "The worker configuration details. You may have 0 or more workers"
-  validation {
-    condition     = lookup(var.worker, "count", 1) >= 0
-    error_message = "The worker.count value must be greater than 0."
-  }
-  nullable = false
-}
-
-################################################################
-# RHCOS PowerVS Details
-################################################################
-
-variable "rhcos_image_name" {
-  type        = string
-  description = "Name of the rhcos image that you want to use for the workers"
-  default     = "rhcos-4.14"
-}
-
-variable "rhcos_import_image" {
-  type        = bool
-  description = "Set to true to upload RHCOS image to PowerVS from Cloud Object Storage."
-  default     = false
-}
-
-variable "rhcos_import_image_filename" {
-  type        = string
-  description = "Name of the RHCOS image object file. This file is expected to be in .ova.gz format"
-  default     = "rhcos-414-92-202307050443-0-ppc64le-powervs.ova.gz"
-}
-
-variable "rhcos_import_image_storage_type" {
-  type        = string
-  description = "Storage type in PowerVS where the RHCOS image needs to be uploaded"
-  default     = "tier1"
-}
-
-variable "rhcos_import_image_region_override" {
-  type        = string
-  description = "Overrides the region used to import"
-  default     = ""
-}
-
-### RHCOS Instance Details
-
-variable "rhcos_pre_kernel_options" {
-  type        = list(string)
-  description = "List of kernel arguments for the cluster nodes that for pre-installation"
-  default     = []
-}
-
-variable "rhcos_kernel_options" {
-  type        = list(string)
-  description = "List of kernel arguments for the cluster nodes"
-  default     = []
-}
-
-################################################################
-# PowerVS Network - Networking
-################################################################
-
-variable "powervs_machine_cidr" {
-  type        = string
-  description = "PowerVS Network cidr eg. 192.168.200.0/24"
-  default     = "192.168.200.0/24"
-}
-
-variable "powervs_network_name" {
-  type        = string
-  description = "overrides network creation for a specific network"
-  default     = "ocp-net"
-}
-
-################################################################
-### OpenShift variables
-################################################################
-
-variable "openshift_client_tarball" {
-  type    = string
-  default = "https://mirror.openshift.com/pub/openshift-v4/multi/clients/ocp/stable/ppc64le/openshift-client-linux.tar.gz"
-}
-
-variable "release_image_override" {
-  type    = string
-  default = ""
-}
-
-# Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character
-variable "cluster_domain" {
-  type        = string
-  default     = "ibm.com"
-  description = "Domain name to use to setup the cluster. A DNS Forward Zone should be a registered in IBM Cloud if use_ibmcloud_services = true"
-
-  validation {
-    condition     = can(regex("^[a-z0-9]+[a-zA-Z0-9_\\-.]*[a-z0-9]+$", var.cluster_domain))
-    error_message = "The cluster_domain value must be a lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character."
-  }
-}
-# Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character
-# Should not be more than 14 characters
-variable "cluster_id_prefix" {
-  type    = string
-  default = "test-ocp"
-
-  validation {
-    condition     = can(regex("^$|^[a-z0-9]+[a-zA-Z0-9_\\-.]*[a-z0-9]+$", var.cluster_id_prefix))
-    error_message = "The cluster_id_prefix value must be a lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character."
-  }
-
-  validation {
-    condition     = length(var.cluster_id_prefix) <= 14
-    error_message = "The cluster_id_prefix value shouldn't be greater than 14 characters."
-  }
-}
-# Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character
-# Length cannot exceed 14 characters when combined with cluster_id_prefix
-variable "cluster_id" {
-  type    = string
-  default = ""
-
-  validation {
-    condition     = can(regex("^$|^[a-z0-9]+[a-zA-Z0-9_\\-.]*[a-z0-9]+$", var.cluster_id))
-    error_message = "The cluster_id value must be a lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character."
-  }
-
-  validation {
-    condition     = length(var.cluster_id) <= 14
-    error_message = "The cluster_id value shouldn't be greater than 14 characters."
-  }
-}
-
-variable "use_zone_info_for_names" {
-  type        = bool
-  default     = true
-  description = "Add zone info to instance name or not"
-}
-
-variable "cluster_network_mtu" {
-  type        = number
-  description = "MTU value for the OCP cluster network"
-  default     = 1350
-}
-################################################################
-# Additional Settings
-################################################################
-variable "ssh_agent" {
-  type        = bool
-  description = "Enable or disable SSH Agent. Can correct some connectivity issues. Default: false"
-  default     = false
-}
-
-variable "connection_timeout" {
-  description = "Timeout in minutes for SSH connections"
-  default     = 30
-}
-
-variable "helpernode_repo" {
-  type        = string
-  description = "Set the repo URL for using ocp4-helpernode"
-  default     = "https://github.com/redhat-cop/ocp4-helpernode"
-  # Repo for running ocp4 installations steps.
-}
-
-variable "helpernode_tag" {
-  type        = string
-  description = "Set the branch/tag name or commit# for using ocp4-helpernode repo"
-  default     = "adb1102f64b2f25a8a1b44a96c414f293d72d3fc"
-  # Checkout level for var.helpernode_repo which is used for setting up services required on bastion node
-}
-
-variable "install_playbook_repo" {
-  type        = string
-  description = "Set the repo URL for using ocp4-playbooks"
-  default     = "https://github.com/ocp-power-automation/ocp4-playbooks"
-  # Repo for running ocp4 installations steps.
-}
-
-variable "install_playbook_tag" {
-  type        = string
-  description = "Set the branch/tag name or commit# for using ocp4-playbooks repo"
-  default     = "main"
-  # Checkout level for var.install_playbook_repo which is used for running ocp4 installations steps
-}
-
-variable "ansible_extra_options" {
-  type        = string
-  description = "Extra options string to append to ansible-playbook commands"
-  default     = "-v"
-}
-
-variable "public_network_mtu" {
-  type        = number
-  description = "MTU value for the private network interface on RHEL and RHCOS nodes"
-  default     = 1450
-}
-
-variable "private_network_mtu" {
-  type        = number
-  description = "MTU value for the private network interface on RHEL and RHCOS nodes"
-  default     = 1450
-}
-
-variable "installer_log_level" {
-  type        = string
-  description = "Set the log level required for openshift-install commands"
-  default     = "info"
-}
-
-variable "public_key_name" {
-  type    = string
-  default = "<none>"
-}
-
-variable "powervs_dns_forwarders" {
-  type    = string
-  default = "8.8.8.8;8.8.4.4"
-}
-
-variable "node_labels" {
-  type        = map(string)
-  description = "Map of node labels for the cluster nodes"
-  default     = {}
-}
-
-variable "enable_snat" {
-  type        = bool
-  description = "Enables SNAT on the service"
-  default     = true
-}
-
-variable "nfs_server" {
-  type        = string
-  description = "IP address of existing NFS Server"
-  default     = "none"
-}
-
-variable "nfs_path" {
-  type        = string
-  description = "Path on NFS Server where storage is mounted"
-  default     = "/export"
-}
-
-variable "remove_nfs_deployment" {
-  type        = bool
-  description = "Removes the NFS deployment running in nfs-provisioner Namespace"
-  default     = false
-}
-
-variable "skip_vpc_key" {
-  type        = bool
-  description = "Flag to skip creation of key in VPC"
-  default     = false
-}
-
-##########################################
-
-variable "public_key_file" {
-  type        = string
-  description = "Path to public key file"
-  default     = "data/id_rsa.pub"
-  # if empty, will default to ${path.cwd}/data/id_rsa.pub
-}
-
-variable "private_key_file" {
-  type        = string
-  description = "Path to private key file"
-  default     = "data/id_rsa"
-  # if empty, will default to ${path.cwd}/data/id_rsa
-}
-
-variable "private_key" {
-  type        = string
-  description = "content of private ssh key"
-  default     = ""
-  # if empty, will read contents of file at var.private_key_file
-}
-
-variable "public_key" {
-  type        = string
-  description = "Public key"
-  default     = ""
-  # if empty, will read contents of file at var.public_key_file
-}
-
-###
 variable "name_prefix" {
-  type    = string
-  default = ""
+  type        = string
+  description = "Prefix for all provisioned resource names (max 32 chars)"
+  default     = ""
   validation {
     condition     = length(var.name_prefix) <= 32
     error_message = "Length cannot exceed 32 characters for name_prefix."
   }
 }
 
-variable "node_prefix" {
-  type    = string
-  default = ""
-  validation {
-    condition     = length(var.node_prefix) <= 32
-    error_message = "Length cannot exceed 32 characters for node_prefix."
+################################################################
+# PowerVS network (pre-existing resources)
+################################################################
+
+variable "powervs_network_id" {
+  type        = string
+  description = "ID of the existing PowerVS network to attach workers to"
+}
+
+variable "powervs_bastion_name" {
+  type        = string
+  description = "Name of the existing PowerVS bastion instance"
+}
+
+variable "powervs_machine_cidr" {
+  type        = string
+  description = "CIDR of the PowerVS network (e.g. 192.168.200.0/24). Used to derive the ignition server IP."
+  default     = "192.168.200.0/24"
+}
+
+################################################################
+# Instance configuration
+################################################################
+
+variable "processor_type" {
+  type        = string
+  description = "Processor mode for worker instances (shared/dedicated)"
+  default     = "shared"
+}
+
+variable "system_type" {
+  type        = string
+  description = "PowerVS machine type for worker instances (s922/e980/s1022/s1080)"
+  default     = "s1022"
+}
+
+variable "rhcos_image_id" {
+  type        = string
+  description = "ID of the RHCOS image already imported into the PowerVS workspace"
+}
+
+variable "worker" {
+  type        = object({ count = number, memory = string, processors = string })
+  description = "Worker instance configuration: count, memory (GiB), and processors"
+  default = {
+    count      = 1
+    memory     = "16"
+    processors = "1"
   }
-}
-
-###
-locals {
-  private_key_file = var.private_key_file == "" ? "${path.cwd}/data/id_rsa" : var.private_key_file
-  public_key_file  = var.public_key_file == "" ? "${path.cwd}/data/id_rsa.pub" : var.public_key_file
-  private_key      = var.private_key == "" ? file(coalesce(local.private_key_file, "/dev/null")) : var.private_key
-  public_key       = var.public_key == "" ? file(coalesce(local.public_key_file, "/dev/null")) : var.public_key
+  validation {
+    condition     = lookup(var.worker, "count", 1) >= 0
+    error_message = "The worker.count value must be greater than or equal to 0."
+  }
+  nullable = false
 }
 
 ################################################################
-# Overrides the Region Check
+# Ignition / bastion details
 ################################################################
 
-variable "override_region_check" {
+variable "ignition_mac" {
+  type        = string
+  description = "MAC address of the bastion's private network interface"
+}
+
+variable "ignition_ip" {
+  type        = string
+  description = "IP of the ignition server (bastion private IP). Leave empty to derive from powervs_machine_cidr host 3."
+  default     = ""
+}
+
+variable "bastion_public_ip" {
+  type        = string
+  description = "Public IP address of the bastion instance"
+}
+
+################################################################
+# SSH connectivity
+################################################################
+
+variable "private_key_file" {
+  type        = string
+  description = "Path to the private SSH key file"
+  default     = "data/id_rsa"
+}
+
+variable "ssh_agent" {
   type        = bool
-  description = "Set to true if you want to skip region checks."
+  description = "Enable SSH agent forwarding. Can correct some connectivity issues."
   default     = false
 }
 
-variable "vpc_supp_public_ip" {
-  type        = bool
-  description = "Set to true to create a public ip for the PowerVS (vpc) support machine"
-  default     = false
-}
-
 ################################################################
-# Supports the CICD features
+# CI/CD
 ################################################################
 
 variable "cicd" {
   type        = bool
-  description = "Flips on additional checks used by cicd"
+  description = "Enables additional checks used by CI/CD pipelines"
   default     = false
-}
-
-variable "mac_tags" {
-  type        = list(string)
-  description = "Tags to mac resources"
-  default     = []
-}
-
-variable "keep_dns" {
-  type        = bool
-  description = "Moves the dns pods to the Intel nodes"
-  default     = false
-}
-
-variable "cicd_disable_defrag" {
-  type        = bool
-  description = "Creates a config map 'etcd-disable-defrag' to disable the etcd defragmentation"
-  default     = false
-  # User needs to manually remove the config map to restore the settings
-}
-
-variable "cicd_etcd_secondary_disk" {
-  type        = bool
-  description = "moves etcd disk to secondary devices"
-  default     = false
-  # not for customer, cicd-only
-}
-
-################################################################
-# Manages transit gateway creation from a PowerVS perspective.
-################################################################
-
-variable "setup_transit_gateway" {
-  type        = bool
-  description = "Flag to create the new transit gateway by automation"
-  default     = false
-}
-
-variable "transit_gateway_name" {
-  type        = string
-  description = "uses an existing transit gateway"
-  default     = ""
 }
