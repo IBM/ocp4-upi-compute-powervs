@@ -5,5 +5,5 @@
 
 output "worker_objects" {
   description = "All provisioned ibm_pi_instance worker objects"
-  value       = module.worker.worker_objects
+  value       = "All provisioned ibm_pi_instance worker objects"
 }
